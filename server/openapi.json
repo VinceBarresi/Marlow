@@ -6,12 +6,7 @@
     "description": "Retail API for the Marlow shop. Sign in with POST /api/login. The session cookie is sent automatically on later requests from this page."
   },
   "servers": [{ "url": "http://127.0.0.1:4000" }],
-  "tags": [
-    { "name": "Session" },
-    { "name": "Catalog" },
-    { "name": "Cart" },
-    { "name": "Orders" }
-  ],
+  "tags": [{ "name": "Session" }, { "name": "Catalog" }, { "name": "Cart" }, { "name": "Orders" }],
   "components": {
     "securitySchemes": {
       "session": {
@@ -23,15 +18,382 @@
     "schemas": {
       "Error": {
         "type": "object",
+        "required": ["error"],
         "properties": { "error": { "type": "string" } }
+      },
+      "Ok": {
+        "type": "object",
+        "required": ["ok"],
+        "properties": { "ok": { "type": "boolean", "enum": [true] } }
+      },
+      "Health": {
+        "type": "object",
+        "required": ["ok", "postgres", "redis"],
+        "properties": {
+          "ok": { "type": "boolean" },
+          "postgres": { "type": "boolean" },
+          "redis": { "type": "boolean" }
+        }
+      },
+      "Role": {
+        "type": "string",
+        "enum": ["customer", "staff", "admin"]
+      },
+      "OrderStatus": {
+        "type": "string",
+        "enum": ["paid", "picking", "shipped", "out_for_delivery", "delivered", "cancelled"]
       },
       "User": {
         "type": "object",
+        "required": ["id", "email", "name", "role"],
         "properties": {
           "id": { "type": "string", "format": "uuid" },
           "email": { "type": "string" },
           "name": { "type": "string" },
-          "role": { "type": "string", "enum": ["customer", "staff"] }
+          "role": { "$ref": "#/components/schemas/Role" }
+        }
+      },
+      "UserResponse": {
+        "type": "object",
+        "required": ["user"],
+        "properties": { "user": { "$ref": "#/components/schemas/User" } }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "example": "customer@marlow.test" },
+          "password": { "type": "string", "example": "datalab" }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "required": [
+          "sku",
+          "name",
+          "category",
+          "description",
+          "priceCents",
+          "onHand",
+          "reserved",
+          "available"
+        ],
+        "properties": {
+          "sku": { "type": "string", "example": "BED-10331" },
+          "name": { "type": "string" },
+          "category": { "type": "string" },
+          "description": { "type": "string" },
+          "priceCents": { "type": "integer" },
+          "onHand": { "type": "integer" },
+          "reserved": { "type": "integer" },
+          "available": { "type": "integer" }
+        }
+      },
+      "ProductList": {
+        "type": "object",
+        "required": ["products", "page", "pageSize", "total"],
+        "properties": {
+          "products": { "type": "array", "items": { "$ref": "#/components/schemas/Product" } },
+          "page": { "type": "integer" },
+          "pageSize": { "type": "integer" },
+          "total": { "type": "integer" }
+        }
+      },
+      "ProductResponse": {
+        "type": "object",
+        "required": ["product"],
+        "properties": { "product": { "$ref": "#/components/schemas/Product" } }
+      },
+      "Category": {
+        "type": "object",
+        "required": ["category", "products"],
+        "properties": {
+          "category": { "type": "string" },
+          "products": { "type": "integer" }
+        }
+      },
+      "CategoryList": {
+        "type": "object",
+        "required": ["categories"],
+        "properties": {
+          "categories": { "type": "array", "items": { "$ref": "#/components/schemas/Category" } }
+        }
+      },
+      "InventoryRow": {
+        "type": "object",
+        "required": [
+          "sku",
+          "name",
+          "category",
+          "priceCents",
+          "onHand",
+          "reserved",
+          "available",
+          "reorderPoint",
+          "bin",
+          "updatedAt"
+        ],
+        "properties": {
+          "sku": { "type": "string" },
+          "name": { "type": "string" },
+          "category": { "type": "string" },
+          "priceCents": { "type": "integer" },
+          "onHand": { "type": "integer" },
+          "reserved": { "type": "integer" },
+          "available": { "type": "integer" },
+          "reorderPoint": { "type": "integer" },
+          "bin": { "type": "string" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "InventoryList": {
+        "type": "object",
+        "required": ["inventory", "page", "pageSize", "total"],
+        "properties": {
+          "inventory": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/InventoryRow" }
+          },
+          "page": { "type": "integer" },
+          "pageSize": { "type": "integer" },
+          "total": { "type": "integer" }
+        }
+      },
+      "CartItem": {
+        "type": "object",
+        "required": ["sku", "name", "priceCents", "quantity", "available", "lineTotalCents"],
+        "properties": {
+          "sku": { "type": "string" },
+          "name": { "type": "string" },
+          "priceCents": { "type": "integer" },
+          "quantity": { "type": "integer" },
+          "available": { "type": "integer" },
+          "lineTotalCents": { "type": "integer" }
+        }
+      },
+      "Cart": {
+        "type": "object",
+        "required": ["items", "subtotalCents"],
+        "properties": {
+          "items": { "type": "array", "items": { "$ref": "#/components/schemas/CartItem" } },
+          "subtotalCents": { "type": "integer" }
+        }
+      },
+      "CartItemRequest": {
+        "type": "object",
+        "required": ["sku", "quantity"],
+        "properties": {
+          "sku": { "type": "string" },
+          "quantity": { "type": "integer", "minimum": 0, "description": "Zero removes the line." }
+        }
+      },
+      "CartItemResult": {
+        "type": "object",
+        "required": ["ok", "sku", "quantity"],
+        "properties": {
+          "ok": { "type": "boolean" },
+          "sku": { "type": "string" },
+          "quantity": { "type": "integer" }
+        }
+      },
+      "CheckoutRequest": {
+        "type": "object",
+        "required": ["shipName", "shipLine1", "shipCity", "shipRegion", "shipPostalCode"],
+        "properties": {
+          "shipName": { "type": "string" },
+          "shipLine1": { "type": "string" },
+          "shipCity": { "type": "string" },
+          "shipRegion": { "type": "string" },
+          "shipPostalCode": { "type": "string" },
+          "shipCountry": { "type": "string", "default": "US" }
+        }
+      },
+      "CheckoutOrder": {
+        "type": "object",
+        "required": [
+          "number",
+          "status",
+          "subtotalCents",
+          "shippingCents",
+          "taxCents",
+          "totalCents"
+        ],
+        "properties": {
+          "number": { "type": "string", "example": "MRW-103510" },
+          "status": { "$ref": "#/components/schemas/OrderStatus" },
+          "subtotalCents": { "type": "integer" },
+          "shippingCents": { "type": "integer" },
+          "taxCents": { "type": "integer" },
+          "totalCents": { "type": "integer" }
+        }
+      },
+      "CheckoutResponse": {
+        "type": "object",
+        "required": ["order"],
+        "properties": { "order": { "$ref": "#/components/schemas/CheckoutOrder" } }
+      },
+      "OrderSummary": {
+        "type": "object",
+        "required": [
+          "number",
+          "status",
+          "placedAt",
+          "totalCents",
+          "shipCity",
+          "shipRegion",
+          "customerEmail",
+          "lineCount"
+        ],
+        "properties": {
+          "number": { "type": "string" },
+          "status": { "$ref": "#/components/schemas/OrderStatus" },
+          "placedAt": { "type": "string", "format": "date-time" },
+          "totalCents": { "type": "integer" },
+          "shipCity": { "type": "string" },
+          "shipRegion": { "type": "string" },
+          "customerEmail": { "type": "string" },
+          "lineCount": { "type": "integer" }
+        }
+      },
+      "OrderList": {
+        "type": "object",
+        "required": ["orders", "page", "pageSize", "total"],
+        "properties": {
+          "orders": { "type": "array", "items": { "$ref": "#/components/schemas/OrderSummary" } },
+          "page": { "type": "integer" },
+          "pageSize": { "type": "integer" },
+          "total": { "type": "integer" }
+        }
+      },
+      "ShipTo": {
+        "type": "object",
+        "required": ["name", "line1", "city", "region", "postalCode", "country"],
+        "properties": {
+          "name": { "type": "string" },
+          "line1": { "type": "string" },
+          "city": { "type": "string" },
+          "region": { "type": "string" },
+          "postalCode": { "type": "string" },
+          "country": { "type": "string" }
+        }
+      },
+      "OrderLine": {
+        "type": "object",
+        "required": ["sku", "name", "quantity", "unitPriceCents", "lineTotalCents"],
+        "properties": {
+          "sku": { "type": "string" },
+          "name": { "type": "string" },
+          "quantity": { "type": "integer" },
+          "unitPriceCents": { "type": "integer" },
+          "lineTotalCents": { "type": "integer" }
+        }
+      },
+      "OrderEvent": {
+        "type": "object",
+        "required": ["status", "note", "createdAt"],
+        "properties": {
+          "status": { "type": "string" },
+          "note": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "actorEmail": { "type": "string", "nullable": true }
+        }
+      },
+      "TrackingScan": {
+        "type": "object",
+        "required": ["status", "location", "message", "happenedAt"],
+        "properties": {
+          "status": { "type": "string" },
+          "location": { "type": "string" },
+          "message": { "type": "string" },
+          "happenedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Shipment": {
+        "type": "object",
+        "required": ["carrier", "service", "trackingNumber", "status", "scans"],
+        "properties": {
+          "carrier": { "type": "string", "enum": ["UPS", "FedEx", "USPS", "DHL"] },
+          "service": { "type": "string", "enum": ["Ground", "Express"] },
+          "trackingNumber": { "type": "string" },
+          "status": { "type": "string" },
+          "shippedAt": { "type": "string", "format": "date-time" },
+          "estimatedDelivery": { "type": "string", "format": "date", "nullable": true },
+          "deliveredAt": { "type": "string", "format": "date-time", "nullable": true },
+          "scans": { "type": "array", "items": { "$ref": "#/components/schemas/TrackingScan" } }
+        }
+      },
+      "OrderDetail": {
+        "type": "object",
+        "required": [
+          "number",
+          "status",
+          "placedAt",
+          "subtotalCents",
+          "shippingCents",
+          "taxCents",
+          "totalCents",
+          "shipTo",
+          "lines",
+          "events",
+          "shipment"
+        ],
+        "properties": {
+          "number": { "type": "string" },
+          "status": { "$ref": "#/components/schemas/OrderStatus" },
+          "placedAt": { "type": "string", "format": "date-time" },
+          "subtotalCents": { "type": "integer" },
+          "shippingCents": { "type": "integer" },
+          "taxCents": { "type": "integer" },
+          "totalCents": { "type": "integer" },
+          "shipTo": { "$ref": "#/components/schemas/ShipTo" },
+          "lines": { "type": "array", "items": { "$ref": "#/components/schemas/OrderLine" } },
+          "events": { "type": "array", "items": { "$ref": "#/components/schemas/OrderEvent" } },
+          "shipment": { "allOf": [{ "$ref": "#/components/schemas/Shipment" }], "nullable": true }
+        }
+      },
+      "OrderResponse": {
+        "type": "object",
+        "required": ["order"],
+        "properties": { "order": { "$ref": "#/components/schemas/OrderDetail" } }
+      },
+      "OrderAction": {
+        "type": "object",
+        "required": ["number", "status"],
+        "properties": {
+          "number": { "type": "string" },
+          "status": { "$ref": "#/components/schemas/OrderStatus" }
+        }
+      },
+      "ShipRequest": {
+        "type": "object",
+        "required": ["carrier"],
+        "properties": {
+          "carrier": { "type": "string", "enum": ["UPS", "FedEx", "USPS", "DHL"] },
+          "service": { "type": "string", "enum": ["Ground", "Express"], "default": "Ground" }
+        }
+      },
+      "ShipResult": {
+        "type": "object",
+        "required": ["number", "status", "carrier", "service", "trackingNumber"],
+        "properties": {
+          "number": { "type": "string" },
+          "status": { "$ref": "#/components/schemas/OrderStatus" },
+          "carrier": { "type": "string" },
+          "service": { "type": "string" },
+          "trackingNumber": { "type": "string" }
+        }
+      },
+      "TrackingRequest": {
+        "type": "object",
+        "required": ["trackingNumber"],
+        "properties": { "trackingNumber": { "type": "string", "minLength": 6 } }
+      },
+      "TrackingResult": {
+        "type": "object",
+        "required": ["number", "trackingNumber"],
+        "properties": {
+          "number": { "type": "string" },
+          "trackingNumber": { "type": "string" }
         }
       }
     }
@@ -41,7 +403,14 @@
       "get": {
         "tags": ["Session"],
         "summary": "Check Postgres and Redis",
-        "responses": { "200": { "description": "Both dependencies responded" } }
+        "responses": {
+          "200": {
+            "description": "Both dependencies responded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Health" } }
+            }
+          }
+        }
       }
     },
     "/api/login": {
@@ -51,31 +420,28 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["email", "password"],
-                "properties": {
-                  "email": { "type": "string", "example": "customer@marlow.test" },
-                  "password": { "type": "string", "example": "datalab" }
-                }
-              }
-            }
+            "application/json": { "schema": { "$ref": "#/components/schemas/LoginRequest" } }
           }
         },
         "responses": {
           "200": {
             "description": "Signed in",
             "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": { "user": { "$ref": "#/components/schemas/User" } }
-                }
-              }
+              "application/json": { "schema": { "$ref": "#/components/schemas/UserResponse" } }
             }
           },
-          "401": { "description": "Wrong email or password" }
+          "400": {
+            "description": "Missing email or password",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "401": {
+            "description": "Wrong email or password",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
         }
       }
     },
@@ -84,7 +450,12 @@
         "tags": ["Session"],
         "summary": "Clear the session",
         "security": [{ "session": [] }],
-        "responses": { "200": { "description": "Signed out" } }
+        "responses": {
+          "200": {
+            "description": "Signed out",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Ok" } } }
+          }
+        }
       }
     },
     "/api/me": {
@@ -93,8 +464,18 @@
         "summary": "Current user",
         "security": [{ "session": [] }],
         "responses": {
-          "200": { "description": "The signed-in user" },
-          "401": { "description": "Not signed in" }
+          "200": {
+            "description": "The signed-in user",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/UserResponse" } }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
         }
       }
     },
@@ -102,26 +483,62 @@
       "get": {
         "tags": ["Catalog"],
         "summary": "List products",
+        "description": "Served by the catalog service.",
         "security": [{ "session": [] }],
         "parameters": [
           { "name": "q", "in": "query", "schema": { "type": "string" } },
           { "name": "category", "in": "query", "schema": { "type": "string" } },
           { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
-          { "name": "pageSize", "in": "query", "schema": { "type": "integer", "default": 24, "maximum": 200 } },
-          { "name": "useCache", "in": "query", "description": "Set to false to skip the 60 second Redis cache.", "schema": { "type": "boolean", "default": true } }
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": { "type": "integer", "default": 24, "maximum": 200 }
+          },
+          {
+            "name": "useCache",
+            "in": "query",
+            "description": "Set to false to skip the 60 second Redis cache.",
+            "schema": { "type": "boolean", "default": true }
+          }
         ],
-        "responses": { "200": { "description": "A page of products, with an X-Cache header" } }
+        "responses": {
+          "200": {
+            "description": "A page of products, with an X-Cache header",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ProductList" } }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
       }
     },
     "/api/products/{sku}": {
       "get": {
         "tags": ["Catalog"],
         "summary": "One product and its stock",
+        "description": "Served by the catalog service.",
         "security": [{ "session": [] }],
-        "parameters": [{ "name": "sku", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "parameters": [
+          { "name": "sku", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
         "responses": {
-          "200": { "description": "Product" },
-          "404": { "description": "Unknown sku" }
+          "200": {
+            "description": "Product",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ProductResponse" } }
+            }
+          },
+          "404": {
+            "description": "Unknown sku",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
         }
       }
     },
@@ -129,11 +546,24 @@
       "get": {
         "tags": ["Catalog"],
         "summary": "Category counts",
+        "description": "Served by the catalog service.",
         "security": [{ "session": [] }],
         "parameters": [
-          { "name": "useCache", "in": "query", "description": "Set to false to skip the 60 second Redis cache.", "schema": { "type": "boolean", "default": true } }
+          {
+            "name": "useCache",
+            "in": "query",
+            "description": "Set to false to skip the 60 second Redis cache.",
+            "schema": { "type": "boolean", "default": true }
+          }
         ],
-        "responses": { "200": { "description": "Categories" } }
+        "responses": {
+          "200": {
+            "description": "Categories",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/CategoryList" } }
+            }
+          }
+        }
       }
     },
     "/api/inventory": {
@@ -146,12 +576,31 @@
           { "name": "q", "in": "query", "schema": { "type": "string" } },
           { "name": "lowStock", "in": "query", "schema": { "type": "boolean" } },
           { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
-          { "name": "pageSize", "in": "query", "schema": { "type": "integer", "default": 24, "maximum": 200 } },
-          { "name": "useCache", "in": "query", "description": "Set to false to skip the 60 second Redis cache.", "schema": { "type": "boolean", "default": true } }
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": { "type": "integer", "default": 24, "maximum": 200 }
+          },
+          {
+            "name": "useCache",
+            "in": "query",
+            "description": "Set to false to skip the 60 second Redis cache.",
+            "schema": { "type": "boolean", "default": true }
+          }
         ],
         "responses": {
-          "200": { "description": "Inventory page" },
-          "403": { "description": "Not staff" }
+          "200": {
+            "description": "Inventory page",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/InventoryList" } }
+            }
+          },
+          "403": {
+            "description": "Not staff",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
         }
       }
     },
@@ -159,8 +608,14 @@
       "get": {
         "tags": ["Cart"],
         "summary": "Current cart",
+        "description": "Served by the orders service.",
         "security": [{ "session": [] }],
-        "responses": { "200": { "description": "Cart lines and subtotal" } }
+        "responses": {
+          "200": {
+            "description": "Cart lines and subtotal",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Cart" } } }
+          }
+        }
       }
     },
     "/api/cart/items": {
@@ -172,21 +627,28 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["sku", "quantity"],
-                "properties": {
-                  "sku": { "type": "string" },
-                  "quantity": { "type": "integer", "minimum": 0 }
-                }
-              }
-            }
+            "application/json": { "schema": { "$ref": "#/components/schemas/CartItemRequest" } }
           }
         },
         "responses": {
-          "200": { "description": "Updated" },
-          "409": { "description": "Not enough stock" }
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/CartItemResult" } }
+            }
+          },
+          "404": {
+            "description": "Unknown sku",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "409": {
+            "description": "Not enough stock",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
         }
       }
     },
@@ -195,8 +657,15 @@
         "tags": ["Cart"],
         "summary": "Remove a line",
         "security": [{ "session": [] }],
-        "parameters": [{ "name": "sku", "in": "path", "required": true, "schema": { "type": "string" } }],
-        "responses": { "200": { "description": "Removed" } }
+        "parameters": [
+          { "name": "sku", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Removed",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Ok" } } }
+          }
+        }
       }
     },
     "/api/checkout": {
@@ -208,26 +677,28 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["shipName", "shipLine1", "shipCity", "shipRegion", "shipPostalCode"],
-                "properties": {
-                  "shipName": { "type": "string" },
-                  "shipLine1": { "type": "string" },
-                  "shipCity": { "type": "string" },
-                  "shipRegion": { "type": "string" },
-                  "shipPostalCode": { "type": "string" },
-                  "shipCountry": { "type": "string", "default": "US" }
-                }
-              }
-            }
+            "application/json": { "schema": { "$ref": "#/components/schemas/CheckoutRequest" } }
           }
         },
         "responses": {
-          "201": { "description": "Order created" },
-          "400": { "description": "Missing address or empty cart" },
-          "409": { "description": "Not enough stock" }
+          "201": {
+            "description": "Order created",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/CheckoutResponse" } }
+            }
+          },
+          "400": {
+            "description": "Missing address or empty cart",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "409": {
+            "description": "Not enough stock",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
         }
       }
     },
@@ -238,11 +709,26 @@
         "description": "Customers see their own orders. Staff see every order.",
         "security": [{ "session": [] }],
         "parameters": [
-          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["paid", "picking", "shipped", "out_for_delivery", "delivered", "cancelled"] } },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": { "$ref": "#/components/schemas/OrderStatus" }
+          },
           { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
-          { "name": "pageSize", "in": "query", "schema": { "type": "integer", "default": 20, "maximum": 100 } }
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": { "type": "integer", "default": 20, "maximum": 100 }
+          }
         ],
-        "responses": { "200": { "description": "Order page" } }
+        "responses": {
+          "200": {
+            "description": "Order page",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/OrderList" } }
+            }
+          }
+        }
       }
     },
     "/api/orders/{number}": {
@@ -250,10 +736,27 @@
         "tags": ["Orders"],
         "summary": "Order detail, shipment, and tracking scans",
         "security": [{ "session": [] }],
-        "parameters": [{ "name": "number", "in": "path", "required": true, "schema": { "type": "string", "example": "MRW-100001" } }],
+        "parameters": [
+          {
+            "name": "number",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "example": "MRW-100001" }
+          }
+        ],
         "responses": {
-          "200": { "description": "Order" },
-          "404": { "description": "Not found for this user" }
+          "200": {
+            "description": "Order",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/OrderResponse" } }
+            }
+          },
+          "404": {
+            "description": "Not found for this user",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
         }
       }
     },
@@ -262,10 +765,22 @@
         "tags": ["Orders"],
         "summary": "Cancel a paid or picking order",
         "security": [{ "session": [] }],
-        "parameters": [{ "name": "number", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "parameters": [
+          { "name": "number", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
         "responses": {
-          "200": { "description": "Cancelled and stock released" },
-          "409": { "description": "Order has already shipped" }
+          "200": {
+            "description": "Cancelled and stock released",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/OrderAction" } }
+            }
+          },
+          "409": {
+            "description": "Order has already shipped",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
         }
       }
     },
@@ -275,8 +790,23 @@
         "summary": "Start picking",
         "description": "Staff only. Paid orders only.",
         "security": [{ "session": [] }],
-        "parameters": [{ "name": "number", "in": "path", "required": true, "schema": { "type": "string" } }],
-        "responses": { "200": { "description": "Picking" }, "403": { "description": "Not staff" } }
+        "parameters": [
+          { "name": "number", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Picking",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/OrderAction" } }
+            }
+          },
+          "403": {
+            "description": "Not staff",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
       }
     },
     "/api/orders/{number}/ship": {
@@ -285,23 +815,29 @@
         "summary": "Ship a picking order",
         "description": "Staff only. Creates the shipment and the first tracking scan.",
         "security": [{ "session": [] }],
-        "parameters": [{ "name": "number", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "parameters": [
+          { "name": "number", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["carrier"],
-                "properties": {
-                  "carrier": { "type": "string", "enum": ["UPS", "FedEx", "USPS", "DHL"] },
-                  "service": { "type": "string", "enum": ["Ground", "Express"], "default": "Ground" }
-                }
-              }
-            }
+            "application/json": { "schema": { "$ref": "#/components/schemas/ShipRequest" } }
           }
         },
-        "responses": { "200": { "description": "Shipped, with a tracking number" } }
+        "responses": {
+          "200": {
+            "description": "Shipped, with a tracking number",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ShipResult" } }
+            }
+          },
+          "400": {
+            "description": "Unknown carrier or service",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
       }
     },
     "/api/orders/{number}/out-for-delivery": {
@@ -309,8 +845,17 @@
         "tags": ["Orders"],
         "summary": "Mark a shipped order out for delivery",
         "security": [{ "session": [] }],
-        "parameters": [{ "name": "number", "in": "path", "required": true, "schema": { "type": "string" } }],
-        "responses": { "200": { "description": "Out for delivery" } }
+        "parameters": [
+          { "name": "number", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Out for delivery",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/OrderAction" } }
+            }
+          }
+        }
       }
     },
     "/api/orders/{number}/deliver": {
@@ -318,8 +863,17 @@
         "tags": ["Orders"],
         "summary": "Mark an out-for-delivery order delivered",
         "security": [{ "session": [] }],
-        "parameters": [{ "name": "number", "in": "path", "required": true, "schema": { "type": "string" } }],
-        "responses": { "200": { "description": "Delivered" } }
+        "parameters": [
+          { "name": "number", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delivered",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/OrderAction" } }
+            }
+          }
+        }
       }
     },
     "/api/orders/{number}/tracking": {
@@ -328,20 +882,29 @@
         "summary": "Replace the tracking number",
         "description": "Staff only. The order must already have a shipment.",
         "security": [{ "session": [] }],
-        "parameters": [{ "name": "number", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "parameters": [
+          { "name": "number", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["trackingNumber"],
-                "properties": { "trackingNumber": { "type": "string", "minLength": 6 } }
-              }
-            }
+            "application/json": { "schema": { "$ref": "#/components/schemas/TrackingRequest" } }
           }
         },
-        "responses": { "200": { "description": "Tracking number updated" } }
+        "responses": {
+          "200": {
+            "description": "Tracking number updated",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/TrackingResult" } }
+            }
+          },
+          "400": {
+            "description": "Tracking number is too short",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
       }
     }
   }

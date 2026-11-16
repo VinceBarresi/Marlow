@@ -1,8 +1,8 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { api } from "../api";
-import { money } from "../format";
-import type { Product } from "../types";
+import { api } from "./api";
+import { money } from "./format";
+import type { Product } from "./types";
 
 export function Shop() {
   const [params, setParams] = useSearchParams();
@@ -64,11 +64,17 @@ export function Shop() {
   return (
     <>
       <h1 data-testid="shop-title">Shop</h1>
-      <p className="lede" data-testid="shop-count">{total} products in the current catalog.</p>
+      <p className="lede" data-testid="shop-count">
+        {total} products in the current catalog.
+      </p>
       <form className="filters" onSubmit={search} data-testid="shop-search-form">
         <label>
           Search
-          <input data-testid="shop-search" value={draft} onChange={(event) => setDraft(event.target.value)} />
+          <input
+            data-testid="shop-search"
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+          />
         </label>
         <label>
           Category
@@ -83,24 +89,47 @@ export function Shop() {
               setParams(next);
             }}
           >
-            <option value="" data-testid="shop-category-all">All</option>
+            <option value="" data-testid="shop-category-all">
+              All
+            </option>
             {categories.map((item) => (
-              <option key={item.category} value={item.category} data-testid={`shop-category-${item.category}`}>
+              <option
+                key={item.category}
+                value={item.category}
+                data-testid={`shop-category-${item.category}`}
+              >
                 {item.category}
               </option>
             ))}
           </select>
         </label>
-        <button type="submit" data-testid="shop-search-submit">Search</button>
+        <button type="submit" data-testid="shop-search-submit">
+          Search
+        </button>
       </form>
-      {error ? <p className="error" data-testid="shop-error">{error}</p> : null}
+      {error ? (
+        <p className="error" data-testid="shop-error">
+          {error}
+        </p>
+      ) : null}
       <div className="grid" data-testid="shop-grid">
         {products.map((product) => (
-          <Link className="card" key={product.sku} to={`/products/${product.sku}`} data-testid={`product-card-${product.sku}`}>
-            <span className="category" data-testid={`product-category-${product.sku}`}>{product.category}</span>
+          <Link
+            className="card"
+            key={product.sku}
+            to={`/products/${product.sku}`}
+            data-testid={`product-card-${product.sku}`}
+          >
+            <span className="category" data-testid={`product-category-${product.sku}`}>
+              {product.category}
+            </span>
             <strong data-testid={`product-name-${product.sku}`}>{product.name}</strong>
-            <span className="price" data-testid={`product-price-${product.sku}`}>{money(product.priceCents)}</span>
-            <span className="hint" data-testid={`product-stock-${product.sku}`}>{product.available > 0 ? `${product.available} available` : "Out of stock"}</span>
+            <span className="price" data-testid={`product-price-${product.sku}`}>
+              {money(product.priceCents)}
+            </span>
+            <span className="hint" data-testid={`product-stock-${product.sku}`}>
+              {product.available > 0 ? `${product.available} available` : "Out of stock"}
+            </span>
           </Link>
         ))}
       </div>

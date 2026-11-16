@@ -3,7 +3,7 @@ CREATE TABLE users (
   email text NOT NULL UNIQUE,
   password_hash text NOT NULL,
   name text NOT NULL,
-  role text NOT NULL CHECK (role IN ('customer', 'staff')),
+  role text NOT NULL CHECK (role IN ('customer', 'staff', 'admin')),
   created_at timestamptz NOT NULL DEFAULT now()
 );
 

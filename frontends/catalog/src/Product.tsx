@@ -1,8 +1,8 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { api } from "../api";
-import { money } from "../format";
-import type { Product } from "../types";
+import { api } from "./api";
+import { money } from "./format";
+import type { Product } from "./types";
 
 export function ProductPage() {
   const { sku = "" } = useParams();
@@ -36,17 +36,30 @@ export function ProductPage() {
     }
   }
 
-  if (error && !product) return <p className="error" data-testid="product-error">{error}</p>;
+  if (error && !product)
+    return (
+      <p className="error" data-testid="product-error">
+        {error}
+      </p>
+    );
   if (!product) return <p data-testid="product-loading">Loading product…</p>;
 
   return (
     <>
-      <p className="sku" data-testid="product-sku">{product.category} · {product.sku}</p>
+      <p className="sku" data-testid="product-sku">
+        {product.category} · {product.sku}
+      </p>
       <h1 data-testid="product-name">{product.name}</h1>
-      <p className="lede" data-testid="product-description">{product.description}</p>
+      <p className="lede" data-testid="product-description">
+        {product.description}
+      </p>
       <div className="panel stack" style={{ maxWidth: 420 }} data-testid="product-panel">
-        <strong className="price" data-testid="product-price">{money(product.priceCents)}</strong>
-        <span data-testid="product-stock">{product.available} available · {product.onHand} on hand · {product.reserved} reserved</span>
+        <strong className="price" data-testid="product-price">
+          {money(product.priceCents)}
+        </strong>
+        <span data-testid="product-stock">
+          {product.available} available · {product.onHand} on hand · {product.reserved} reserved
+        </span>
         <form className="actions" onSubmit={add} data-testid="product-add-form">
           <label>
             Quantity
@@ -63,8 +76,14 @@ export function ProductPage() {
             Add to cart
           </button>
         </form>
-        {error ? <p className="error" data-testid="product-error">{error}</p> : null}
-        <Link to="/" data-testid="product-back">Back to shop</Link>
+        {error ? (
+          <p className="error" data-testid="product-error">
+            {error}
+          </p>
+        ) : null}
+        <Link to="/" data-testid="product-back">
+          Back to shop
+        </Link>
       </div>
     </>
   );

@@ -29,7 +29,9 @@ export function Login() {
   return (
     <main className="login" data-testid="login-page">
       <h1 data-testid="login-title">Marlow</h1>
-      <p className="lede" data-testid="login-lede">Sign in to shop, or to pick and ship orders.</p>
+      <p className="lede" data-testid="login-lede">
+        Sign in to shop, or to pick and ship orders.
+      </p>
       <form onSubmit={onSubmit} data-testid="login-form">
         <label>
           Email
@@ -50,8 +52,14 @@ export function Login() {
             autoComplete="current-password"
           />
         </label>
-        {error ? <p className="error" data-testid="login-error">{error}</p> : null}
-        <button type="submit" data-testid="login-submit">Sign in</button>
+        {error ? (
+          <p className="error" data-testid="login-error">
+            {error}
+          </p>
+        ) : null}
+        <button type="submit" data-testid="login-submit">
+          Sign in
+        </button>
       </form>
       <p className="hint" data-testid="login-hint">
         Customer: customer@marlow.test / datalab

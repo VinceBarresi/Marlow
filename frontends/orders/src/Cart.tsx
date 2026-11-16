@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { api } from "../api";
-import { money } from "../format";
-import type { CartItem } from "../types";
+import { api } from "./api";
+import { money } from "./format";
+import type { CartItem } from "./types";
 
 export function CartPage() {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -33,10 +33,17 @@ export function CartPage() {
   return (
     <>
       <h1 data-testid="cart-title">Cart</h1>
-      {error ? <p className="error" data-testid="cart-error">{error}</p> : null}
+      {error ? (
+        <p className="error" data-testid="cart-error">
+          {error}
+        </p>
+      ) : null}
       {items.length === 0 ? (
         <p data-testid="cart-empty">
-          The cart is empty. <Link to="/" data-testid="cart-browse">Browse the shop.</Link>
+          The cart is empty.{" "}
+          <Link to="/" data-testid="cart-browse">
+            Browse the shop.
+          </Link>
         </p>
       ) : (
         <>
@@ -53,8 +60,12 @@ export function CartPage() {
               {items.map((item) => (
                 <tr key={item.sku} data-testid={`cart-item-${item.sku}`}>
                   <td>
-                    <Link to={`/products/${item.sku}`} data-testid={`cart-link-${item.sku}`}>{item.name}</Link>
-                    <div className="hint" data-testid={`cart-meta-${item.sku}`}>{money(item.priceCents)} · {item.available} available</div>
+                    <Link to={`/products/${item.sku}`} data-testid={`cart-link-${item.sku}`}>
+                      {item.name}
+                    </Link>
+                    <div className="hint" data-testid={`cart-meta-${item.sku}`}>
+                      {money(item.priceCents)} · {item.available} available
+                    </div>
                   </td>
                   <td className="num">
                     <input
@@ -65,9 +76,16 @@ export function CartPage() {
                       onChange={(event) => update(item.sku, Number(event.target.value))}
                     />
                   </td>
-                  <td className="num" data-testid={`cart-line-total-${item.sku}`}>{money(item.lineTotalCents)}</td>
+                  <td className="num" data-testid={`cart-line-total-${item.sku}`}>
+                    {money(item.lineTotalCents)}
+                  </td>
                   <td>
-                    <button className="quiet" type="button" data-testid={`cart-remove-${item.sku}`} onClick={() => update(item.sku, 0)}>
+                    <button
+                      className="quiet"
+                      type="button"
+                      data-testid={`cart-remove-${item.sku}`}
+                      onClick={() => update(item.sku, 0)}
+                    >
                       Remove
                     </button>
                   </td>

@@ -7,13 +7,14 @@ import Fastify, { type FastifyReply, type FastifyRequest } from "fastify";
 import Redis from "ioredis";
 import pg from "pg";
 import { registerCatalog } from "./catalog.js";
+import { registerCatalogProxy } from "./catalog-proxy.js";
 import { registerCommerce } from "./commerce.js";
+import { registerOrdersProxy } from "./orders-proxy.js";
 import { verifyPassword } from "./passwords.js";
 
 const WEEK = 60 * 60 * 24 * 7;
 const pool = new pg.Pool({
-  connectionString:
-    process.env.DATABASE_URL ?? "postgres://datalab:datalab@localhost:5432/datalab",
+  connectionString: process.env.DATABASE_URL ?? "postgres://datalab:datalab@localhost:5432/datalab",
 });
 const redis = new Redis(process.env.REDIS_URL ?? "redis://localhost:6379");
 
@@ -96,7 +97,9 @@ app.get("/api/me", async (request, reply) => {
   return { user };
 });
 
+await registerCatalogProxy(app, requireUser);
 await registerCatalog(app, { pool, redis, requireUser });
+await registerOrdersProxy(app, requireUser);
 await registerCommerce(app, { pool, redis, requireUser });
 
 await app.register(swagger, {

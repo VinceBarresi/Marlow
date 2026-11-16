@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { api } from "../api";
-import { money, when } from "../format";
-import type { OrderSummary } from "../types";
+import { api } from "./api";
+import { money, when } from "./format";
+import type { OrderSummary } from "./types";
 
 export function Orders({ staff = false }: { staff?: boolean }) {
   const [params, setParams] = useSearchParams();
@@ -37,7 +37,9 @@ export function Orders({ staff = false }: { staff?: boolean }) {
   return (
     <>
       <h1 data-testid={`${prefix}-title`}>{staff ? "All orders" : "Your orders"}</h1>
-      <p className="lede" data-testid={`${prefix}-count`}>{total} orders</p>
+      <p className="lede" data-testid={`${prefix}-count`}>
+        {total} orders
+      </p>
       <label>
         Status
         <select
@@ -52,14 +54,20 @@ export function Orders({ staff = false }: { staff?: boolean }) {
           }}
         >
           <option value="">All</option>
-          {["paid", "picking", "shipped", "out_for_delivery", "delivered", "cancelled"].map((item) => (
-            <option key={item} value={item} data-testid={`${prefix}-status-${item}`}>
-              {item.replaceAll("_", " ")}
-            </option>
-          ))}
+          {["paid", "picking", "shipped", "out_for_delivery", "delivered", "cancelled"].map(
+            (item) => (
+              <option key={item} value={item} data-testid={`${prefix}-status-${item}`}>
+                {item.replaceAll("_", " ")}
+              </option>
+            ),
+          )}
         </select>
       </label>
-      {error ? <p className="error" data-testid={`${prefix}-error`}>{error}</p> : null}
+      {error ? (
+        <p className="error" data-testid={`${prefix}-error`}>
+          {error}
+        </p>
+      ) : null}
       <table data-testid={`${prefix}-table`}>
         <thead>
           <tr>
@@ -74,17 +82,28 @@ export function Orders({ staff = false }: { staff?: boolean }) {
           {orders.map((order) => (
             <tr key={order.number} data-testid={`${prefix}-row-${order.number}`}>
               <td>
-                <Link to={`/orders/${order.number}`} data-testid={`${prefix}-link-${order.number}`}>{order.number}</Link>
+                <Link to={`/orders/${order.number}`} data-testid={`${prefix}-link-${order.number}`}>
+                  {order.number}
+                </Link>
                 <div className="hint" data-testid={`${prefix}-meta-${order.number}`}>
                   {order.lineCount} lines · {order.shipCity}, {order.shipRegion}
                 </div>
               </td>
               <td>
-                <span className={`pill ${order.status}`} data-testid={`${prefix}-status-${order.number}`}>{order.status.replaceAll("_", " ")}</span>
+                <span
+                  className={`pill ${order.status}`}
+                  data-testid={`${prefix}-status-${order.number}`}
+                >
+                  {order.status.replaceAll("_", " ")}
+                </span>
               </td>
-              {staff ? <td data-testid={`${prefix}-customer-${order.number}`}>{order.customerEmail}</td> : null}
+              {staff ? (
+                <td data-testid={`${prefix}-customer-${order.number}`}>{order.customerEmail}</td>
+              ) : null}
               <td data-testid={`${prefix}-placed-${order.number}`}>{when(order.placedAt)}</td>
-              <td className="num" data-testid={`${prefix}-total-${order.number}`}>{money(order.totalCents)}</td>
+              <td className="num" data-testid={`${prefix}-total-${order.number}`}>
+                {money(order.totalCents)}
+              </td>
             </tr>
           ))}
         </tbody>

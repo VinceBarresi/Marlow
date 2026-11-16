@@ -52,11 +52,17 @@ export function Inventory() {
   return (
     <>
       <h1 data-testid="inventory-title">Inventory</h1>
-      <p className="lede" data-testid="inventory-count">{total} bins{lowStock ? " at or below the reorder point" : ""}.</p>
+      <p className="lede" data-testid="inventory-count">
+        {total} bins{lowStock ? " at or below the reorder point" : ""}.
+      </p>
       <form className="filters" onSubmit={search} data-testid="inventory-search-form">
         <label>
           Search
-          <input data-testid="inventory-search" value={draft} onChange={(event) => setDraft(event.target.value)} />
+          <input
+            data-testid="inventory-search"
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+          />
         </label>
         <label>
           <span>Low stock</span>
@@ -73,9 +79,15 @@ export function Inventory() {
             }}
           />
         </label>
-        <button type="submit" data-testid="inventory-search-submit">Search</button>
+        <button type="submit" data-testid="inventory-search-submit">
+          Search
+        </button>
       </form>
-      {error ? <p className="error" data-testid="inventory-error">{error}</p> : null}
+      {error ? (
+        <p className="error" data-testid="inventory-error">
+          {error}
+        </p>
+      ) : null}
       <table data-testid="inventory-table">
         <thead>
           <tr>
@@ -96,9 +108,15 @@ export function Inventory() {
                 <div className="hint">{row.category}</div>
               </td>
               <td data-testid={`inventory-bin-${row.sku}`}>{row.bin}</td>
-              <td className="num" data-testid={`inventory-on-hand-${row.sku}`}>{row.onHand}</td>
-              <td className="num" data-testid={`inventory-reserved-${row.sku}`}>{row.reserved}</td>
-              <td className="num" data-testid={`inventory-available-${row.sku}`}>{row.available}</td>
+              <td className="num" data-testid={`inventory-on-hand-${row.sku}`}>
+                {row.onHand}
+              </td>
+              <td className="num" data-testid={`inventory-reserved-${row.sku}`}>
+                {row.reserved}
+              </td>
+              <td className="num" data-testid={`inventory-available-${row.sku}`}>
+                {row.available}
+              </td>
             </tr>
           ))}
         </tbody>

@@ -1,13 +1,22 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { api } from "../api";
-import { useAuth } from "../auth";
-import { money, when } from "../format";
-import type { OrderDetail } from "../types";
+import { api } from "./api";
+import { money, when } from "./format";
+import type { OrderDetail } from "./types";
+
+function useRole() {
+  const [role, setRole] = useState<string | null>(null);
+  useEffect(() => {
+    api<{ user: { role: string } }>("/api/me")
+      .then((result) => setRole(result.user.role))
+      .catch(() => setRole(null));
+  }, []);
+  return role;
+}
 
 export function OrderPage() {
   const { number = "" } = useParams();
-  const { user } = useAuth();
+  const user = { role: useRole() };
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [error, setError] = useState("");
   const [carrier, setCarrier] = useState("UPS");
@@ -35,18 +44,31 @@ export function OrderPage() {
     }
   }
 
-  if (error && !order) return <p className="error" data-testid="order-error">{error}</p>;
+  if (error && !order)
+    return (
+      <p className="error" data-testid="order-error">
+        {error}
+      </p>
+    );
   if (!order) return <p data-testid="order-loading">Loading order…</p>;
   const open = order.status === "paid" || order.status === "picking";
 
   return (
     <>
-      <p className="sku" data-testid="order-placed">{when(order.placedAt)}</p>
+      <p className="sku" data-testid="order-placed">
+        {when(order.placedAt)}
+      </p>
       <h1 data-testid="order-number">{order.number}</h1>
       <p>
-        <span className={`pill ${order.status}`} data-testid="order-status">{order.status.replaceAll("_", " ")}</span>
+        <span className={`pill ${order.status}`} data-testid="order-status">
+          {order.status.replaceAll("_", " ")}
+        </span>
       </p>
-      {error ? <p className="error" data-testid="order-error">{error}</p> : null}
+      {error ? (
+        <p className="error" data-testid="order-error">
+          {error}
+        </p>
+      ) : null}
       <div className="split">
         <div>
           <table data-testid="order-lines">
@@ -64,8 +86,12 @@ export function OrderPage() {
                     <span data-testid={`order-line-name-${line.sku}`}>{line.name}</span>
                     <div className="hint">{line.sku}</div>
                   </td>
-                  <td className="num" data-testid={`order-line-qty-${line.sku}`}>{line.quantity}</td>
-                  <td className="num" data-testid={`order-line-total-${line.sku}`}>{money(line.lineTotalCents)}</td>
+                  <td className="num" data-testid={`order-line-qty-${line.sku}`}>
+                    {line.quantity}
+                  </td>
+                  <td className="num" data-testid={`order-line-total-${line.sku}`}>
+                    {money(line.lineTotalCents)}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -90,7 +116,9 @@ export function OrderPage() {
           {order.shipment ? (
             <section className="panel" data-testid="order-tracking">
               <strong>Tracking</strong>
-              <div className="tracking-number" data-testid="order-tracking-number">{order.shipment.trackingNumber}</div>
+              <div className="tracking-number" data-testid="order-tracking-number">
+                {order.shipment.trackingNumber}
+              </div>
               <div data-testid="order-tracking-carrier">
                 {order.shipment.carrier} {order.shipment.service}
               </div>
@@ -102,7 +130,10 @@ export function OrderPage() {
               </div>
               <div className="scans">
                 {order.shipment.scans.map((scan, index) => (
-                  <div key={`${scan.happenedAt}-${scan.message}`} data-testid={`order-scan-${index}`}>
+                  <div
+                    key={`${scan.happenedAt}-${scan.message}`}
+                    data-testid={`order-scan-${index}`}
+                  >
                     <strong>{scan.message}</strong>
                     <div className="hint">
                       {scan.location} · {when(scan.happenedAt)}
@@ -121,9 +152,15 @@ export function OrderPage() {
                 >
                   <label>
                     Tracking number
-                    <input data-testid="order-tracking-input" value={trackingNumber} onChange={(event) => setTrackingNumber(event.target.value)} />
+                    <input
+                      data-testid="order-tracking-input"
+                      value={trackingNumber}
+                      onChange={(event) => setTrackingNumber(event.target.value)}
+                    />
                   </label>
-                  <button type="submit" data-testid="order-tracking-submit">Update tracking</button>
+                  <button type="submit" data-testid="order-tracking-submit">
+                    Update tracking
+                  </button>
                 </form>
               ) : null}
             </section>
@@ -144,22 +181,39 @@ export function OrderPage() {
           </section>
           <div className="actions" data-testid="order-actions">
             {open ? (
-              <button className="danger" type="button" data-testid="order-cancel" onClick={() => act(`/api/orders/${order.number}/cancel`)}>
+              <button
+                className="danger"
+                type="button"
+                data-testid="order-cancel"
+                onClick={() => act(`/api/orders/${order.number}/cancel`)}
+              >
                 Cancel order
               </button>
             ) : null}
             {user?.role === "staff" && order.status === "paid" ? (
-              <button type="button" data-testid="order-pick" onClick={() => act(`/api/orders/${order.number}/pick`)}>
+              <button
+                type="button"
+                data-testid="order-pick"
+                onClick={() => act(`/api/orders/${order.number}/pick`)}
+              >
                 Start picking
               </button>
             ) : null}
             {user?.role === "staff" && order.status === "shipped" ? (
-              <button type="button" data-testid="order-out-for-delivery" onClick={() => act(`/api/orders/${order.number}/out-for-delivery`)}>
+              <button
+                type="button"
+                data-testid="order-out-for-delivery"
+                onClick={() => act(`/api/orders/${order.number}/out-for-delivery`)}
+              >
                 Out for delivery
               </button>
             ) : null}
             {user?.role === "staff" && order.status === "out_for_delivery" ? (
-              <button type="button" data-testid="order-deliver" onClick={() => act(`/api/orders/${order.number}/deliver`)}>
+              <button
+                type="button"
+                data-testid="order-deliver"
+                onClick={() => act(`/api/orders/${order.number}/deliver`)}
+              >
                 Mark delivered
               </button>
             ) : null}
@@ -175,7 +229,11 @@ export function OrderPage() {
             >
               <label>
                 Carrier
-                <select data-testid="order-carrier" value={carrier} onChange={(event) => setCarrier(event.target.value)}>
+                <select
+                  data-testid="order-carrier"
+                  value={carrier}
+                  onChange={(event) => setCarrier(event.target.value)}
+                >
                   {["UPS", "FedEx", "USPS", "DHL"].map((item) => (
                     <option key={item}>{item}</option>
                   ))}
@@ -183,12 +241,18 @@ export function OrderPage() {
               </label>
               <label>
                 Service
-                <select data-testid="order-service" value={service} onChange={(event) => setService(event.target.value)}>
+                <select
+                  data-testid="order-service"
+                  value={service}
+                  onChange={(event) => setService(event.target.value)}
+                >
                   <option>Ground</option>
                   <option>Express</option>
                 </select>
               </label>
-              <button type="submit" data-testid="order-ship">Ship</button>
+              <button type="submit" data-testid="order-ship">
+                Ship
+              </button>
             </form>
           ) : null}
         </div>

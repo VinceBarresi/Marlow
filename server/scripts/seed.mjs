@@ -159,8 +159,7 @@ for (const [category, prefix, baseName, priceCents] of bases) {
   const variants = variantFor[category] ?? colors;
   for (const variant of variants) {
     skuNumber += 1;
-    const name =
-      category === "Pantry" ? `${baseName}, ${variant}` : `${variant} ${baseName}`;
+    const name = category === "Pantry" ? `${baseName}, ${variant}` : `${variant} ${baseName}`;
     products.push({
       sku: `${prefix}-${skuNumber}`,
       name,
@@ -296,6 +295,13 @@ const staff = {
   role: "staff",
 };
 
+const admin = {
+  id: randomUUID(),
+  email: "admin@marlow.test",
+  name: "Avery Chen",
+  role: "admin",
+};
+
 const onHand = new Map(products.map((product) => [product.sku, 120 + Math.floor(rand() * 280)]));
 const reserved = new Map(products.map((product) => [product.sku, 0]));
 
@@ -346,8 +352,7 @@ const carriers = [
 ];
 
 function trackingNumber(carrier) {
-  const digits = (length) =>
-    Array.from({ length }, () => Math.floor(rand() * 10)).join("");
+  const digits = (length) => Array.from({ length }, () => Math.floor(rand() * 10)).join("");
   if (carrier === "UPS") return `1Z${digits(16)}`;
   if (carrier === "USPS") return `9400${digits(18)}`;
   if (carrier === "DHL") return digits(10);
@@ -376,10 +381,7 @@ function addOrder(user, placed, status) {
 
   orderSequence += 1;
   const id = randomUUID();
-  const subtotal = chosen.reduce(
-    (sum, line) => sum + line.product.priceCents * line.quantity,
-    0,
-  );
+  const subtotal = chosen.reduce((sum, line) => sum + line.product.priceCents * line.quantity, 0);
   const shipping = subtotal >= 7500 ? 0 : 800;
   const tax = Math.round(subtotal * 0.08);
   const [city, region, postal] = user.place;
@@ -510,7 +512,7 @@ process.stdout.write(
 insert(
   "users",
   ["id", "email", "password_hash", "name", "role"],
-  [staff, ...customers].map(
+  [admin, staff, ...customers].map(
     (user) =>
       `(${sqlString(user.id)}, ${sqlString(user.email)}, ${sqlString(passwordHash)}, ${sqlString(user.name)}, ${sqlString(user.role)})`,
   ),

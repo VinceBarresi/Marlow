@@ -20,9 +20,7 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, {
     ...init,
     credentials: "include",
-    headers: init?.body
-      ? { "content-type": "application/json", ...init.headers }
-      : init?.headers,
+    headers: init?.body ? { "content-type": "application/json", ...init.headers } : init?.headers,
   });
   const text = await response.text();
   window.dispatchEvent(

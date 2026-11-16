@@ -57,8 +57,15 @@ export function Shell() {
             </>
           ) : null}
         </nav>
-        <span className="spacer" data-testid="nav-user">{user?.email}</span>
-        <button className="quiet" type="button" data-testid="nav-logout" onClick={() => void logout()}>
+        <span className="spacer" data-testid="nav-user">
+          {user?.email}
+        </span>
+        <button
+          className="quiet"
+          type="button"
+          data-testid="nav-logout"
+          onClick={() => void logout()}
+        >
           Log out
         </button>
       </header>
@@ -76,7 +83,12 @@ export function Shell() {
 
 export function RequireAuth() {
   const { user, ready } = useAuth();
-  if (!ready) return <p className="page" data-testid="session-checking">Checking session…</p>;
+  if (!ready)
+    return (
+      <p className="page" data-testid="session-checking">
+        Checking session…
+      </p>
+    );
   if (!user) return <Navigate to="/login" replace />;
   return <Outlet />;
 }
