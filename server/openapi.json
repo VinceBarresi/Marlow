@@ -1,0 +1,348 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Marlow API",
+    "version": "1.0.0",
+    "description": "Retail API for the Marlow shop. Sign in with POST /api/login. The session cookie is sent automatically on later requests from this page."
+  },
+  "servers": [{ "url": "http://127.0.0.1:4000" }],
+  "tags": [
+    { "name": "Session" },
+    { "name": "Catalog" },
+    { "name": "Cart" },
+    { "name": "Orders" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "session": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "datalab_session"
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": { "error": { "type": "string" } }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "email": { "type": "string" },
+          "name": { "type": "string" },
+          "role": { "type": "string", "enum": ["customer", "staff"] }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": ["Session"],
+        "summary": "Check Postgres and Redis",
+        "responses": { "200": { "description": "Both dependencies responded" } }
+      }
+    },
+    "/api/login": {
+      "post": {
+        "tags": ["Session"],
+        "summary": "Sign in and set the session cookie",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "example": "customer@marlow.test" },
+                  "password": { "type": "string", "example": "datalab" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "user": { "$ref": "#/components/schemas/User" } }
+                }
+              }
+            }
+          },
+          "401": { "description": "Wrong email or password" }
+        }
+      }
+    },
+    "/api/logout": {
+      "post": {
+        "tags": ["Session"],
+        "summary": "Clear the session",
+        "security": [{ "session": [] }],
+        "responses": { "200": { "description": "Signed out" } }
+      }
+    },
+    "/api/me": {
+      "get": {
+        "tags": ["Session"],
+        "summary": "Current user",
+        "security": [{ "session": [] }],
+        "responses": {
+          "200": { "description": "The signed-in user" },
+          "401": { "description": "Not signed in" }
+        }
+      }
+    },
+    "/api/products": {
+      "get": {
+        "tags": ["Catalog"],
+        "summary": "List products",
+        "security": [{ "session": [] }],
+        "parameters": [
+          { "name": "q", "in": "query", "schema": { "type": "string" } },
+          { "name": "category", "in": "query", "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "pageSize", "in": "query", "schema": { "type": "integer", "default": 24, "maximum": 200 } },
+          { "name": "useCache", "in": "query", "description": "Set to false to skip the 60 second Redis cache.", "schema": { "type": "boolean", "default": true } }
+        ],
+        "responses": { "200": { "description": "A page of products, with an X-Cache header" } }
+      }
+    },
+    "/api/products/{sku}": {
+      "get": {
+        "tags": ["Catalog"],
+        "summary": "One product and its stock",
+        "security": [{ "session": [] }],
+        "parameters": [{ "name": "sku", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "200": { "description": "Product" },
+          "404": { "description": "Unknown sku" }
+        }
+      }
+    },
+    "/api/categories": {
+      "get": {
+        "tags": ["Catalog"],
+        "summary": "Category counts",
+        "security": [{ "session": [] }],
+        "parameters": [
+          { "name": "useCache", "in": "query", "description": "Set to false to skip the 60 second Redis cache.", "schema": { "type": "boolean", "default": true } }
+        ],
+        "responses": { "200": { "description": "Categories" } }
+      }
+    },
+    "/api/inventory": {
+      "get": {
+        "tags": ["Catalog"],
+        "summary": "Inventory bins",
+        "description": "Staff only.",
+        "security": [{ "session": [] }],
+        "parameters": [
+          { "name": "q", "in": "query", "schema": { "type": "string" } },
+          { "name": "lowStock", "in": "query", "schema": { "type": "boolean" } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "pageSize", "in": "query", "schema": { "type": "integer", "default": 24, "maximum": 200 } },
+          { "name": "useCache", "in": "query", "description": "Set to false to skip the 60 second Redis cache.", "schema": { "type": "boolean", "default": true } }
+        ],
+        "responses": {
+          "200": { "description": "Inventory page" },
+          "403": { "description": "Not staff" }
+        }
+      }
+    },
+    "/api/cart": {
+      "get": {
+        "tags": ["Cart"],
+        "summary": "Current cart",
+        "security": [{ "session": [] }],
+        "responses": { "200": { "description": "Cart lines and subtotal" } }
+      }
+    },
+    "/api/cart/items": {
+      "put": {
+        "tags": ["Cart"],
+        "summary": "Set a line quantity",
+        "description": "Quantity 0 removes the line.",
+        "security": [{ "session": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["sku", "quantity"],
+                "properties": {
+                  "sku": { "type": "string" },
+                  "quantity": { "type": "integer", "minimum": 0 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Updated" },
+          "409": { "description": "Not enough stock" }
+        }
+      }
+    },
+    "/api/cart/items/{sku}": {
+      "delete": {
+        "tags": ["Cart"],
+        "summary": "Remove a line",
+        "security": [{ "session": [] }],
+        "parameters": [{ "name": "sku", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Removed" } }
+      }
+    },
+    "/api/checkout": {
+      "post": {
+        "tags": ["Cart"],
+        "summary": "Place the cart as a paid order",
+        "description": "Reserves stock. Shipping is $8 under $75. Tax is 8%.",
+        "security": [{ "session": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["shipName", "shipLine1", "shipCity", "shipRegion", "shipPostalCode"],
+                "properties": {
+                  "shipName": { "type": "string" },
+                  "shipLine1": { "type": "string" },
+                  "shipCity": { "type": "string" },
+                  "shipRegion": { "type": "string" },
+                  "shipPostalCode": { "type": "string" },
+                  "shipCountry": { "type": "string", "default": "US" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Order created" },
+          "400": { "description": "Missing address or empty cart" },
+          "409": { "description": "Not enough stock" }
+        }
+      }
+    },
+    "/api/orders": {
+      "get": {
+        "tags": ["Orders"],
+        "summary": "List orders",
+        "description": "Customers see their own orders. Staff see every order.",
+        "security": [{ "session": [] }],
+        "parameters": [
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["paid", "picking", "shipped", "out_for_delivery", "delivered", "cancelled"] } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "pageSize", "in": "query", "schema": { "type": "integer", "default": 20, "maximum": 100 } }
+        ],
+        "responses": { "200": { "description": "Order page" } }
+      }
+    },
+    "/api/orders/{number}": {
+      "get": {
+        "tags": ["Orders"],
+        "summary": "Order detail, shipment, and tracking scans",
+        "security": [{ "session": [] }],
+        "parameters": [{ "name": "number", "in": "path", "required": true, "schema": { "type": "string", "example": "MRW-100001" } }],
+        "responses": {
+          "200": { "description": "Order" },
+          "404": { "description": "Not found for this user" }
+        }
+      }
+    },
+    "/api/orders/{number}/cancel": {
+      "post": {
+        "tags": ["Orders"],
+        "summary": "Cancel a paid or picking order",
+        "security": [{ "session": [] }],
+        "parameters": [{ "name": "number", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "200": { "description": "Cancelled and stock released" },
+          "409": { "description": "Order has already shipped" }
+        }
+      }
+    },
+    "/api/orders/{number}/pick": {
+      "post": {
+        "tags": ["Orders"],
+        "summary": "Start picking",
+        "description": "Staff only. Paid orders only.",
+        "security": [{ "session": [] }],
+        "parameters": [{ "name": "number", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Picking" }, "403": { "description": "Not staff" } }
+      }
+    },
+    "/api/orders/{number}/ship": {
+      "post": {
+        "tags": ["Orders"],
+        "summary": "Ship a picking order",
+        "description": "Staff only. Creates the shipment and the first tracking scan.",
+        "security": [{ "session": [] }],
+        "parameters": [{ "name": "number", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["carrier"],
+                "properties": {
+                  "carrier": { "type": "string", "enum": ["UPS", "FedEx", "USPS", "DHL"] },
+                  "service": { "type": "string", "enum": ["Ground", "Express"], "default": "Ground" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Shipped, with a tracking number" } }
+      }
+    },
+    "/api/orders/{number}/out-for-delivery": {
+      "post": {
+        "tags": ["Orders"],
+        "summary": "Mark a shipped order out for delivery",
+        "security": [{ "session": [] }],
+        "parameters": [{ "name": "number", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Out for delivery" } }
+      }
+    },
+    "/api/orders/{number}/deliver": {
+      "post": {
+        "tags": ["Orders"],
+        "summary": "Mark an out-for-delivery order delivered",
+        "security": [{ "session": [] }],
+        "parameters": [{ "name": "number", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Delivered" } }
+      }
+    },
+    "/api/orders/{number}/tracking": {
+      "post": {
+        "tags": ["Orders"],
+        "summary": "Replace the tracking number",
+        "description": "Staff only. The order must already have a shipment.",
+        "security": [{ "session": [] }],
+        "parameters": [{ "name": "number", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["trackingNumber"],
+                "properties": { "trackingNumber": { "type": "string", "minLength": 6 } }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Tracking number updated" } }
+      }
+    }
+  }
+}
