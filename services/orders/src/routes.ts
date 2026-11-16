@@ -234,13 +234,11 @@ export async function registerOrders(app: FastifyInstance, { pool, redis }: Deps
           const row = locked.rows[0];
           if (!row) {
             await client.query("rollback");
-            return reply
-              .code(404)
-              .send({
-                error: pickup
-                  ? `${line.sku} is not at this store.`
-                  : `Product ${line.sku} not found.`,
-              });
+            return reply.code(404).send({
+              error: pickup
+                ? `${line.sku} is not at this store.`
+                : `Product ${line.sku} not found.`,
+            });
           }
           if (row.available < line.quantity) {
             await client.query("rollback");

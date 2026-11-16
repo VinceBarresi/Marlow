@@ -16,3 +16,4 @@ npm run dev
 - **@module-federation/vite** publishes `remoteEntry.js` and exposes `Cart`, `Checkout`, `Orders`, `Order`, and `Receipt`. React and React Router are shared singletons with the shell.
 - **React** and **React Router** render the order screens.
 - **TypeScript** checks the source. Vite transforms it with esbuild.
+- **Jest** runs the page tests from the repo root: `npm test`. A sample sits next to Cart, Checkout, Orders, Order, and Receipt.

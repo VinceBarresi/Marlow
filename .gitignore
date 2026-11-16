@@ -11,3 +11,4 @@ blob-report
 cypress/videos
 cypress/screenshots
 cypress/downloads
+coverage

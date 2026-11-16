@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+
+jobs:
+  check:
+    name: Unit tests, Prettier, and ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            server/package-lock.json
+            web/package-lock.json
+
+      - name: Install root dependencies
+        run: npm ci
+        env:
+          CYPRESS_INSTALL_BINARY: "0"
+
+      - name: Install server dependencies
+        working-directory: server
+        run: npm ci
+
+      - name: Install shop dependencies
+        working-directory: web
+        run: npm ci
+
+      - name: Unit tests
+        run: npm run test:unit
+
+      - name: Prettier
+        run: npm run format:check
+
+      - name: ESLint
+        run: npm run lint

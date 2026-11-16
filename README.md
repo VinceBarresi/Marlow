@@ -6,6 +6,18 @@ Local retail shop for practicing Cypress and Playwright. The shop is called Marl
 
 From this directory:
 
+```bash
+npm run dev
+```
+
+That starts Postgres, Redis, and all seven apps. The first time the database has no tables, it creates them and loads the shop. Later runs leave the data in place. Ctrl+C stops the apps and leaves Postgres and Redis running.
+
+Open the shop at [http://localhost:5173](http://localhost:5173). Use `localhost`, not `127.0.0.1`.
+
+Store maps use the Google Maps JavaScript API when `VITE_GOOGLE_MAPS_API_KEY` is set in `web/.env`. Copy `web/.env.example`. Without a key, the list still shows every store on one map and each store page embeds a Google map.
+
+### One piece at a time
+
 1. Start Postgres and Redis.
 
    ```bash
@@ -33,14 +45,14 @@ From this directory:
    docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -f - < server/sql/003_admin.sql
    ```
 
-4. Install and start each app in its own terminal.
+4. Install and start each app in its own terminal. Run these commands in that directory, not in the repo root.
 
    ```bash
    npm install
    npm run dev
    ```
 
-   Run that in `server`, `services/catalog`, `services/orders`, `services/db`, `web`, `frontends/catalog`, and `frontends/orders`.
+   The directories are `server`, `services/catalog`, `services/orders`, `services/db`, `web`, `frontends/catalog`, and `frontends/orders`.
 
    If `npm install` stops on the esbuild postinstall script, approve it and install again:
 
@@ -48,10 +60,6 @@ From this directory:
    npm install-scripts approve esbuild
    npm install
    ```
-
-5. Open the shop at [http://localhost:5173](http://localhost:5173). Use `localhost`, not `127.0.0.1`.
-
-   Store maps use the Google Maps JavaScript API when `VITE_GOOGLE_MAPS_API_KEY` is set in `web/.env`. Copy `web/.env.example`. Without a key, the list still shows every store on one map and each store page embeds a Google map.
 
 ## Processes
 
@@ -87,6 +95,7 @@ Each app has its own README with the libraries it uses. These are shared:
 | TypeScript        | every app              | Types. Vite and tsx both transform it with esbuild                           |
 | ESLint            | this directory         | Lint, including React and TypeScript rules                                   |
 | Prettier          | this directory         | Format                                                                       |
+| Jest              | this directory         | Unit tests for each page. `npm test` renders the page with a mocked API      |
 | Cypress           | this directory         | Browser tests. Specs are not checked in yet                                  |
 | Playwright        | this directory         | Browser tests in Chromium, Firefox, and WebKit. Specs are not checked in yet |
 
@@ -106,11 +115,11 @@ On the database console, staff can run read-only queries. The admin can also ins
 
 ## Tests
 
-```bash
-npm test
-```
+From this directory, `npm run test:unit` runs every unit test: the Jest page tests, then the pricing and query tests in `server`, then the money formatting test in `web`.
 
-Run that in `server` and in `web`.
+Each page has a sample next to it, for example `web/src/pages/Login.test.tsx`. The sample mocks `api`, renders the page, and checks a test id. Copy that file when you add a case.
+
+A push to GitHub runs the unit tests, Prettier, and ESLint.
 
 ## Lint and format
 

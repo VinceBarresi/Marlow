@@ -65,17 +65,17 @@ Login writes `session:<sid>` in Redis and sets the `datalab_session` cookie. Lat
 
 ## Who answers `/api`
 
-| Path | Answered by | Stored in |
-| --- | --- | --- |
-| `/api/login`, `/api/logout`, `/api/me` | API | Redis session |
-| `/api/customers` | API | Postgres `users`, `orders` |
-| `/api/products`, `/api/categories` | Catalog service, through the API | Postgres `products`. Category counts cached in Redis for 60 seconds |
-| `/api/inventory` | API | Postgres `inventory` (warehouse) |
-| `/api/locations` | API | Postgres `locations`, `location_inventory` |
-| `/api/jobs`, `/api/applications` | API | Postgres `jobs`, `applications`. Resume files on disk under `server/uploads/resumes` |
-| `/api/cart`, `/api/checkout` | Orders service, through the API | Cart in Redis. Checkout writes Postgres `orders` and clears the cart |
-| `/api/orders`, `/api/orders/:number/cancel` | Orders service, through the API | Postgres `orders` |
-| `/api/orders/:number/pick`, `ship`, `out-for-delivery`, `deliver`, `tracking`, `collect` | API | Postgres `orders`, `shipments`, `tracking_events` |
+| Path                                                                                     | Answered by                      | Stored in                                                                            |
+| ---------------------------------------------------------------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------ |
+| `/api/login`, `/api/logout`, `/api/me`                                                   | API                              | Redis session                                                                        |
+| `/api/customers`                                                                         | API                              | Postgres `users`, `orders`                                                           |
+| `/api/products`, `/api/categories`                                                       | Catalog service, through the API | Postgres `products`. Category counts cached in Redis for 60 seconds                  |
+| `/api/inventory`                                                                         | API                              | Postgres `inventory` (warehouse)                                                     |
+| `/api/locations`                                                                         | API                              | Postgres `locations`, `location_inventory`                                           |
+| `/api/jobs`, `/api/applications`                                                         | API                              | Postgres `jobs`, `applications`. Resume files on disk under `server/uploads/resumes` |
+| `/api/cart`, `/api/checkout`                                                             | Orders service, through the API  | Cart in Redis. Checkout writes Postgres `orders` and clears the cart                 |
+| `/api/orders`, `/api/orders/:number/cancel`                                              | Orders service, through the API  | Postgres `orders`                                                                    |
+| `/api/orders/:number/pick`, `ship`, `out-for-delivery`, `deliver`, `tracking`, `collect` | API                              | Postgres `orders`, `shipments`, `tracking_events`                                    |
 
 Checkout for a shipped order reserves warehouse `inventory`. Checkout for pickup copies the store address onto the order, charges no shipping, and decrements `location_inventory`.
 

@@ -42,5 +42,9 @@ export default tseslint.config(
     },
     settings: { react: { version: "detect" } },
   },
+  {
+    files: ["**/*.{test,spec}.{ts,tsx}", "jest/setup.ts"],
+    languageOptions: { globals: globals.jest },
+  },
   prettier,
 );

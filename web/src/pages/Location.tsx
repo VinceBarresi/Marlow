@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { api } from "../api";
+import { Empty } from "../Empty";
 import { money } from "../format";
 import { StoreMap } from "../StoreMap";
 
@@ -164,62 +165,71 @@ export function Location() {
           Search
         </button>
       </form>
-      <table data-testid="location-inventory">
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th className="num">On hand</th>
-            <th className="num">Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.map((product) => (
-            <tr key={product.sku} data-testid={`location-row-${product.sku}`}>
-              <td>
-                <Link to={`/products/${product.sku}`}>{product.name}</Link>
-                <div className="hint">
-                  {product.category} · {product.sku}
-                </div>
-              </td>
-              <td className="num" data-testid={`location-on-hand-${product.sku}`}>
-                {product.onHand}
-              </td>
-              <td className="num">{money(product.priceCents)}</td>
+      {total === 0 ? (
+        <Empty
+          testId="location-empty"
+          message={q || category ? "No products match." : "No products on this shelf."}
+        />
+      ) : (
+        <table data-testid="location-inventory">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th className="num">On hand</th>
+              <th className="num">Price</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="pager" data-testid="location-pager">
-        <button
-          className="quiet"
-          type="button"
-          data-testid="location-previous"
-          disabled={page <= 1}
-          onClick={() => {
-            const next = new URLSearchParams(params);
-            next.set("page", String(page - 1));
-            setParams(next);
-          }}
-        >
-          Previous
-        </button>
-        <span data-testid="location-page">
-          Page {page} of {pages}
-        </span>
-        <button
-          className="quiet"
-          type="button"
-          data-testid="location-next"
-          disabled={page >= pages}
-          onClick={() => {
-            const next = new URLSearchParams(params);
-            next.set("page", String(page + 1));
-            setParams(next);
-          }}
-        >
-          Next
-        </button>
-      </div>
+          </thead>
+          <tbody>
+            {products.map((product) => (
+              <tr key={product.sku} data-testid={`location-row-${product.sku}`}>
+                <td>
+                  <Link to={`/products/${product.sku}`}>{product.name}</Link>
+                  <div className="hint">
+                    {product.category} · {product.sku}
+                  </div>
+                </td>
+                <td className="num" data-testid={`location-on-hand-${product.sku}`}>
+                  {product.onHand}
+                </td>
+                <td className="num">{money(product.priceCents)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      {total > 0 ? (
+        <div className="pager" data-testid="location-pager">
+          <button
+            className="quiet"
+            type="button"
+            data-testid="location-previous"
+            disabled={page <= 1}
+            onClick={() => {
+              const next = new URLSearchParams(params);
+              next.set("page", String(page - 1));
+              setParams(next);
+            }}
+          >
+            Previous
+          </button>
+          <span data-testid="location-page">
+            Page {page} of {pages}
+          </span>
+          <button
+            className="quiet"
+            type="button"
+            data-testid="location-next"
+            disabled={page >= pages}
+            onClick={() => {
+              const next = new URLSearchParams(params);
+              next.set("page", String(page + 1));
+              setParams(next);
+            }}
+          >
+            Next
+          </button>
+        </div>
+      ) : null}
     </>
   );
 }

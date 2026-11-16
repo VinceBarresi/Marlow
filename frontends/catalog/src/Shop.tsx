@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { api } from "./api";
+import { Empty } from "./Empty";
 import { money } from "./format";
 import type { Product } from "./types";
 
@@ -13,6 +14,7 @@ export function Shop() {
   const [categories, setCategories] = useState<{ category: string; products: number }[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [total, setTotal] = useState(0);
+  const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
   const pageSize = 12;
 
@@ -41,6 +43,7 @@ export function Shop() {
         if (stop) return;
         setProducts(result.products);
         setTotal(result.total);
+        setReady(true);
       })
       .catch((err: Error) => {
         if (!stop) setError(err.message);
@@ -123,58 +126,67 @@ export function Shop() {
           {error}
         </p>
       ) : null}
-      <div className="grid" data-testid="shop-grid">
-        {products.map((product) => (
-          <Link
-            className="card"
-            key={product.sku}
-            to={`/products/${product.sku}`}
-            data-testid={`product-card-${product.sku}`}
+      {ready && total === 0 && !error ? (
+        <Empty
+          testId="shop-empty"
+          message={q || category ? "No products match." : "No products yet."}
+        />
+      ) : (
+        <div className="grid" data-testid="shop-grid">
+          {products.map((product) => (
+            <Link
+              className="card"
+              key={product.sku}
+              to={`/products/${product.sku}`}
+              data-testid={`product-card-${product.sku}`}
+            >
+              <span className="category" data-testid={`product-category-${product.sku}`}>
+                {product.category}
+              </span>
+              <strong data-testid={`product-name-${product.sku}`}>{product.name}</strong>
+              <span className="price" data-testid={`product-price-${product.sku}`}>
+                {money(product.priceCents)}
+              </span>
+              <span className="hint" data-testid={`product-stock-${product.sku}`}>
+                {product.available > 0 ? `${product.available} available` : "Out of stock"}
+              </span>
+            </Link>
+          ))}
+        </div>
+      )}
+      {total > 0 ? (
+        <div className="pager" data-testid="shop-pager">
+          <button
+            className="quiet"
+            type="button"
+            data-testid="shop-previous"
+            disabled={page <= 1}
+            onClick={() => {
+              const next = new URLSearchParams(params);
+              next.set("page", String(page - 1));
+              setParams(next);
+            }}
           >
-            <span className="category" data-testid={`product-category-${product.sku}`}>
-              {product.category}
-            </span>
-            <strong data-testid={`product-name-${product.sku}`}>{product.name}</strong>
-            <span className="price" data-testid={`product-price-${product.sku}`}>
-              {money(product.priceCents)}
-            </span>
-            <span className="hint" data-testid={`product-stock-${product.sku}`}>
-              {product.available > 0 ? `${product.available} available` : "Out of stock"}
-            </span>
-          </Link>
-        ))}
-      </div>
-      <div className="pager" data-testid="shop-pager">
-        <button
-          className="quiet"
-          type="button"
-          data-testid="shop-previous"
-          disabled={page <= 1}
-          onClick={() => {
-            const next = new URLSearchParams(params);
-            next.set("page", String(page - 1));
-            setParams(next);
-          }}
-        >
-          Previous
-        </button>
-        <span data-testid="shop-page">
-          Page {page} of {pages}
-        </span>
-        <button
-          className="quiet"
-          type="button"
-          data-testid="shop-next"
-          disabled={page >= pages}
-          onClick={() => {
-            const next = new URLSearchParams(params);
-            next.set("page", String(page + 1));
-            setParams(next);
-          }}
-        >
-          Next
-        </button>
-      </div>
+            Previous
+          </button>
+          <span data-testid="shop-page">
+            Page {page} of {pages}
+          </span>
+          <button
+            className="quiet"
+            type="button"
+            data-testid="shop-next"
+            disabled={page >= pages}
+            onClick={() => {
+              const next = new URLSearchParams(params);
+              next.set("page", String(page + 1));
+              setParams(next);
+            }}
+          >
+            Next
+          </button>
+        </div>
+      ) : null}
     </>
   );
 }

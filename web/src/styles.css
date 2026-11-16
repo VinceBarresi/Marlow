@@ -277,6 +277,18 @@ th {
   color: var(--muted);
   font-size: 0.9rem;
 }
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  margin: 28px auto;
+  text-align: center;
+  color: var(--muted);
+}
+.empty p {
+  margin: 0;
+  max-width: 26rem;
+}
 .tracking-number {
   font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
   font-size: 1.05rem;
