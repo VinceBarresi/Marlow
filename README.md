@@ -119,7 +119,7 @@ From this directory, `npm run test:unit` runs every unit test: the Jest page tes
 
 Each page has a sample next to it, for example `web/src/pages/Login.test.tsx`. The sample mocks `api`, renders the page, and checks a test id. Copy that file when you add a case.
 
-A push to GitHub runs the unit tests, Prettier, and ESLint.
+A push to GitHub runs three checks: unit tests, Prettier, and ESLint.
 
 ## Lint and format
 
