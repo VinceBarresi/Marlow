@@ -109,12 +109,35 @@ label {
   color: var(--muted);
 }
 input,
-select {
+select,
+textarea {
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: 6px;
   padding: 8px 10px;
   min-width: 0;
+  font: inherit;
+}
+textarea {
+  min-height: 140px;
+}
+.map {
+  width: 100%;
+  height: 360px;
+  border: 0;
+  border-radius: 10px;
+  margin: 0 0 18px;
+  background: var(--paper);
+  overflow: hidden;
+  z-index: 0;
+}
+.map-links {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+.apply {
+  max-width: 640px;
+  margin-top: 18px;
 }
 button,
 .button {
@@ -158,6 +181,17 @@ button:disabled {
   display: grid;
   gap: 6px;
   align-content: start;
+}
+.card-link {
+  text-decoration: none;
+  color: inherit;
+  display: grid;
+  gap: 6px;
+}
+.card-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 .card .category,
 .sku {

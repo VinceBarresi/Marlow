@@ -14,6 +14,7 @@ export default defineConfig({
         "./Checkout": "./src/Checkout.tsx",
         "./Orders": "./src/Orders.tsx",
         "./Order": "./src/Order.tsx",
+        "./Receipt": "./src/Receipt.tsx",
       },
       shared: {
         react: { singleton: true, requiredVersion: "^19.2.0" },

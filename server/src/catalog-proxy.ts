@@ -4,7 +4,7 @@ type SessionUser = {
   id: string;
   email: string;
   name: string;
-  role: "customer" | "staff";
+  role: "customer" | "staff" | "admin";
 };
 
 const catalogUrl = process.env.CATALOG_URL ?? "http://127.0.0.1:4001";

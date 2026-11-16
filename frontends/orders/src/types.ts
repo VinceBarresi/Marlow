@@ -10,6 +10,8 @@ export type CartItem = {
 export type OrderSummary = {
   number: string;
   status: string;
+  fulfillment: "ship" | "pickup";
+  locationName: string | null;
   placedAt: string;
   totalCents: number;
   shipCity: string;
@@ -21,6 +23,8 @@ export type OrderSummary = {
 export type OrderDetail = {
   number: string;
   status: string;
+  fulfillment: "ship" | "pickup";
+  location: { slug: string; name: string } | null;
   placedAt: string;
   subtotalCents: number;
   shippingCents: number;

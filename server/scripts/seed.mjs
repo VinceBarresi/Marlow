@@ -599,6 +599,59 @@ insert(
   ),
 );
 
+process.stdout
+  .write(`INSERT INTO locations (id, slug, name, city, line1, region, postal_code, phone, hours, latitude, longitude)
+VALUES
+  ('4b1e6a10-2f44-4c1a-8a11-111111111101', 'austin-domain', 'Marlow Domain', 'Austin', '11600 Domain Drive', 'TX', '78758', '512-555-0142', 'Daily 10am–7pm', 30.4015, -97.7254),
+  ('4b1e6a10-2f44-4c1a-8a11-111111111102', 'austin-south-congress', 'Marlow South Congress', 'Austin', '1600 South Congress Avenue', 'TX', '78704', '512-555-0194', 'Daily 11am–7pm', 30.2493, -97.7490),
+  ('4b1e6a10-2f44-4c1a-8a11-111111111103', 'dallas-bishop-arts', 'Marlow Bishop Arts', 'Dallas', '419 North Bishop Avenue', 'TX', '75208', '214-555-0168', 'Daily 10am–6pm', 32.7480, -96.8289),
+  ('4b1e6a10-2f44-4c1a-8a11-111111111104', 'fort-worth-magnolia', 'Marlow Magnolia', 'Fort Worth', '1400 West Magnolia Avenue', 'TX', '76104', '817-555-0133', 'Daily 10am–6pm', 32.7243, -97.3498),
+  ('4b1e6a10-2f44-4c1a-8a11-111111111105', 'houston-heights', 'Marlow Heights', 'Houston', '610 West 19th Street', 'TX', '77008', '713-555-0177', 'Daily 10am–7pm', 29.8024, -95.4042),
+  ('4b1e6a10-2f44-4c1a-8a11-111111111106', 'san-antonio-pearl', 'Marlow Pearl', 'San Antonio', '303 Pearl Parkway', 'TX', '78215', '210-555-0119', 'Daily 10am–6pm', 29.4426, -98.4798),
+  ('4b1e6a10-2f44-4c1a-8a11-111111111107', 'el-paso-mesa', 'Marlow Mesa', 'El Paso', '2812 North Mesa Street', 'TX', '79902', '915-555-0186', 'Daily 10am–6pm', 31.7778, -106.4955),
+  ('4b1e6a10-2f44-4c1a-8a11-111111111108', 'marfa-highland', 'Marlow Highland', 'Marfa', '113 North Highland Avenue', 'TX', '79843', '432-555-0104', 'Thu–Mon 11am–5pm', 30.3110, -104.0205)
+ON CONFLICT (slug) DO UPDATE SET
+  latitude = EXCLUDED.latitude,
+  longitude = EXCLUDED.longitude;
+INSERT INTO location_inventory (location_id, sku, on_hand)
+SELECT l.id, p.sku,
+  CASE
+    WHEN abs(hashtext(l.slug || p.sku)::bigint) % 5 = 0 THEN 0
+    ELSE (abs(hashtext(l.slug || p.sku)::bigint) % 12) + 1
+  END
+FROM locations l
+CROSS JOIN products p
+ON CONFLICT (location_id, sku) DO NOTHING;
+`);
+process.stdout
+  .write(`INSERT INTO jobs (id, slug, title, department, workplace, location_id, summary, description)
+VALUES
+  ('6c0a0001-0000-4000-8000-000000000001', 'software-engineer', 'Software Engineer', 'engineering', 'remote', NULL, 'Build the shop, catalog, and order tools from anywhere.', 'You will work on the Marlow web shop and the services behind it. The role is remote, on US hours, and reports to engineering.'),
+  ('6c0a0001-0000-4000-8000-000000000002', 'frontend-engineer', 'Frontend Engineer', 'engineering', 'remote', NULL, 'Shape the storefront, from the product grid to checkout.', 'You will build the pages guests use to browse, pick up, and track orders. The role is remote.'),
+  ('6c0a0001-0000-4000-8000-000000000003', 'brand-marketing-manager', 'Brand Marketing Manager', 'marketing', 'remote', NULL, 'Tell the Marlow story across the site, mail, and the stores.', 'You will plan campaigns for the shop and the Texas stores. The role is remote, with occasional visits to a store.'),
+  ('6c0a0001-0000-4000-8000-000000000004', 'content-marketing', 'Content Marketing', 'marketing', 'remote', NULL, 'Write the product stories, the journal, and the store notes.', 'You will draft copy for goods, campaigns, and the careers page. The role is remote.'),
+  ('6c0a0001-0000-4000-8000-000000000005', 'account-executive', 'Account Executive', 'sales', 'remote', NULL, 'Sell Marlow to trade accounts and hospitality groups.', 'You will own a book of wholesale accounts and visit stores when a buyer wants to see the floor. The role is remote.'),
+  ('6c0a0001-0000-4000-8000-000000000006', 'wholesale-sales', 'Wholesale Sales', 'sales', 'remote', NULL, 'Keep trade buyers stocked and introduce new goods.', 'You will write orders, answer buyers, and coordinate pickup with the stores. The role is remote.')
+ON CONFLICT (slug) DO NOTHING;
+INSERT INTO jobs (id, slug, title, department, workplace, location_id, summary, description)
+SELECT gen_random_uuid(), 'sales-associate-' || l.slug, 'Sales Associate', 'sales', 'store', l.id,
+  'Help guests on the floor at ' || l.name || ' in ' || l.city || '.',
+  'Greet guests, know the goods, and hand off pickup orders at ' || l.name || '. The store is at ' || l.line1 || ', ' || l.city || ', ' || l.region || ' ' || l.postal_code || '. Hours are ' || l.hours || '.'
+FROM locations l
+ON CONFLICT (slug) DO NOTHING;
+INSERT INTO jobs (id, slug, title, department, workplace, location_id, summary, description)
+SELECT gen_random_uuid(), 'store-lead-' || l.slug, 'Store Lead', 'retail', 'store', l.id,
+  'Open and close ' || l.name || ' and run the floor.',
+  'Schedule the team, watch the shelf, and make sure pickup orders leave the store complete. This job is on site at ' || l.name || ' in ' || l.city || '.'
+FROM locations l
+ON CONFLICT (slug) DO NOTHING;
+INSERT INTO jobs (id, slug, title, department, workplace, location_id, summary, description)
+SELECT gen_random_uuid(), 'visual-merchandiser-' || l.slug, 'Visual Merchandiser', 'marketing', 'store', l.id,
+  'Set the floor at ' || l.name || ' so the goods read from the door.',
+  'You will change the windows and tables at ' || l.name || ' in ' || l.city || ' and keep the shop looking like the pictures. This job is on site.'
+FROM locations l
+ON CONFLICT (slug) DO NOTHING;
+`);
 process.stdout.write("COMMIT;\n");
 console.error(
   `seeded ${products.length} products, ${orders.length} orders, ${lines.length} lines, ${shipments.length} shipments`,

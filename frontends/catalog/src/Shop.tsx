@@ -107,6 +107,17 @@ export function Shop() {
           Search
         </button>
       </form>
+      <div className="row" data-testid="shop-categories">
+        {categories.map((item) => (
+          <Link
+            key={item.category}
+            to={`/categories/${encodeURIComponent(item.category)}`}
+            data-testid={`category-link-${item.category}`}
+          >
+            {item.category}
+          </Link>
+        ))}
+      </div>
       {error ? (
         <p className="error" data-testid="shop-error">
           {error}

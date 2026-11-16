@@ -6,7 +6,19 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["**/node_modules/**", "**/dist/**", "**/@mf-types/**"] },
+  {
+    ignores: [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/@mf-types/**",
+      "**/test-results/**",
+      "**/playwright-report/**",
+      "**/blob-report/**",
+      "**/cypress/videos/**",
+      "**/cypress/screenshots/**",
+      "**/cypress/downloads/**",
+    ],
+  },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   {

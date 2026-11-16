@@ -13,3 +13,7 @@ declare module "orders/Orders" {
 declare module "orders/Order" {
   export function OrderPage(): import("react").ReactElement;
 }
+
+declare module "orders/Receipt" {
+  export function Receipt(): import("react").ReactElement;
+}

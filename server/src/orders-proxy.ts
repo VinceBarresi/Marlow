@@ -4,7 +4,7 @@ type SessionUser = {
   id: string;
   email: string;
   name: string;
-  role: "customer" | "staff";
+  role: "customer" | "staff" | "admin";
 };
 
 const ordersUrl = process.env.ORDERS_URL ?? "http://127.0.0.1:4002";

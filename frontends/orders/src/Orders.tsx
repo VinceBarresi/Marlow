@@ -86,7 +86,10 @@ export function Orders({ staff = false }: { staff?: boolean }) {
                   {order.number}
                 </Link>
                 <div className="hint" data-testid={`${prefix}-meta-${order.number}`}>
-                  {order.lineCount} lines · {order.shipCity}, {order.shipRegion}
+                  {order.lineCount} lines ·{" "}
+                  {order.fulfillment === "pickup"
+                    ? `Pickup at ${order.locationName ?? order.shipCity}`
+                    : `${order.shipCity}, ${order.shipRegion}`}
                 </div>
               </td>
               <td>

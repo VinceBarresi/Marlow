@@ -40,13 +40,22 @@ export function Shell() {
           <NavLink to="/" end data-testid="nav-shop">
             Shop
           </NavLink>
+          <NavLink to="/locations" data-testid="nav-locations">
+            Locations
+          </NavLink>
+          <NavLink to="/careers" data-testid="nav-careers">
+            Careers
+          </NavLink>
           <NavLink to="/orders" data-testid="nav-orders">
             Orders
           </NavLink>
           <NavLink to="/cart" data-testid="nav-cart">
             Cart ({count})
           </NavLink>
-          {user?.role === "staff" ? (
+          <NavLink to="/account" data-testid="nav-account">
+            Account
+          </NavLink>
+          {user?.role === "staff" || user?.role === "admin" ? (
             <>
               <NavLink to="/staff/orders" data-testid="nav-fulfillment">
                 Fulfillment
@@ -54,7 +63,18 @@ export function Shell() {
               <NavLink to="/staff/inventory" data-testid="nav-inventory">
                 Inventory
               </NavLink>
+              <NavLink to="/staff/customers" data-testid="nav-customers">
+                Customers
+              </NavLink>
+              <NavLink to="/staff/applications" data-testid="nav-applications">
+                Applications
+              </NavLink>
             </>
+          ) : null}
+          {user?.role === "admin" ? (
+            <NavLink to="/admin" data-testid="nav-admin">
+              Admin
+            </NavLink>
           ) : null}
         </nav>
         <span className="spacer" data-testid="nav-user">
@@ -95,6 +115,12 @@ export function RequireAuth() {
 
 export function RequireStaff() {
   const { user } = useAuth();
-  if (user?.role !== "staff") return <Navigate to="/" replace />;
+  if (user?.role !== "staff" && user?.role !== "admin") return <Navigate to="/" replace />;
+  return <Outlet />;
+}
+
+export function RequireAdmin() {
+  const { user } = useAuth();
+  if (user?.role !== "admin") return <Navigate to="/" replace />;
   return <Outlet />;
 }

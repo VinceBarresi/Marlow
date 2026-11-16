@@ -2,7 +2,7 @@ export type User = {
   id: string;
   email: string;
   name: string;
-  role: "customer" | "staff";
+  role: "customer" | "staff" | "admin";
 };
 
 export type Product = {
@@ -28,6 +28,8 @@ export type CartItem = {
 export type OrderSummary = {
   number: string;
   status: string;
+  fulfillment: "ship" | "pickup";
+  locationName: string | null;
   placedAt: string;
   totalCents: number;
   shipCity: string;

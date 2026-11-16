@@ -7,7 +7,7 @@ type SessionUser = {
   id: string;
   email: string;
   name: string;
-  role: "customer" | "staff";
+  role: "customer" | "staff" | "admin";
 };
 
 type Deps = {
@@ -47,6 +47,7 @@ export async function registerCommerce(app: FastifyInstance, { pool, redis, requ
         user_id: string;
         ship_city: string;
         ship_region: string;
+        fulfillment: string;
       },
     ) => Promise<string | null>,
   ) {
@@ -59,8 +60,10 @@ export async function registerCommerce(app: FastifyInstance, { pool, redis, requ
         user_id: string;
         ship_city: string;
         ship_region: string;
+        fulfillment: string;
       }>(
-        `select id, status, user_id, ship_city, ship_region from orders where number = $1 for update`,
+        `select id, status, user_id, ship_city, ship_region, fulfillment
+         from orders where number = $1 for update`,
         [number],
       );
       const order = locked.rows[0];
@@ -87,8 +90,9 @@ export async function registerCommerce(app: FastifyInstance, { pool, redis, requ
   app.post<{ Params: { number: string } }>("/api/orders/:number/pick", async (request, reply) => {
     const user = await requireUser(request, reply);
     if (!user) return;
-    if (user.role !== "staff") return reply.code(403).send({ error: "Staff only." });
+    if (user.role === "customer") return reply.code(403).send({ error: "Staff only." });
     const found = await withOrder(request.params.number, async (client, order) => {
+      if (order.fulfillment === "pickup") return "Pickup orders are collected at the store.";
       if (order.status !== "paid") return "Only paid orders can be picked.";
       await client.query(`update orders set status = 'picking' where id = $1`, [order.id]);
       await client.query(
@@ -108,7 +112,7 @@ export async function registerCommerce(app: FastifyInstance, { pool, redis, requ
     async (request, reply) => {
       const user = await requireUser(request, reply);
       if (!user) return;
-      if (user.role !== "staff") return reply.code(403).send({ error: "Staff only." });
+      if (user.role === "customer") return reply.code(403).send({ error: "Staff only." });
       const carrier = text(request.body?.carrier);
       const service = text(request.body?.service) || "Ground";
       if (!carriers.has(carrier) || (service !== "Ground" && service !== "Express")) {
@@ -116,6 +120,7 @@ export async function registerCommerce(app: FastifyInstance, { pool, redis, requ
       }
       let tracking = "";
       const found = await withOrder(request.params.number, async (client, order) => {
+        if (order.fulfillment === "pickup") return "Pickup orders are collected at the store.";
         if (order.status !== "picking") return "Only picking orders can be shipped.";
         const lines = await client.query<{ sku: string; quantity: number }>(
           `select sku, quantity from order_lines where order_id = $1`,
@@ -163,8 +168,9 @@ export async function registerCommerce(app: FastifyInstance, { pool, redis, requ
     async (request, reply) => {
       const user = await requireUser(request, reply);
       if (!user) return;
-      if (user.role !== "staff") return reply.code(403).send({ error: "Staff only." });
+      if (user.role === "customer") return reply.code(403).send({ error: "Staff only." });
       const found = await withOrder(request.params.number, async (client, order) => {
+        if (order.fulfillment === "pickup") return "Pickup orders are collected at the store.";
         if (order.status !== "shipped") return "Only shipped orders can go out for delivery.";
         await client.query(`update shipments set status = 'out_for_delivery' where order_id = $1`, [
           order.id,
@@ -197,8 +203,9 @@ export async function registerCommerce(app: FastifyInstance, { pool, redis, requ
     async (request, reply) => {
       const user = await requireUser(request, reply);
       if (!user) return;
-      if (user.role !== "staff") return reply.code(403).send({ error: "Staff only." });
+      if (user.role === "customer") return reply.code(403).send({ error: "Staff only." });
       const found = await withOrder(request.params.number, async (client, order) => {
+        if (order.fulfillment === "pickup") return "Pickup orders are collected at the store.";
         if (order.status !== "out_for_delivery") {
           return "Only orders that are out for delivery can be delivered.";
         }
@@ -232,12 +239,13 @@ export async function registerCommerce(app: FastifyInstance, { pool, redis, requ
     async (request, reply) => {
       const user = await requireUser(request, reply);
       if (!user) return;
-      if (user.role !== "staff") return reply.code(403).send({ error: "Staff only." });
+      if (user.role === "customer") return reply.code(403).send({ error: "Staff only." });
       const trackingNumber = text(request.body?.trackingNumber);
       if (trackingNumber.length < 6) {
         return reply.code(400).send({ error: "Enter a tracking number." });
       }
       const found = await withOrder(request.params.number, async (client, order) => {
+        if (order.fulfillment === "pickup") return "Pickup orders are collected at the store.";
         const updated = await client.query(
           `update shipments set tracking_number = $2 where order_id = $1`,
           [order.id, trackingNumber],
@@ -255,6 +263,29 @@ export async function registerCommerce(app: FastifyInstance, { pool, redis, requ
       if (!found) return reply.code(404).send({ error: "Order not found." });
       if (found.outcome) return reply.code(409).send({ error: found.outcome });
       return { number: request.params.number, trackingNumber };
+    },
+  );
+
+  app.post<{ Params: { number: string } }>(
+    "/api/orders/:number/collect",
+    async (request, reply) => {
+      const user = await requireUser(request, reply);
+      if (!user) return;
+      if (user.role === "customer") return reply.code(403).send({ error: "Staff only." });
+      const found = await withOrder(request.params.number, async (client, order) => {
+        if (order.fulfillment !== "pickup") return "Only pickup orders can be collected.";
+        if (order.status !== "paid") return "Only paid pickup orders can be collected.";
+        await client.query(`update orders set status = 'delivered' where id = $1`, [order.id]);
+        await client.query(
+          `insert into order_events (order_id, status, note, created_at, actor_email)
+         values ($1, 'delivered', 'Picked up in store', now(), $2)`,
+          [order.id, user.email],
+        );
+        return null;
+      });
+      if (!found) return reply.code(404).send({ error: "Order not found." });
+      if (found.outcome) return reply.code(409).send({ error: found.outcome });
+      return { number: request.params.number, status: "delivered" };
     },
   );
 }

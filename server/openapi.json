@@ -6,7 +6,13 @@
     "description": "Retail API for the Marlow shop. Sign in with POST /api/login. The session cookie is sent automatically on later requests from this page."
   },
   "servers": [{ "url": "http://127.0.0.1:4000" }],
-  "tags": [{ "name": "Session" }, { "name": "Catalog" }, { "name": "Cart" }, { "name": "Orders" }],
+  "tags": [
+    { "name": "Session" },
+    { "name": "Catalog" },
+    { "name": "Cart" },
+    { "name": "Orders" },
+    { "name": "Careers" }
+  ],
   "components": {
     "securitySchemes": {
       "session": {
@@ -53,10 +59,193 @@
           "role": { "$ref": "#/components/schemas/Role" }
         }
       },
+      "Location": {
+        "type": "object",
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "city",
+          "line1",
+          "region",
+          "postalCode",
+          "phone",
+          "hours",
+          "latitude",
+          "longitude",
+          "productsInStock"
+        ],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "slug": { "type": "string" },
+          "name": { "type": "string" },
+          "city": { "type": "string" },
+          "line1": { "type": "string" },
+          "region": { "type": "string" },
+          "postalCode": { "type": "string" },
+          "phone": { "type": "string" },
+          "hours": { "type": "string" },
+          "latitude": { "type": "number" },
+          "longitude": { "type": "number" },
+          "productsInStock": { "type": "integer" }
+        }
+      },
+      "LocationList": {
+        "type": "object",
+        "required": ["locations"],
+        "properties": {
+          "locations": { "type": "array", "items": { "$ref": "#/components/schemas/Location" } }
+        }
+      },
+      "LocationProduct": {
+        "type": "object",
+        "required": ["sku", "name", "category", "priceCents", "onHand"],
+        "properties": {
+          "sku": { "type": "string" },
+          "name": { "type": "string" },
+          "category": { "type": "string" },
+          "priceCents": { "type": "integer" },
+          "onHand": { "type": "integer" }
+        }
+      },
+      "LocationDetail": {
+        "type": "object",
+        "required": ["location", "categories", "products", "page", "pageSize", "total"],
+        "properties": {
+          "location": { "$ref": "#/components/schemas/Location" },
+          "categories": {
+            "type": "array",
+            "description": "Product types with stock at this store.",
+            "items": {
+              "type": "object",
+              "required": ["category", "products"],
+              "properties": {
+                "category": { "type": "string" },
+                "products": { "type": "integer" }
+              }
+            }
+          },
+          "products": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/LocationProduct" }
+          },
+          "page": { "type": "integer" },
+          "pageSize": { "type": "integer" },
+          "total": { "type": "integer" }
+        }
+      },
+      "JobLocation": {
+        "type": "object",
+        "required": ["slug", "name", "city"],
+        "properties": {
+          "slug": { "type": "string" },
+          "name": { "type": "string" },
+          "city": { "type": "string" },
+          "line1": { "type": "string" },
+          "region": { "type": "string" },
+          "postalCode": { "type": "string" }
+        }
+      },
+      "Job": {
+        "type": "object",
+        "required": ["slug", "title", "department", "workplace", "summary"],
+        "properties": {
+          "slug": { "type": "string" },
+          "title": { "type": "string" },
+          "department": {
+            "type": "string",
+            "enum": ["marketing", "sales", "engineering", "retail"]
+          },
+          "workplace": { "type": "string", "enum": ["remote", "store"] },
+          "summary": { "type": "string" },
+          "description": { "type": "string" },
+          "location": {
+            "anyOf": [{ "$ref": "#/components/schemas/JobLocation" }, { "type": "null" }]
+          }
+        }
+      },
+      "JobList": {
+        "type": "object",
+        "required": ["jobs"],
+        "properties": {
+          "jobs": { "type": "array", "items": { "$ref": "#/components/schemas/Job" } }
+        }
+      },
+      "ApplicationCreated": {
+        "type": "object",
+        "required": ["application"],
+        "properties": {
+          "application": {
+            "type": "object",
+            "required": ["id"],
+            "properties": { "id": { "type": "string", "format": "uuid" } }
+          }
+        }
+      },
       "UserResponse": {
         "type": "object",
         "required": ["user"],
         "properties": { "user": { "$ref": "#/components/schemas/User" } }
+      },
+      "Customer": {
+        "type": "object",
+        "required": ["id", "email", "name", "createdAt", "orders", "spentCents"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "email": { "type": "string" },
+          "name": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "orders": { "type": "integer" },
+          "spentCents": { "type": "integer" }
+        }
+      },
+      "CustomerList": {
+        "type": "object",
+        "required": ["customers", "page", "pageSize", "total"],
+        "properties": {
+          "customers": { "type": "array", "items": { "$ref": "#/components/schemas/Customer" } },
+          "page": { "type": "integer" },
+          "pageSize": { "type": "integer" },
+          "total": { "type": "integer" }
+        }
+      },
+      "CustomerOrder": {
+        "type": "object",
+        "required": [
+          "number",
+          "status",
+          "placedAt",
+          "totalCents",
+          "shipCity",
+          "shipRegion",
+          "lineCount"
+        ],
+        "properties": {
+          "number": { "type": "string" },
+          "status": { "$ref": "#/components/schemas/OrderStatus" },
+          "placedAt": { "type": "string", "format": "date-time" },
+          "totalCents": { "type": "integer" },
+          "shipCity": { "type": "string" },
+          "shipRegion": { "type": "string" },
+          "lineCount": { "type": "integer" }
+        }
+      },
+      "CustomerDetail": {
+        "type": "object",
+        "required": ["customer", "orders"],
+        "properties": {
+          "customer": {
+            "type": "object",
+            "required": ["id", "email", "name", "createdAt"],
+            "properties": {
+              "id": { "type": "string", "format": "uuid" },
+              "email": { "type": "string" },
+              "name": { "type": "string" },
+              "createdAt": { "type": "string", "format": "date-time" }
+            }
+          },
+          "orders": { "type": "array", "items": { "$ref": "#/components/schemas/CustomerOrder" } }
+        }
       },
       "LoginRequest": {
         "type": "object",
@@ -205,7 +394,9 @@
           "shipCity": { "type": "string" },
           "shipRegion": { "type": "string" },
           "shipPostalCode": { "type": "string" },
-          "shipCountry": { "type": "string", "default": "US" }
+          "shipCountry": { "type": "string", "default": "US" },
+          "fulfillment": { "type": "string", "enum": ["ship", "pickup"], "default": "ship" },
+          "locationId": { "type": "string", "format": "uuid" }
         }
       },
       "CheckoutOrder": {
@@ -479,6 +670,67 @@
         }
       }
     },
+    "/api/customers": {
+      "get": {
+        "tags": ["Session"],
+        "summary": "Customers",
+        "description": "Staff and admin. Customers only, with order count and spend.",
+        "security": [{ "session": [] }],
+        "parameters": [
+          { "name": "q", "in": "query", "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": { "type": "integer", "default": 25, "maximum": 200 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of customers",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/CustomerList" } }
+            }
+          },
+          "403": {
+            "description": "Not staff",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/customers/{id}": {
+      "get": {
+        "tags": ["Session"],
+        "summary": "One customer and their orders",
+        "description": "Staff and admin.",
+        "security": [{ "session": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Customer",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/CustomerDetail" } }
+            }
+          },
+          "404": {
+            "description": "Unknown customer",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
     "/api/products": {
       "get": {
         "tags": ["Catalog"],
@@ -561,6 +813,355 @@
             "description": "Categories",
             "content": {
               "application/json": { "schema": { "$ref": "#/components/schemas/CategoryList" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/locations": {
+      "get": {
+        "tags": ["Catalog"],
+        "summary": "Texas stores",
+        "description": "Brick-and-mortar locations and how many products each has on the shelf.",
+        "security": [{ "session": [] }],
+        "responses": {
+          "200": {
+            "description": "Stores",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/LocationList" } }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Catalog"],
+        "summary": "Add a store",
+        "description": "Admin only.",
+        "security": [{ "session": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "city",
+                  "line1",
+                  "region",
+                  "postalCode",
+                  "phone",
+                  "hours",
+                  "latitude",
+                  "longitude"
+                ],
+                "properties": {
+                  "name": { "type": "string" },
+                  "city": { "type": "string" },
+                  "line1": { "type": "string" },
+                  "region": { "type": "string" },
+                  "postalCode": { "type": "string" },
+                  "phone": { "type": "string" },
+                  "hours": { "type": "string" },
+                  "latitude": { "type": "number" },
+                  "longitude": { "type": "number" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Store created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["location"],
+                  "properties": { "location": { "$ref": "#/components/schemas/Location" } }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not an admin",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/locations/{slug}": {
+      "get": {
+        "tags": ["Catalog"],
+        "summary": "One store and its pickup inventory",
+        "security": [{ "session": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "q", "in": "query", "schema": { "type": "string" } },
+          {
+            "name": "category",
+            "in": "query",
+            "description": "Product type in stock at this store.",
+            "schema": { "type": "string" }
+          },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": { "type": "integer", "default": 24, "maximum": 200 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Store and in-stock products",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/LocationDetail" } }
+            }
+          },
+          "404": {
+            "description": "Unknown store",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Catalog"],
+        "summary": "Remove a store",
+        "description": "Admin only. Refused when the store has orders. Store jobs and shelf counts are removed with it.",
+        "security": [{ "session": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "204": { "description": "Store removed" },
+          "403": {
+            "description": "Not an admin",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "409": {
+            "description": "Store has orders",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/jobs": {
+      "get": {
+        "tags": ["Careers"],
+        "summary": "Open roles",
+        "description": "Filter by department, workplace (remote or store), or a store slug.",
+        "security": [{ "session": [] }],
+        "parameters": [
+          {
+            "name": "department",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["marketing", "sales", "engineering", "retail"] }
+          },
+          {
+            "name": "workplace",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["remote", "store"] }
+          },
+          { "name": "location", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Jobs",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/JobList" } }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Careers"],
+        "summary": "Add a role",
+        "description": "Admin only. In-store roles need a store slug.",
+        "security": [{ "session": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["title", "department", "workplace", "summary", "description"],
+                "properties": {
+                  "title": { "type": "string" },
+                  "department": {
+                    "type": "string",
+                    "enum": ["marketing", "sales", "engineering", "retail"]
+                  },
+                  "workplace": { "type": "string", "enum": ["remote", "store"] },
+                  "locationSlug": { "type": "string" },
+                  "summary": { "type": "string" },
+                  "description": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Role created" },
+          "403": {
+            "description": "Not an admin",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/jobs/{slug}": {
+      "get": {
+        "tags": ["Careers"],
+        "summary": "One role",
+        "security": [{ "session": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["job"],
+                  "properties": { "job": { "$ref": "#/components/schemas/Job" } }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown role",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Careers"],
+        "summary": "Remove a role",
+        "description": "Admin only. Applications for the role are removed with it.",
+        "security": [{ "session": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "204": { "description": "Role removed" },
+          "403": {
+            "description": "Not an admin",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/jobs/{slug}/applications": {
+      "post": {
+        "tags": ["Careers"],
+        "summary": "Apply for a role",
+        "description": "Multipart form with a PDF or Word resume, 5 MB or smaller.",
+        "security": [{ "session": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "email",
+                  "phone",
+                  "city",
+                  "workAuthorization",
+                  "startDate",
+                  "coverLetter",
+                  "resume"
+                ],
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string" },
+                  "phone": { "type": "string" },
+                  "city": { "type": "string" },
+                  "workAuthorization": { "type": "string", "enum": ["yes", "no"] },
+                  "startDate": { "type": "string", "format": "date" },
+                  "linkedin": { "type": "string" },
+                  "website": { "type": "string" },
+                  "coverLetter": { "type": "string" },
+                  "resume": { "type": "string", "format": "binary" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Application stored",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApplicationCreated" }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing fields or an unsupported resume",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/applications": {
+      "get": {
+        "tags": ["Careers"],
+        "summary": "Applications",
+        "description": "Staff only.",
+        "security": [{ "session": [] }],
+        "responses": {
+          "200": { "description": "Applications" },
+          "403": {
+            "description": "Not staff",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/applications/{id}/resume": {
+      "get": {
+        "tags": ["Careers"],
+        "summary": "Download a resume",
+        "description": "Staff only.",
+        "security": [{ "session": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resume file",
+            "content": {
+              "application/octet-stream": { "schema": { "type": "string", "format": "binary" } }
             }
           }
         }
@@ -672,7 +1273,7 @@
       "post": {
         "tags": ["Cart"],
         "summary": "Place the cart as a paid order",
-        "description": "Reserves stock. Shipping is $8 under $75. Tax is 8%.",
+        "description": "Ship reserves warehouse stock. Pickup takes stock from the chosen Texas store and charges no shipping. Tax is 8%.",
         "security": [{ "session": [] }],
         "requestBody": {
           "required": true,
@@ -869,6 +1470,25 @@
         "responses": {
           "200": {
             "description": "Delivered",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/OrderAction" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/{number}/collect": {
+      "post": {
+        "tags": ["Orders"],
+        "summary": "Mark a pickup order collected",
+        "description": "Staff only. The order must be a paid pickup.",
+        "security": [{ "session": [] }],
+        "parameters": [
+          { "name": "number", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Collected",
             "content": {
               "application/json": { "schema": { "$ref": "#/components/schemas/OrderAction" } }
             }

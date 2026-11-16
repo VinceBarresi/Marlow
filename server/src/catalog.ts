@@ -7,7 +7,7 @@ type SessionUser = {
   id: string;
   email: string;
   name: string;
-  role: "customer" | "staff";
+  role: "customer" | "staff" | "admin";
 };
 
 type Deps = {
@@ -53,7 +53,7 @@ export async function registerCatalog(app: FastifyInstance, { pool, redis, requi
   }>("/api/inventory", async (request, reply) => {
     const user = await requireUser(request, reply);
     if (!user) return;
-    if (user.role !== "staff") return reply.code(403).send({ error: "Staff only." });
+    if (user.role === "customer") return reply.code(403).send({ error: "Staff only." });
 
     const q = request.query.q?.trim() || null;
     const lowStock = request.query.lowStock === "true";

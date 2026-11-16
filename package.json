@@ -3,18 +3,29 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "cypress": "cypress open",
+    "cypress:run": "cypress run",
+    "playwright": "playwright test",
+    "playwright:ui": "playwright test --ui",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
+    "@playwright/test": "^1.65.1",
+    "@types/node": "^24.19.2",
+    "cypress": "^16.3.0",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.14.0",
     "prettier": "^3.10.1",
+    "typescript": "^5.9.3",
     "typescript-eslint": "^8.72.2"
+  },
+  "allowScripts": {
+    "cypress@16.3.0": true
   }
 }

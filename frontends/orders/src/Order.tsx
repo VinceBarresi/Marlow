@@ -16,7 +16,8 @@ function useRole() {
 
 export function OrderPage() {
   const { number = "" } = useParams();
-  const user = { role: useRole() };
+  const role = useRole();
+  const staff = role === "staff" || role === "admin";
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [error, setError] = useState("");
   const [carrier, setCarrier] = useState("UPS");
@@ -59,6 +60,11 @@ export function OrderPage() {
         {when(order.placedAt)}
       </p>
       <h1 data-testid="order-number">{order.number}</h1>
+      {order.fulfillment === "pickup" ? (
+        <p data-testid="order-fulfillment">
+          Pickup{order.location ? ` at ${order.location.name}` : ""}
+        </p>
+      ) : null}
       <p>
         <span className={`pill ${order.status}`} data-testid="order-status">
           {order.status.replaceAll("_", " ")}
@@ -106,7 +112,7 @@ export function OrderPage() {
         </div>
         <div className="stack">
           <section className="panel" data-testid="order-ship-to">
-            <strong>Ship to</strong>
+            <strong>{order.fulfillment === "pickup" ? "Pickup" : "Ship to"}</strong>
             <div data-testid="order-ship-name">{order.shipTo.name}</div>
             <div data-testid="order-ship-line">{order.shipTo.line1}</div>
             <div data-testid="order-ship-city">
@@ -141,7 +147,7 @@ export function OrderPage() {
                   </div>
                 ))}
               </div>
-              {user?.role === "staff" ? (
+              {staff && order.fulfillment !== "pickup" ? (
                 <form
                   className="actions"
                   data-testid="order-tracking-form"
@@ -190,7 +196,16 @@ export function OrderPage() {
                 Cancel order
               </button>
             ) : null}
-            {user?.role === "staff" && order.status === "paid" ? (
+            {staff && order.fulfillment === "pickup" && order.status === "paid" ? (
+              <button
+                type="button"
+                data-testid="order-collect"
+                onClick={() => act(`/api/orders/${order.number}/collect`)}
+              >
+                Mark picked up
+              </button>
+            ) : null}
+            {staff && order.fulfillment !== "pickup" && order.status === "paid" ? (
               <button
                 type="button"
                 data-testid="order-pick"
@@ -199,7 +214,7 @@ export function OrderPage() {
                 Start picking
               </button>
             ) : null}
-            {user?.role === "staff" && order.status === "shipped" ? (
+            {staff && order.fulfillment !== "pickup" && order.status === "shipped" ? (
               <button
                 type="button"
                 data-testid="order-out-for-delivery"
@@ -208,7 +223,7 @@ export function OrderPage() {
                 Out for delivery
               </button>
             ) : null}
-            {user?.role === "staff" && order.status === "out_for_delivery" ? (
+            {staff && order.fulfillment !== "pickup" && order.status === "out_for_delivery" ? (
               <button
                 type="button"
                 data-testid="order-deliver"
@@ -218,7 +233,7 @@ export function OrderPage() {
               </button>
             ) : null}
           </div>
-          {user?.role === "staff" && order.status === "picking" ? (
+          {staff && order.fulfillment !== "pickup" && order.status === "picking" ? (
             <form
               className="actions"
               data-testid="order-ship-form"

@@ -5,3 +5,7 @@ declare module "catalog/Shop" {
 declare module "catalog/Product" {
   export function ProductPage(): import("react").ReactElement;
 }
+
+declare module "catalog/Category" {
+  export function CategoryPage(): import("react").ReactElement;
+}

@@ -17,6 +17,8 @@ From this directory:
    ```bash
    docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -f - < server/sql/001_schema.sql
    docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -f - < server/sql/002_tracking.sql
+   docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -f - < server/sql/004_locations.sql
+   docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -f - < server/sql/005_careers.sql
    ```
 
 3. Load the catalog, customers, and orders. This replaces the current shop data.
@@ -49,6 +51,8 @@ From this directory:
 
 5. Open the shop at [http://localhost:5173](http://localhost:5173). Use `localhost`, not `127.0.0.1`.
 
+   Store maps use the Google Maps JavaScript API when `VITE_GOOGLE_MAPS_API_KEY` is set in `web/.env`. Copy `web/.env.example`. Without a key, the list still shows every store on one map and each store page embeds a Google map.
+
 ## Processes
 
 | Directory           | What it serves                                                                                    | URL                                            |
@@ -62,6 +66,29 @@ From this directory:
 | `frontends/orders`  | Cart, checkout, and order pages, loaded by the shell                                              | [http://localhost:5175](http://localhost:5175) |
 
 API docs are at [http://127.0.0.1:4000/docs](http://127.0.0.1:4000/docs). The shop proxies `/api` to the main API, so the session cookie stays on the shop origin.
+
+How the processes, screens, and data fit together is in [ARCHITECTURE.md](ARCHITECTURE.md).
+
+## Tools
+
+Each app has its own README with the libraries it uses. These are shared:
+
+| Tool              | Where                  | Role                                                                         |
+| ----------------- | ---------------------- | ---------------------------------------------------------------------------- |
+| Docker Compose    | this directory         | Runs Postgres 16 and Redis 7                                                 |
+| Vite              | `web`, `frontends/*`   | Dev server and production build                                              |
+| Module Federation | `web`, `frontends/*`   | The shell loads the catalog and orders screens at runtime                    |
+| React             | `web`, `frontends/*`   | UI                                                                           |
+| React Router      | `web`, `frontends/*`   | Routes in the shell and in the loaded screens                                |
+| Fastify           | `server`, `services/*` | HTTP                                                                         |
+| tsx               | `server`, `services/*` | Runs TypeScript and restarts the process when a file changes                 |
+| node-postgres     | `server`, `services/*` | Postgres client (`pg`)                                                       |
+| ioredis           | `server`, `services/*` | Redis client                                                                 |
+| TypeScript        | every app              | Types. Vite and tsx both transform it with esbuild                           |
+| ESLint            | this directory         | Lint, including React and TypeScript rules                                   |
+| Prettier          | this directory         | Format                                                                       |
+| Cypress           | this directory         | Browser tests. Specs are not checked in yet                                  |
+| Playwright        | this directory         | Browser tests in Chromium, Firefox, and WebKit. Specs are not checked in yet |
 
 ## Logins
 

@@ -46,12 +46,15 @@ CREATE TABLE orders (
   ship_city text NOT NULL,
   ship_region text NOT NULL,
   ship_postal_code text NOT NULL,
-  ship_country text NOT NULL
+  ship_country text NOT NULL,
+  fulfillment text NOT NULL DEFAULT 'ship' CHECK (fulfillment IN ('ship', 'pickup')),
+  location_id uuid
 );
 
 CREATE INDEX orders_user_id_idx ON orders (user_id);
 CREATE INDEX orders_status_idx ON orders (status);
 CREATE INDEX orders_placed_at_idx ON orders (placed_at DESC);
+CREATE INDEX orders_location_id_idx ON orders (location_id);
 
 CREATE TABLE order_lines (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -88,3 +91,67 @@ CREATE TABLE shipments (
   estimated_delivery date,
   delivered_at timestamptz
 );
+
+CREATE TABLE locations (
+  id uuid PRIMARY KEY,
+  slug text NOT NULL UNIQUE,
+  name text NOT NULL,
+  city text NOT NULL,
+  line1 text NOT NULL,
+  region text NOT NULL,
+  postal_code text NOT NULL,
+  phone text NOT NULL,
+  hours text NOT NULL,
+  latitude double precision NOT NULL,
+  longitude double precision NOT NULL
+);
+
+CREATE INDEX locations_city_idx ON locations (city, name);
+
+CREATE TABLE location_inventory (
+  location_id uuid NOT NULL REFERENCES locations (id),
+  sku text NOT NULL REFERENCES products (sku),
+  on_hand integer NOT NULL CHECK (on_hand >= 0),
+  PRIMARY KEY (location_id, sku)
+);
+
+ALTER TABLE orders
+  ADD CONSTRAINT orders_location_id_fkey
+  FOREIGN KEY (location_id) REFERENCES locations (id);
+
+CREATE TABLE jobs (
+  id uuid PRIMARY KEY,
+  slug text NOT NULL UNIQUE,
+  title text NOT NULL,
+  department text NOT NULL CHECK (department IN ('marketing', 'sales', 'engineering', 'retail')),
+  workplace text NOT NULL CHECK (workplace IN ('remote', 'store')),
+  location_id uuid REFERENCES locations (id),
+  summary text NOT NULL,
+  description text NOT NULL,
+  CHECK (
+    (workplace = 'remote' AND location_id IS NULL)
+    OR (workplace = 'store' AND location_id IS NOT NULL)
+  )
+);
+
+CREATE INDEX jobs_department_idx ON jobs (department);
+CREATE INDEX jobs_location_id_idx ON jobs (location_id);
+
+CREATE TABLE applications (
+  id uuid PRIMARY KEY,
+  job_id uuid NOT NULL REFERENCES jobs (id),
+  name text NOT NULL,
+  email text NOT NULL,
+  phone text NOT NULL,
+  city text NOT NULL,
+  work_authorization text NOT NULL CHECK (work_authorization IN ('yes', 'no')),
+  start_date date NOT NULL,
+  linkedin text,
+  website text,
+  cover_letter text NOT NULL,
+  resume_filename text NOT NULL,
+  resume_original_name text NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX applications_job_id_idx ON applications (job_id);

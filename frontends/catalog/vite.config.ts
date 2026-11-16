@@ -12,6 +12,7 @@ export default defineConfig({
       exposes: {
         "./Shop": "./src/Shop.tsx",
         "./Product": "./src/Product.tsx",
+        "./Category": "./src/Category.tsx",
       },
       shared: {
         react: { singleton: true, requiredVersion: "^19.2.0" },

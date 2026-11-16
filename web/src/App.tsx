@@ -1,9 +1,18 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./auth";
+import { Account } from "./pages/Account";
+import { Admin } from "./pages/Admin";
+import { Applications } from "./pages/Applications";
+import { Apply } from "./pages/Apply";
+import { Careers } from "./pages/Careers";
+import { Customer } from "./pages/Customer";
+import { Customers } from "./pages/Customers";
 import { Inventory } from "./pages/Inventory";
+import { Location } from "./pages/Location";
+import { Locations } from "./pages/Locations";
 import { Login } from "./pages/Login";
-import { RequireAuth, RequireStaff, Shell } from "./shell";
+import { RequireAdmin, RequireAuth, RequireStaff, Shell } from "./shell";
 
 const Shop = lazy(() => import("catalog/Shop").then((mod) => ({ default: mod.Shop })));
 const ProductPage = lazy(() =>
@@ -13,6 +22,10 @@ const CartPage = lazy(() => import("orders/Cart").then((mod) => ({ default: mod.
 const Checkout = lazy(() => import("orders/Checkout").then((mod) => ({ default: mod.Checkout })));
 const Orders = lazy(() => import("orders/Orders").then((mod) => ({ default: mod.Orders })));
 const OrderPage = lazy(() => import("orders/Order").then((mod) => ({ default: mod.OrderPage })));
+const Receipt = lazy(() => import("orders/Receipt").then((mod) => ({ default: mod.Receipt })));
+const CategoryPage = lazy(() =>
+  import("catalog/Category").then((mod) => ({ default: mod.CategoryPage })),
+);
 
 export function App() {
   return (
@@ -27,6 +40,19 @@ export function App() {
                 element={
                   <Suspense fallback={<p data-testid="catalog-loading">Loading catalog…</p>}>
                     <Shop />
+                  </Suspense>
+                }
+              />
+              <Route path="/account" element={<Account />} />
+              <Route path="/locations" element={<Locations />} />
+              <Route path="/locations/:slug" element={<Location />} />
+              <Route path="/careers" element={<Careers />} />
+              <Route path="/careers/:slug" element={<Apply />} />
+              <Route
+                path="/categories/:category"
+                element={
+                  <Suspense fallback={<p data-testid="catalog-loading">Loading catalog…</p>}>
+                    <CategoryPage />
                   </Suspense>
                 }
               />
@@ -63,6 +89,14 @@ export function App() {
                 }
               />
               <Route
+                path="/orders/:number/confirmed"
+                element={
+                  <Suspense fallback={<p data-testid="orders-loading">Loading orders…</p>}>
+                    <Receipt />
+                  </Suspense>
+                }
+              />
+              <Route
                 path="/orders/:number"
                 element={
                   <Suspense fallback={<p data-testid="orders-loading">Loading orders…</p>}>
@@ -80,6 +114,12 @@ export function App() {
                   }
                 />
                 <Route path="/staff/inventory" element={<Inventory />} />
+                <Route path="/staff/customers" element={<Customers />} />
+                <Route path="/staff/customers/:id" element={<Customer />} />
+                <Route path="/staff/applications" element={<Applications />} />
+              </Route>
+              <Route element={<RequireAdmin />}>
+                <Route path="/admin" element={<Admin />} />
               </Route>
             </Route>
           </Route>

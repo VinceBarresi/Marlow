@@ -5,6 +5,7 @@ import { CartPage } from "./Cart";
 import { Checkout } from "./Checkout";
 import { OrderPage } from "./Order";
 import { Orders } from "./Orders";
+import { Receipt } from "./Receipt";
 import "./styles.css";
 
 createRoot(document.getElementById("root")!).render(
@@ -15,6 +16,7 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/orders" element={<Orders />} />
+          <Route path="/orders/:number/confirmed" element={<Receipt />} />
           <Route path="/orders/:number" element={<OrderPage />} />
           <Route path="/staff/orders" element={<Orders staff />} />
         </Routes>
