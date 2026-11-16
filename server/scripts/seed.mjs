@@ -264,8 +264,8 @@ const places = [
   ["Albany", "NY", "12207"],
 ];
 
-const customerId = randomUUID();
-const staffId = randomUUID();
+const customerId = "3cb48fe1-b709-44f7-9fe6-9d30c1156f4e";
+const staffId = "a7e1e53f-064a-437f-be27-722883d5f8f9";
 const customers = [
   {
     id: customerId,
@@ -296,7 +296,7 @@ const staff = {
 };
 
 const admin = {
-  id: randomUUID(),
+  id: "69d89a06-daf5-410d-befe-07b2326664f1",
   email: "admin@marlow.test",
   name: "Avery Chen",
   role: "admin",

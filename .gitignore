@@ -12,3 +12,4 @@ cypress/videos
 cypress/screenshots
 cypress/downloads
 coverage
+.e2e-logs

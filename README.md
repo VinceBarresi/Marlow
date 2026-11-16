@@ -81,23 +81,23 @@ How the processes, screens, and data fit together is in [ARCHITECTURE.md](ARCHIT
 
 Each app has its own README with the libraries it uses. These are shared:
 
-| Tool              | Where                  | Role                                                                         |
-| ----------------- | ---------------------- | ---------------------------------------------------------------------------- |
-| Docker Compose    | this directory         | Runs Postgres 16 and Redis 7                                                 |
-| Vite              | `web`, `frontends/*`   | Dev server and production build                                              |
-| Module Federation | `web`, `frontends/*`   | The shell loads the catalog and orders screens at runtime                    |
-| React             | `web`, `frontends/*`   | UI                                                                           |
-| React Router      | `web`, `frontends/*`   | Routes in the shell and in the loaded screens                                |
-| Fastify           | `server`, `services/*` | HTTP                                                                         |
-| tsx               | `server`, `services/*` | Runs TypeScript and restarts the process when a file changes                 |
-| node-postgres     | `server`, `services/*` | Postgres client (`pg`)                                                       |
-| ioredis           | `server`, `services/*` | Redis client                                                                 |
-| TypeScript        | every app              | Types. Vite and tsx both transform it with esbuild                           |
-| ESLint            | this directory         | Lint, including React and TypeScript rules                                   |
-| Prettier          | this directory         | Format                                                                       |
-| Jest              | this directory         | Unit tests for each page. `npm test` renders the page with a mocked API      |
-| Cypress           | this directory         | Browser tests. Specs are not checked in yet                                  |
-| Playwright        | this directory         | Browser tests in Chromium, Firefox, and WebKit. Specs are not checked in yet |
+| Tool              | Where                  | Role                                                                       |
+| ----------------- | ---------------------- | -------------------------------------------------------------------------- |
+| Docker Compose    | this directory         | Runs Postgres 16 and Redis 7                                               |
+| Vite              | `web`, `frontends/*`   | Dev server and production build                                            |
+| Module Federation | `web`, `frontends/*`   | The shell loads the catalog and orders screens at runtime                  |
+| React             | `web`, `frontends/*`   | UI                                                                         |
+| React Router      | `web`, `frontends/*`   | Routes in the shell and in the loaded screens                              |
+| Fastify           | `server`, `services/*` | HTTP                                                                       |
+| tsx               | `server`, `services/*` | Runs TypeScript and restarts the process when a file changes               |
+| node-postgres     | `server`, `services/*` | Postgres client (`pg`)                                                     |
+| ioredis           | `server`, `services/*` | Redis client                                                               |
+| TypeScript        | every app              | Types. Vite and tsx both transform it with esbuild                         |
+| ESLint            | this directory         | Lint, including React and TypeScript rules                                 |
+| Prettier          | this directory         | Format                                                                     |
+| Jest              | this directory         | Unit tests for each page. `npm test` renders the page with a mocked API    |
+| Cypress           | this directory         | API tests in `cypress/tests/api` and browser tests in `cypress/tests/e2e`  |
+| Playwright        | this directory         | Browser tests in Chromium, Firefox, and WebKit. `playwright` does the same |
 
 ## Logins
 
@@ -119,7 +119,7 @@ From this directory, `npm run test:unit` runs every unit test: the Jest page tes
 
 Each page has a sample next to it, for example `web/src/pages/Login.test.tsx`. The sample mocks `api`, renders the page, and checks a test id. Copy that file when you add a case.
 
-A push to GitHub runs three checks: unit tests, Prettier, and ESLint.
+A push to GitHub runs six checks: unit tests, Prettier, ESLint, Cypress API, Cypress e2e, and Playwright. The Cypress and Playwright checks start the shop first.
 
 ## Lint and format
 

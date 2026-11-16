@@ -78,3 +78,94 @@ jobs:
 
       - name: ESLint
         run: npm run lint
+
+  cypress:
+    name: Cypress ${{ matrix.suite }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: API
+            script: cypress:api
+          - suite: e2e
+            script: cypress:e2e
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            server/package-lock.json
+            services/catalog/package-lock.json
+            services/orders/package-lock.json
+            web/package-lock.json
+            frontends/catalog/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm ci --prefix server
+          npm ci --prefix services/catalog
+          npm ci --prefix services/orders
+          npm ci --prefix web
+          npm ci --prefix frontends/catalog
+
+      - name: Start the shop
+        run: bash scripts/e2e-up.sh
+
+      - name: Cypress
+        run: npm run ${{ matrix.script }}
+
+      - name: Shop logs
+        if: failure()
+        run: tail -n 80 .e2e-logs/*.log || true
+
+  playwright:
+    name: Playwright
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            server/package-lock.json
+            services/catalog/package-lock.json
+            services/orders/package-lock.json
+            web/package-lock.json
+            frontends/catalog/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm ci --prefix server
+          npm ci --prefix services/catalog
+          npm ci --prefix services/orders
+          npm ci --prefix web
+          npm ci --prefix frontends/catalog
+        env:
+          CYPRESS_INSTALL_BINARY: "0"
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Start the shop
+        run: bash scripts/e2e-up.sh
+
+      - name: Playwright
+        run: npx playwright test --project=chromium
+
+      - name: Shop logs
+        if: failure()
+        run: tail -n 80 .e2e-logs/*.log || true

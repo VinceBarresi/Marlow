@@ -7,5 +7,5 @@
     "noEmit": true,
     "types": ["cypress", "node"]
   },
-  "include": ["e2e"]
+  "include": ["tests", "support", "pages", "fixtures"]
 }

@@ -1,9 +1,8 @@
+import { loginAsCustomer } from "../../support/login";
+
 describe("shop", () => {
   it("signs in through the API and opens the shop", () => {
-    cy.request("POST", "/api/login", {
-      email: "customer@marlow.test",
-      password: "datalab",
-    });
+    loginAsCustomer();
 
     cy.visit("/");
 

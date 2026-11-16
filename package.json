@@ -8,6 +8,8 @@
     "test:unit": "jest && npm test --prefix server && npm test --prefix web",
     "cypress": "cypress open",
     "cypress:run": "cypress run",
+    "cypress:api": "cypress run --spec \"cypress/tests/api/**/*.ts\"",
+    "cypress:e2e": "cypress run --spec \"cypress/tests/e2e/**/*.cy.ts\"",
     "playwright": "playwright test",
     "playwright:ui": "playwright test --ui",
     "lint": "eslint .",
