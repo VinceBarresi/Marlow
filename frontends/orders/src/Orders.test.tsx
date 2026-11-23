@@ -42,7 +42,5 @@ test("shows filtered empty state for staff fulfillment", async () => {
   await renderPage(<Orders staff />, "/staff/orders?status=cancelled", "/staff/orders");
 
   expect(screen.getByTestId("fulfillment-title")).toHaveTextContent("All orders");
-  expect(screen.getByTestId("fulfillment-empty")).toHaveTextContent(
-    "No orders with that status.",
-  );
+  expect(screen.getByTestId("fulfillment-empty")).toHaveTextContent("No orders with that status.");
 });
