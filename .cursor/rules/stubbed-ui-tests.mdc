@@ -1,0 +1,14 @@
+---
+description: Conventions for stubbed Jest + Testing Library UI tests
+globs: "**/*.test.tsx"
+alwaysApply: false
+---
+
+# Stubbed UI tests
+
+- Prefer the `stubbed-ui-test-author` skill when creating new page/component unit tests.
+- Co-locate `ComponentName.test.tsx` next to the source file.
+- Mock the package `api` module; use that package’s `src/test/whenApi` and `renderPage` (`web`, `frontends/catalog`, `frontends/orders`).
+- Always `await renderPage(...)` so effects flush.
+- Assert with `screen.getByTestId(...)`; prefer adding a `data-testid` over role/text queries.
+- No real network, Cypress, or Playwright in these files.
