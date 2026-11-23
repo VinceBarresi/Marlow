@@ -63,30 +63,30 @@ Both Cypress and Playwright API tests import from here. Extend these files when 
 
 ## How to run
 
-| Suite            | Command |
-| ---------------- | ------- |
-| Unit / stubbed   | `npm run test:unit` |
-| Cypress API      | `npm run cypress:api` |
-| Cypress e2e      | `npm run cypress:e2e` |
-| Cypress Docker   | `npm run cypress:docker` |
-| Playwright API   | `npm run playwright:api` |
-| Playwright e2e   | `npx playwright test --project=chromium` |
-| Playwright Docker| `npm run playwright:docker` |
+| Suite             | Command                                  |
+| ----------------- | ---------------------------------------- |
+| Unit / stubbed    | `npm run test:unit`                      |
+| Cypress API       | `npm run cypress:api`                    |
+| Cypress e2e       | `npm run cypress:e2e`                    |
+| Cypress Docker    | `npm run cypress:docker`                 |
+| Playwright API    | `npm run playwright:api`                 |
+| Playwright e2e    | `npx playwright test --project=chromium` |
+| Playwright Docker | `npm run playwright:docker`              |
 
 Docker runners boot the shop via `scripts/e2e-up.sh` and use `host.docker.internal`. Only change Vite `LISTEN_HOST` / `E2E_HOST` / `allowedHosts` when fixing Docker reachability—not for ordinary new tests.
 
 ## File placement
 
-| Kind        | Location |
-| ----------- | -------- |
-| Manual      | `docs/test-cases/*.md` |
-| Cypress API | `cypress/tests/api/*.cy.ts` |
-| Cypress e2e | `cypress/tests/e2e/*.cy.ts` |
-| Cypress integ | `cypress/tests/e2e/integ/*.cy.ts` (`cy.intercept`) |
-| Cypress PO  | `cypress/pages/` (required for e2e/integ) |
-| Playwright API | `playwright/api/*.spec.ts` |
-| Playwright e2e | `playwright/e2e/*.spec.ts` |
-| Playwright integ | `playwright/e2e/integ/*.spec.ts` (`page.route`) |
-| Playwright PO | `playwright/pages/*.page.ts` (required for e2e/integ) |
-| Playwright auth | `playwright/support/login.ts` |
-| Stubbed UI  | next to source as `*.test.tsx` (every page already has coverage) |
+| Kind             | Location                                                         |
+| ---------------- | ---------------------------------------------------------------- |
+| Manual           | `docs/test-cases/*.md`                                           |
+| Cypress API      | `cypress/tests/api/*.cy.ts`                                      |
+| Cypress e2e      | `cypress/tests/e2e/*.cy.ts`                                      |
+| Cypress integ    | `cypress/tests/e2e/integ/*.cy.ts` (`cy.intercept`)               |
+| Cypress PO       | `cypress/pages/` (required for e2e/integ)                        |
+| Playwright API   | `playwright/api/*.spec.ts`                                       |
+| Playwright e2e   | `playwright/e2e/*.spec.ts`                                       |
+| Playwright integ | `playwright/e2e/integ/*.spec.ts` (`page.route`)                  |
+| Playwright PO    | `playwright/pages/*.page.ts` (required for e2e/integ)            |
+| Playwright auth  | `playwright/support/login.ts`                                    |
+| Stubbed UI       | next to source as `*.test.tsx` (every page already has coverage) |
