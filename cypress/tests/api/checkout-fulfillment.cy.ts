@@ -32,7 +32,7 @@ const firstWarehouseSku = () =>
     const product = (response.body.products as { sku: string; available: number }[]).find(
       (row) => row.available > 0,
     );
-    expect(product, "an in-stock warehouse product").to.exist;
+    expect(product, "an in-stock warehouse product").to.not.equal(undefined);
     return product!.sku;
   });
 
@@ -105,12 +105,10 @@ describe("checkout and fulfillment API", () => {
       });
 
       const trackingNumber = `TESTTRACK${Date.now()}`;
-      cy.request("POST", ordersEndpoints.tracking(number), { trackingNumber }).then(
-        (response) => {
-          expect(response.status).to.eq(200);
-          expect(response.body).to.deep.equal({ number, trackingNumber });
-        },
-      );
+      cy.request("POST", ordersEndpoints.tracking(number), { trackingNumber }).then((response) => {
+        expect(response.status).to.eq(200);
+        expect(response.body).to.deep.equal({ number, trackingNumber });
+      });
 
       cy.request("POST", ordersEndpoints.outForDelivery(number)).then((response) => {
         expect(response.status).to.eq(200);
@@ -136,17 +134,17 @@ describe("checkout and fulfillment API", () => {
 
     cy.request("GET", locationsEndpoints.locations).then((locationsResponse) => {
       expect(locationsResponse.status).to.eq(200);
-      const store = (
-        locationsResponse.body.locations as { id: string; slug: string }[]
-      ).find((row) => row.slug === seedLocationSlug);
-      expect(store, "seed austin-domain location").to.exist;
+      const store = (locationsResponse.body.locations as { id: string; slug: string }[]).find(
+        (row) => row.slug === seedLocationSlug,
+      );
+      expect(store, "seed austin-domain location").to.not.equal(undefined);
 
       cy.request("GET", locationsEndpoints.location(seedLocationSlug)).then((detail) => {
         expect(detail.status).to.eq(200);
         const product = (detail.body.products as { sku: string; onHand: number }[]).find(
           (row) => row.onHand > 0,
         );
-        expect(product, "in-stock location product").to.exist;
+        expect(product, "in-stock location product").to.not.equal(undefined);
 
         cy.request("PUT", ordersEndpoints.cartItems, {
           sku: product!.sku,

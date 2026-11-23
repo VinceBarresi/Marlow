@@ -25,7 +25,7 @@ describe("locations API", () => {
       const seed = (response.body.locations as { slug: string }[]).find(
         (row) => row.slug === seedLocationSlug,
       );
-      expect(seed, "seed austin-domain").to.exist;
+      expect(seed, "seed austin-domain").to.not.equal(undefined);
     });
 
     cy.request("GET", locationsEndpoints.location(seedLocationSlug)).then((response) => {

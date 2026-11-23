@@ -1,10 +1,6 @@
 import { expect, type Page } from "@playwright/test";
 
-export async function loginViaApi(
-  page: Page,
-  email: string,
-  password = "datalab",
-) {
+export async function loginViaApi(page: Page, email: string, password = "datalab") {
   const response = await page.request.post("/api/login", {
     data: { email, password },
   });

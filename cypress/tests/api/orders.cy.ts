@@ -10,7 +10,9 @@ describe("orders and cart API", () => {
     cy.request("POST", loginEndpoints.login, {
       email: "customer@marlow.test",
       password: "datalab",
-    }).its("status").should("eq", 200);
+    })
+      .its("status")
+      .should("eq", 200);
   });
 
   it("returns an empty cart for a fresh session", () => {
