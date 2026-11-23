@@ -13,15 +13,7 @@ services:
     volumes:
       - ./blob-report:/work/blob-report
       - ./test-results:/work/test-results
-    command:
-      [
-        "npx",
-        "playwright",
-        "test",
-        "--project=api",
-        "--project=chromium",
-        "--shard=1/2",
-      ]
+    command: ["npx", "playwright", "test", "--project=api", "--project=chromium", "--shard=1/2"]
 
   playwright-2:
     <<: *playwright
@@ -30,12 +22,4 @@ services:
       PLAYWRIGHT_DOCKER: "1"
       PLAYWRIGHT_OUTPUT_DIR: test-results/shard-2
       CI: "true"
-    command:
-      [
-        "npx",
-        "playwright",
-        "test",
-        "--project=api",
-        "--project=chromium",
-        "--shard=2/2",
-      ]
+    command: ["npx", "playwright", "test", "--project=api", "--project=chromium", "--shard=2/2"]

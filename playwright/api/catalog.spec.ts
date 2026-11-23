@@ -1,11 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { catalogEndpoints } from "../../fixtures/endpoints/catalogEndpoints";
 import { loginEndpoints } from "../../fixtures/endpoints/loginEndpoints";
-import {
-  categoryKeys,
-  inventoryItemKeys,
-  productKeys,
-} from "../../fixtures/models/catalogModel";
+import { categoryKeys, inventoryItemKeys, productKeys } from "../../fixtures/models/catalogModel";
 
 test.describe("catalog API", () => {
   test.beforeEach(async ({ request }) => {

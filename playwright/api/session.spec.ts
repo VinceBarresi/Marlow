@@ -5,10 +5,7 @@ import {
   customerLoginResponseModel,
   type LoginResponseModel,
 } from "../../fixtures/models/loginModel";
-import {
-  healthResponseModel,
-  logoutResponseModel,
-} from "../../fixtures/models/sessionModel";
+import { healthResponseModel, logoutResponseModel } from "../../fixtures/models/sessionModel";
 
 test.describe("session API", () => {
   test("returns health", async ({ request }) => {

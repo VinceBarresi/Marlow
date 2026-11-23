@@ -37,8 +37,7 @@ export function uniqueRemoteJobRequest(stamp = Date.now()): CreateJobRequestMode
 }
 
 /** Minimal PDF contents accepted by the careers upload (PDF/Word only; not text/plain). */
-export const minimalResumePdfContents =
-  "%PDF-1.1\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\n";
+export const minimalResumePdfContents = "%PDF-1.1\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\n";
 
 export const applicationFieldValues = {
   name: "Alex Applicant",
