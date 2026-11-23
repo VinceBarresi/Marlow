@@ -25,9 +25,7 @@ export interface CreateLocationRequestModel {
   longitude: number;
 }
 
-export function uniqueLocationRequest(
-  stamp = Date.now(),
-): CreateLocationRequestModel {
+export function uniqueLocationRequest(stamp = Date.now()): CreateLocationRequestModel {
   return {
     name: `API Test Store ${stamp}`,
     city: "Austin",
