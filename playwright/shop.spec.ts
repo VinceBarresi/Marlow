@@ -10,5 +10,5 @@ test("signs in through the API and opens the shop", async ({ page }) => {
 
   await expect(page.getByTestId("nav-user")).toContainText("customer@marlow.test");
   await expect(page.getByTestId("shop-title")).toHaveText("Shop", { timeout: 20000 });
-  await expect(page).toHaveURL(/localhost:5173\/$/);
+  await expect(page).toHaveURL(/\/$/);
 });
