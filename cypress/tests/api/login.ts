@@ -11,16 +11,22 @@ const loginRequestAdmin: LoginRequestModel = {
   password: "datalab",
 };
 
-const expectLoginResponse = (body: LoginResponseModel, email: string, id: string, name: string, role: string) => {
+const expectLoginResponse = (
+  body: LoginResponseModel,
+  email: string,
+  id: string,
+  name: string,
+  role: string,
+) => {
   const { user } = body;
   expect(user).to.be.an("object").and.to.have.all.keys("email", "id", "name", "role");
-  expect(user.email).to.be.a("string").and.not.to.be.empty;
+  expect(user.email).to.be.a("string").and.not.equal("");
   expect(user.email).to.eq(email);
-  expect(user.id).to.be.a("string").and.not.to.be.empty;
+  expect(user.id).to.be.a("string").and.not.equal("");
   expect(user.id).to.eq(id);
-  expect(user.name).to.be.a("string").and.not.to.be.empty;
+  expect(user.name).to.be.a("string").and.not.equal("");
   expect(user.name).to.eq(name);
-  expect(user.role).to.be.a("string").and.not.to.be.empty;
+  expect(user.role).to.be.a("string").and.not.equal("");
   expect(user.role).to.eq(role);
 };
 
@@ -29,11 +35,11 @@ describe("POST api/login", () => {
     cy.request("POST", loginEndpoints.login, loginRequest).then((response) => {
       expect(response.status).to.eq(200);
       expectLoginResponse(
-        response.body, 
-        "customer@marlow.test", 
-        "3cb48fe1-b709-44f7-9fe6-9d30c1156f4e", 
-        "Mina Adler", 
-        "customer"
+        response.body,
+        "customer@marlow.test",
+        "3cb48fe1-b709-44f7-9fe6-9d30c1156f4e",
+        "Mina Adler",
+        "customer",
       );
     });
   });
@@ -51,4 +57,3 @@ describe("POST api/login", () => {
     });
   });
 });
-

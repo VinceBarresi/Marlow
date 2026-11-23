@@ -7,4 +7,3 @@ RUN npm ci
 
 COPY playwright.config.ts ./
 COPY playwright ./playwright
-COPY fixtures ./fixtures

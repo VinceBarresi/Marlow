@@ -15,7 +15,7 @@ const expectLoginResponse = (body: unknown) => {
 
   const { user } = body as LoginResponseModel;
   expect(user).to.be.an("object").and.to.have.all.keys("email", "id", "name", "role");
-  expect(user.id).to.be.a("string").and.not.to.be.empty;
+  expect(user.id).to.be.a("string").and.not.equal("");
   expect(user).to.include(loginResponseModel.user);
 };
 
