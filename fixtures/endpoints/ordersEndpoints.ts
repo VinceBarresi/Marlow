@@ -1,0 +1,16 @@
+export const ordersEndpoints = {
+  cart: "/api/cart",
+  cartItems: "/api/cart/items",
+  cartItem: (sku: string) => `/api/cart/items/${encodeURIComponent(sku)}`,
+  checkout: "/api/checkout",
+  orders: "/api/orders",
+  order: (number: string) => `/api/orders/${encodeURIComponent(number)}`,
+  cancel: (number: string) => `/api/orders/${encodeURIComponent(number)}/cancel`,
+  pick: (number: string) => `/api/orders/${encodeURIComponent(number)}/pick`,
+  ship: (number: string) => `/api/orders/${encodeURIComponent(number)}/ship`,
+  outForDelivery: (number: string) =>
+    `/api/orders/${encodeURIComponent(number)}/out-for-delivery`,
+  deliver: (number: string) => `/api/orders/${encodeURIComponent(number)}/deliver`,
+  collect: (number: string) => `/api/orders/${encodeURIComponent(number)}/collect`,
+  tracking: (number: string) => `/api/orders/${encodeURIComponent(number)}/tracking`,
+};
