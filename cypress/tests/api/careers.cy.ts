@@ -1,7 +1,4 @@
-import {
-  careersEndpoints,
-  seedJobSlug,
-} from "../../../fixtures/endpoints/careersEndpoints";
+import { careersEndpoints, seedJobSlug } from "../../../fixtures/endpoints/careersEndpoints";
 import { loginEndpoints } from "../../../fixtures/endpoints/loginEndpoints";
 import {
   applicationFieldValues,
@@ -31,7 +28,7 @@ describe("careers API", () => {
       const seed = (response.body.jobs as { slug: string }[]).find(
         (row) => row.slug === seedJobSlug,
       );
-      expect(seed, "seed software-engineer").to.exist;
+      expect(seed, "seed software-engineer").to.not.equal(undefined);
     });
 
     cy.request("GET", careersEndpoints.job(seedJobSlug)).then((response) => {
@@ -98,55 +95,57 @@ describe("careers API", () => {
   });
 
   it("submits an application and staff can list and download the resume", () => {
-    cy.window().then(async (win) => {
-      const formData = new FormData();
-      for (const [key, value] of Object.entries(applicationFieldValues)) {
-        formData.append(key, value);
-      }
-      formData.append(
-        "resume",
-        new Blob([minimalResumePdfContents], { type: "application/pdf" }),
-        "resume.pdf",
-      );
+    cy.window()
+      .then(async (win) => {
+        const formData = new FormData();
+        for (const [key, value] of Object.entries(applicationFieldValues)) {
+          formData.append(key, value);
+        }
+        formData.append(
+          "resume",
+          new Blob([minimalResumePdfContents], { type: "application/pdf" }),
+          "resume.pdf",
+        );
 
-      const createResponse = await win.fetch(careersEndpoints.applications(seedJobSlug), {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
-      expect(createResponse.status).to.eq(201);
-      const createBody = (await createResponse.json()) as { application: { id: string } };
-      expect(createBody).to.have.all.keys("application");
-      expect(createBody.application.id).to.be.a("string").and.not.equal("");
-      return createBody.application.id;
-    }).then((applicationId) => {
-      cy.request("POST", loginEndpoints.login, {
-        email: "staff@marlow.test",
-        password: "datalab",
+        const createResponse = await win.fetch(careersEndpoints.applications(seedJobSlug), {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        });
+        expect(createResponse.status).to.eq(201);
+        const createBody = (await createResponse.json()) as { application: { id: string } };
+        expect(createBody).to.have.all.keys("application");
+        expect(createBody.application.id).to.be.a("string").and.not.equal("");
+        return createBody.application.id;
       })
-        .its("status")
-        .should("eq", 200);
+      .then((applicationId) => {
+        cy.request("POST", loginEndpoints.login, {
+          email: "staff@marlow.test",
+          password: "datalab",
+        })
+          .its("status")
+          .should("eq", 200);
 
-      cy.request("GET", careersEndpoints.applicationsList).then((list) => {
-        expect(list.status).to.eq(200);
-        expect(list.body).to.have.all.keys("applications");
-        expect(list.body.applications).to.be.an("array").and.not.have.length(0);
-        const found = (
-          list.body.applications as { id: string; email: string }[]
-        ).find((row) => row.id === applicationId);
-        expect(found, "submitted application").to.exist;
-        expect(found!.email).to.eq(applicationFieldValues.email);
-      });
+        cy.request("GET", careersEndpoints.applicationsList).then((list) => {
+          expect(list.status).to.eq(200);
+          expect(list.body).to.have.all.keys("applications");
+          expect(list.body.applications).to.be.an("array").and.not.have.length(0);
+          const found = (list.body.applications as { id: string; email: string }[]).find(
+            (row) => row.id === applicationId,
+          );
+          expect(found, "submitted application").to.not.equal(undefined);
+          expect(found!.email).to.eq(applicationFieldValues.email);
+        });
 
-      cy.request({
-        method: "GET",
-        url: careersEndpoints.resume(applicationId),
-        encoding: "binary",
-      }).then((resume) => {
-        expect(resume.status).to.eq(200);
-        expect(resume.body).to.be.a("string").and.not.equal("");
+        cy.request({
+          method: "GET",
+          url: careersEndpoints.resume(applicationId),
+          encoding: "binary",
+        }).then((resume) => {
+          expect(resume.status).to.eq(200);
+          expect(resume.body).to.be.a("string").and.not.equal("");
+        });
       });
-    });
   });
 
   it("rejects applications list for a customer", () => {

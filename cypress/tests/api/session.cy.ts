@@ -4,10 +4,7 @@ import {
   customerLoginResponseModel,
   type LoginResponseModel,
 } from "../../../fixtures/models/loginModel";
-import {
-  healthResponseModel,
-  logoutResponseModel,
-} from "../../../fixtures/models/sessionModel";
+import { healthResponseModel, logoutResponseModel } from "../../../fixtures/models/sessionModel";
 
 describe("session API", () => {
   it("returns health", () => {

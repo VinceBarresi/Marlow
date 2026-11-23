@@ -1,10 +1,7 @@
 import { catalogEndpoints } from "../../../fixtures/endpoints/catalogEndpoints";
 import { loginEndpoints } from "../../../fixtures/endpoints/loginEndpoints";
 import { ordersEndpoints } from "../../../fixtures/endpoints/ordersEndpoints";
-import {
-  cartItemKeys,
-  emptyCartResponseModel,
-} from "../../../fixtures/models/ordersModel";
+import { cartItemKeys, emptyCartResponseModel } from "../../../fixtures/models/ordersModel";
 
 const clearCart = () => {
   cy.request("GET", ordersEndpoints.cart).then((response) => {
@@ -21,7 +18,7 @@ const firstAvailableSku = () =>
     const product = (response.body.products as { sku: string; available: number }[]).find(
       (row) => row.available > 0,
     );
-    expect(product, "an in-stock product").to.exist;
+    expect(product, "an in-stock product").to.not.equal(undefined);
     return product!.sku;
   });
 

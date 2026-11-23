@@ -1,10 +1,7 @@
 import { expect, test, type APIRequestContext } from "@playwright/test";
 import { catalogEndpoints } from "../../fixtures/endpoints/catalogEndpoints";
 import { loginEndpoints } from "../../fixtures/endpoints/loginEndpoints";
-import {
-  locationsEndpoints,
-  seedLocationSlug,
-} from "../../fixtures/endpoints/locationsEndpoints";
+import { locationsEndpoints, seedLocationSlug } from "../../fixtures/endpoints/locationsEndpoints";
 import { ordersEndpoints } from "../../fixtures/endpoints/ordersEndpoints";
 import {
   checkoutOrderKeys,
@@ -139,16 +136,16 @@ test.describe("checkout and fulfillment API", () => {
 
     const locations = await request.get(locationsEndpoints.locations);
     expect(locations.status()).toBe(200);
-    const store = (
-      (await locations.json()).locations as { id: string; slug: string }[]
-    ).find((row) => row.slug === seedLocationSlug);
+    const store = ((await locations.json()).locations as { id: string; slug: string }[]).find(
+      (row) => row.slug === seedLocationSlug,
+    );
     expect(store).toBeTruthy();
 
     const detail = await request.get(locationsEndpoints.location(seedLocationSlug));
     expect(detail.status()).toBe(200);
-    const product = (
-      (await detail.json()).products as { sku: string; onHand: number }[]
-    ).find((row) => row.onHand > 0);
+    const product = ((await detail.json()).products as { sku: string; onHand: number }[]).find(
+      (row) => row.onHand > 0,
+    );
     expect(product).toBeTruthy();
 
     const put = await request.put(ordersEndpoints.cartItems, {
