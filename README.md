@@ -97,7 +97,7 @@ Each app has its own README with the libraries it uses. These are shared:
 | Prettier          | this directory         | Format                                                                     |
 | Jest              | this directory         | Unit tests for each page. `npm test` renders the page with a mocked API    |
 | Cypress           | this directory         | API tests in `cypress/tests/api` and browser tests in `cypress/tests/e2e`  |
-| Playwright        | this directory         | Browser tests in Chromium, Firefox, and WebKit. `playwright` does the same |
+| Playwright        | this directory         | API + browser tests in `playwright/`. Local: `playwright` / `playwright:ui` |
 
 ## Logins
 
@@ -119,7 +119,16 @@ From this directory, `npm run test:unit` runs every unit test: the Jest page tes
 
 Each page has a sample next to it, for example `web/src/pages/Login.test.tsx`. The sample mocks `api`, renders the page, and checks a test id. Copy that file when you add a case.
 
-A push to GitHub runs six checks: unit tests, Prettier, ESLint, Cypress API, Cypress e2e, and Playwright. The Cypress and Playwright checks start the shop first.
+A push to GitHub runs five checks: unit tests, Prettier, ESLint, Cypress, and Playwright. The Cypress and Playwright checks start the shop, then run tests in Docker workers (Cypress splits API vs e2e specs; Playwright uses `--shard` — no Cypress Cloud).
+
+Locally, with Docker available:
+
+```bash
+npm run cypress:docker
+npm run playwright:docker
+```
+
+Each script starts the shop via `scripts/e2e-up.sh` if needed, then runs parallel containers against `host.docker.internal:5173`.
 
 ## Lint and format
 

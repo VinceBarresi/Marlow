@@ -1,0 +1,14 @@
+FROM cypress/included:16.3.0
+
+WORKDIR /work
+
+COPY package.json package-lock.json ./
+ENV CYPRESS_INSTALL_BINARY=0
+RUN npm ci
+
+COPY cypress.config.ts ./
+COPY cypress ./cypress
+COPY fixtures ./fixtures
+
+# Image entrypoint is `cypress`; compose supplies `run --spec ...`.
+ENTRYPOINT ["cypress"]

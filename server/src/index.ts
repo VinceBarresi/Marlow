@@ -223,4 +223,5 @@ await app.register(swagger, {
 await app.register(swaggerUi, { routePrefix: "/docs" });
 
 const port = Number(process.env.PORT ?? 4000);
-await app.listen({ port, host: "127.0.0.1" });
+const host = process.env.LISTEN_HOST ?? "127.0.0.1";
+await app.listen({ port, host });

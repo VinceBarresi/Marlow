@@ -1,0 +1,41 @@
+services:
+  playwright-1: &playwright
+    build:
+      context: .
+      dockerfile: Dockerfile.playwright
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      PLAYWRIGHT_BASE_URL: http://host.docker.internal:5173
+      PLAYWRIGHT_DOCKER: "1"
+      PLAYWRIGHT_OUTPUT_DIR: test-results/shard-1
+      CI: "true"
+    volumes:
+      - ./blob-report:/work/blob-report
+      - ./test-results:/work/test-results
+    command:
+      [
+        "npx",
+        "playwright",
+        "test",
+        "--project=api",
+        "--project=chromium",
+        "--shard=1/2",
+      ]
+
+  playwright-2:
+    <<: *playwright
+    environment:
+      PLAYWRIGHT_BASE_URL: http://host.docker.internal:5173
+      PLAYWRIGHT_DOCKER: "1"
+      PLAYWRIGHT_OUTPUT_DIR: test-results/shard-2
+      CI: "true"
+    command:
+      [
+        "npx",
+        "playwright",
+        "test",
+        "--project=api",
+        "--project=chromium",
+        "--shard=2/2",
+      ]
