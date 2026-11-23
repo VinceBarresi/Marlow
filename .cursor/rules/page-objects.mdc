@@ -1,0 +1,32 @@
+---
+description: Page object conventions for Cypress and Playwright e2e/integ tests
+globs: cypress/pages/**/*.ts,cypress/tests/e2e/**/*.ts,playwright/pages/**/*.ts,playwright/e2e/**/*.ts,playwright/support/**/*.ts
+alwaysApply: false
+---
+
+# Page objects
+
+- Prefer the `page-object-author` skill when adding or extending page objects.
+- E2E and integ specs must use page objects—do not inline `data-testid` strings in specs.
+- Keep selectors and navigation in the page object; keep scenario orchestration in the spec.
+- Auth helpers stay in `*/support/login.ts` (not page objects). Use API login unless testing login UX.
+
+## Cypress (`cypress/pages/`)
+
+- Static class with selector constants + `visit` / action helpers.
+- Specs: `cy.get(LoginPage.error)`, `ShopPage.visit()`.
+
+## Playwright (`playwright/pages/*.page.ts`)
+
+- Instance class taking `Page`; methods for `goto`, actions, and `expect*` assertions.
+- Specs: `const shop = new ShopPage(page); await shop.goto(); await shop.expectLoaded();`.
+
+## Naming
+
+| Surface | Cypress | Playwright |
+| ------- | ------- | ---------- |
+| Login | `pages/login.ts` → `LoginPage` | `pages/login.page.ts` → `LoginPage` |
+| Shell/nav | `pages/shell.ts` → `Shell` | `pages/shell.page.ts` → `ShellPage` |
+| Shop / cart / orders | same pattern | same pattern |
+
+Extend an existing page object before creating a new file. Mirror Cypress and Playwright when both frameworks cover the flow.
