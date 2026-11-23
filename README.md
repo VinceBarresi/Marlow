@@ -130,6 +130,15 @@ npm run playwright:docker
 
 Each script starts the shop via `scripts/e2e-up.sh` if needed, then runs parallel containers against `host.docker.internal:5173`.
 
+Cypress writes Allure results under `allure-results/` (failure screenshots are attached automatically). After a run:
+
+```bash
+npm run allure:cypress   # generate HTML into allure-report/
+npm run allure:open      # open the report
+```
+
+`npm run cypress:docker` generates the report when the workers finish.
+
 ## Lint and format
 
 From this directory:

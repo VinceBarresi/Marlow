@@ -117,6 +117,17 @@ jobs:
         if: failure()
         run: tail -n 80 .e2e-logs/*.log || true
 
+      - name: Upload Allure report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-allure-report
+          path: |
+            allure-report/
+            allure-results/
+            cypress/screenshots/
+          if-no-files-found: ignore
+
   playwright:
     name: Playwright
     runs-on: ubuntu-latest

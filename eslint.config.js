@@ -17,6 +17,8 @@ export default tseslint.config(
       "**/cypress/videos/**",
       "**/cypress/screenshots/**",
       "**/cypress/downloads/**",
+      "**/allure-results/**",
+      "**/allure-report/**",
     ],
   },
   eslint.configs.recommended,

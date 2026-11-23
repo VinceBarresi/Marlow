@@ -7,11 +7,16 @@ services:
       - "host.docker.internal:host-gateway"
     environment:
       CYPRESS_BASE_URL: http://host.docker.internal:5173
+      ALLURE_RESULTS_DIR: allure-results/api
     volumes:
       - ./cypress/screenshots:/work/cypress/screenshots
       - ./cypress/videos:/work/cypress/videos
+      - ./allure-results:/work/allure-results
     command: ["run", "--spec", "cypress/tests/api/**/*.ts"]
 
   cypress-e2e:
     <<: *cypress
+    environment:
+      CYPRESS_BASE_URL: http://host.docker.internal:5173
+      ALLURE_RESULTS_DIR: allure-results/e2e
     command: ["run", "--spec", "cypress/tests/e2e/**/*.cy.ts"]
