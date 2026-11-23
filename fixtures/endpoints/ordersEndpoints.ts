@@ -8,8 +8,7 @@ export const ordersEndpoints = {
   cancel: (number: string) => `/api/orders/${encodeURIComponent(number)}/cancel`,
   pick: (number: string) => `/api/orders/${encodeURIComponent(number)}/pick`,
   ship: (number: string) => `/api/orders/${encodeURIComponent(number)}/ship`,
-  outForDelivery: (number: string) =>
-    `/api/orders/${encodeURIComponent(number)}/out-for-delivery`,
+  outForDelivery: (number: string) => `/api/orders/${encodeURIComponent(number)}/out-for-delivery`,
   deliver: (number: string) => `/api/orders/${encodeURIComponent(number)}/deliver`,
   collect: (number: string) => `/api/orders/${encodeURIComponent(number)}/collect`,
   tracking: (number: string) => `/api/orders/${encodeURIComponent(number)}/tracking`,
