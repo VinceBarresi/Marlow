@@ -1,8 +1,5 @@
 import { expect, test } from "@playwright/test";
-import {
-  careersEndpoints,
-  seedJobSlug,
-} from "../../fixtures/endpoints/careersEndpoints";
+import { careersEndpoints, seedJobSlug } from "../../fixtures/endpoints/careersEndpoints";
 import { loginEndpoints } from "../../fixtures/endpoints/loginEndpoints";
 import {
   applicationFieldValues,
@@ -79,9 +76,7 @@ test.describe("careers API", () => {
     expect(await missing.json()).toHaveProperty("error");
   });
 
-  test("submits an application and staff can list and download the resume", async ({
-    request,
-  }) => {
+  test("submits an application and staff can list and download the resume", async ({ request }) => {
     const create = await request.post(careersEndpoints.applications(seedJobSlug), {
       multipart: {
         ...applicationFieldValues,
@@ -110,9 +105,9 @@ test.describe("careers API", () => {
     const listBody = await list.json();
     expect(Object.keys(listBody).sort()).toEqual(["applications"]);
     expect(listBody.applications.length).toBeGreaterThan(0);
-    const found = (
-      listBody.applications as { id: string; email: string }[]
-    ).find((row) => row.id === applicationId);
+    const found = (listBody.applications as { id: string; email: string }[]).find(
+      (row) => row.id === applicationId,
+    );
     expect(found).toBeTruthy();
     expect(found!.email).toBe(applicationFieldValues.email);
 

@@ -1,9 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { loginEndpoints } from "../../fixtures/endpoints/loginEndpoints";
-import {
-  locationsEndpoints,
-  seedLocationSlug,
-} from "../../fixtures/endpoints/locationsEndpoints";
+import { locationsEndpoints, seedLocationSlug } from "../../fixtures/endpoints/locationsEndpoints";
 import { locationKeys, uniqueLocationRequest } from "../../fixtures/models/locationsModel";
 
 test.describe("locations API", () => {
@@ -22,9 +19,9 @@ test.describe("locations API", () => {
     expect(Object.keys(body).sort()).toEqual(["locations"]);
     expect(body.locations.length).toBeGreaterThan(0);
     expect(Object.keys(body.locations[0]).sort()).toEqual([...locationKeys].sort());
-    expect(
-      body.locations.some((row: { slug: string }) => row.slug === seedLocationSlug),
-    ).toBe(true);
+    expect(body.locations.some((row: { slug: string }) => row.slug === seedLocationSlug)).toBe(
+      true,
+    );
 
     const detail = await request.get(locationsEndpoints.location(seedLocationSlug));
     expect(detail.status()).toBe(200);

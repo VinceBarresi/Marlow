@@ -24,11 +24,13 @@ description: >-
 # <Feature / flow name>
 
 ## Meta
+
 - Area: <shop | account | admin | api | ...>
 - Priority: <P0 | P1 | P2>
 - Type: manual
 
 ## Preconditions
+
 - App running (`npm run dev` or e2e stack)
 - Signed in as: <role / email> (or signed out)
 - Data: <seed state or setup>
@@ -36,21 +38,28 @@ description: >-
 ## Cases
 
 ### TC-1: <Happy path title>
+
 **Steps**
+
 1. ...
 2. ...
 
 **Expected**
+
 - ...
 
 ### TC-2: <Negative / edge title>
+
 **Steps**
+
 1. ...
 
 **Expected**
+
 - ...
 
 ## Notes
+
 - ...
 ```
 

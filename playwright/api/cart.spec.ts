@@ -2,10 +2,7 @@ import { expect, test, type APIRequestContext } from "@playwright/test";
 import { catalogEndpoints } from "../../fixtures/endpoints/catalogEndpoints";
 import { loginEndpoints } from "../../fixtures/endpoints/loginEndpoints";
 import { ordersEndpoints } from "../../fixtures/endpoints/ordersEndpoints";
-import {
-  cartItemKeys,
-  emptyCartResponseModel,
-} from "../../fixtures/models/ordersModel";
+import { cartItemKeys, emptyCartResponseModel } from "../../fixtures/models/ordersModel";
 
 async function clearCart(request: APIRequestContext) {
   const response = await request.get(ordersEndpoints.cart);
