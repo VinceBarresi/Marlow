@@ -1,39 +1,29 @@
-export class Shop {
-  static shopTitle = "[data-testid=shop-title]";
+export class ShopPage {
+  static path = "/";
 
-  static shopCount = "[data-testid=shop-count]";
+  static title = "[data-testid=shop-title]";
+  static count = "[data-testid=shop-count]";
+  static grid = "[data-testid=shop-grid]";
+  static empty = "[data-testid=shop-empty]";
+  static searchInput = "[data-testid=shop-search]";
+  static searchSubmit = "[data-testid=shop-search-submit]";
+  static productCard = "[data-testid^=product-card-]";
+  static categoryLink = "[data-testid^=category-link-]";
 
-  // search form
-  static searchForm = "[data-testid=search-form]";
+  static visit(query = "") {
+    cy.visit(`${ShopPage.path}${query}`);
+  }
 
-  // search input
-  static searchInput = "[data-testid=search-input]";
+  static search(query: string) {
+    cy.get(ShopPage.searchInput).clear().type(query);
+    cy.get(ShopPage.searchSubmit).click();
+  }
 
-  // search button
-  static searchButton = "[data-testid=search-button]";
+  static openFirstProduct() {
+    cy.get(ShopPage.productCard).first().click();
+  }
 
-  // search results
-  static searchResults = "[data-testid=search-results]";
-
-  // search result item
-  static searchResultItem = "[data-testid=search-result-item]";
-
-  // search result item title
-  static searchResultItemTitle = "[data-testid=search-result-item-title]";
-
-  // shop categiries
-  static shopCategories = "[data-testid=shop-categories]";
-
-  // shop category item
-  static shopCategoryItem = "[data-testid=shop-category-item]";
-
-  // shop category item title
-  static shopCategoryItemTitle = "[data-testid=shop-category-item-title]";
-
-  // shop category item count
-  static shopCategoryItemCount = "[data-testid=shop-category-item-count]";
-
-  static visit() {
-    cy.visit("/");
+  static openFirstCategory() {
+    cy.get(ShopPage.categoryLink).first().click();
   }
 }

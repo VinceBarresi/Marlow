@@ -1,0 +1,18 @@
+---
+description: Conventions for Cypress and Playwright browser e2e tests
+globs: cypress/tests/e2e/**/*.ts,cypress/pages/**/*.ts,cypress/support/**/*.ts,playwright/e2e/**/*.ts,playwright/pages/**/*.ts,playwright/support/**/*.ts
+alwaysApply: false
+---
+
+# E2E tests
+
+- Prefer the `e2e-test-author` skill when creating new browser flows; use `page-object-author` when adding or extending page objects.
+- Add **both** Cypress (`cypress/tests/e2e/*.cy.ts`) and Playwright (`playwright/e2e/*.spec.ts`) unless the user names one framework.
+- Integ tests (network stubs via `cy.intercept` / `page.route`) go under `**/e2e/integ/`—not mixed into live-API e2e files.
+- Selectors: `data-testid` only; add a test id in product code if missing. Specs go through page objects (see `page-objects.mdc`).
+- Sign in via API, then open the UI—do not drive the login form unless testing login UX.
+  - Cypress: `loginAsCustomer()` / `loginAsAdmin()` from `cypress/support/login.ts`, then page `visit`
+  - Playwright: `loginAsCustomer(page)` / `loginAsAdmin(page)` from `playwright/support/login.ts`, then page `goto`
+- Assert path/pathname—not hardcoded `localhost` hosts.
+- Page objects: `cypress/pages/` (static) and `playwright/pages/*.page.ts` (instance).
+- Do not change Vite `LISTEN_HOST` / `E2E_HOST` / `allowedHosts` unless fixing Docker reachability.
