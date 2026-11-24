@@ -153,6 +153,7 @@ jobs:
       - name: Publish Allure to GitHub Pages
         id: allure_pages
         if: always() && hashFiles('allure-report/index.html') != ''
+        continue-on-error: true
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -237,6 +238,7 @@ jobs:
 
       - name: Publish Playwright report to GitHub Pages
         if: always() && hashFiles('playwright-report/index.html') != ''
+        continue-on-error: true
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
