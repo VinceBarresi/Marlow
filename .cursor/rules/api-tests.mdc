@@ -1,0 +1,27 @@
+---
+description: Conventions for Marlow Cypress and Playwright API tests — always assert response schema
+globs: cypress/tests/api/**/*.ts,playwright/api/**/*.ts,cypress/fixtures/endpoints/**/*.ts,cypress/fixtures/models/**/*.ts,fixtures/**/*
+alwaysApply: false
+---
+
+# API tests
+
+- Prefer the `api-test-author` skill when creating API coverage. Write **both** Cypress and Playwright unless the user names one framework.
+- Specs: `cypress/tests/api/*.cy.ts`, `playwright/api/*.spec.ts`. Shared shapes: `cypress/fixtures/endpoints/`, `cypress/fixtures/models/` (and binary fixtures under `fixtures/` when needed).
+- Assert **status and schema** on every successful response under test. Do not stop at status alone.
+
+## Schema checks (required)
+
+For each response body the case cares about:
+
+1. **Exact keys** on the body (and on nested objects you contract against)—no silent extra/missing fields.
+2. **Types / formats** for dynamic fields (e.g. non-empty string `id`, `/^pm_/` payment method ids).
+3. **Expected values** via shared models (`include` / `toMatchObject`), not duplicated literals in both suites.
+
+**Cypress:** `expect(body).to.have.all.keys(...)`; nested objects the same; `expect(obj).to.include(expectedPartial)`; prefer helpers like `expectLoginResponse` next to the spec or in fixtures.
+
+**Playwright:** `expect(Object.keys(body).sort()).toEqual([...])` (and nested); `expect(obj).toMatchObject(expectedPartial)`; `expect.any(String)` / regex for dynamic ids.
+
+Error cases still assert status and a stable error shape when the API returns one (e.g. `{ error: string }` keys + message).
+
+Extend `fixtures/models` (or `cypress/fixtures/models`) when adding endpoints; keep Cypress and Playwright assertions aligned.

@@ -27,3 +27,12 @@ test("lists one of your orders", async () => {
   expect(screen.getByTestId("orders-status-1001")).toHaveTextContent("paid");
   expect(screen.getByTestId("orders-total-1001")).toHaveTextContent("$60.48");
 });
+
+test("shows empty state when you have no orders", async () => {
+  whenApi({ "/api/orders": { orders: [], total: 0 } });
+  await renderPage(<Orders />);
+
+  expect(screen.getByTestId("orders-title")).toHaveTextContent("Your orders");
+  expect(screen.getByTestId("orders-count")).toHaveTextContent("0 orders");
+  expect(screen.getByTestId("orders-empty")).toHaveTextContent("You have no orders yet.");
+});

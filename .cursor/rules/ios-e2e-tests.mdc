@@ -1,0 +1,24 @@
+---
+description: Conventions for Marlow iOS Appium / WebDriverIO e2e tests
+globs: appium/**/*.ts,ios/Marlow/Marlow/Features/**/*.swift,ios/Marlow/Marlow/App/**/*.swift,scripts/appium-ios.sh
+alwaysApply: false
+---
+
+# iOS e2e tests (Appium)
+
+- Prefer the `ios-e2e-test-author` skill when creating Simulator e2e coverage. For screen wrappers only, prefer `screen-object-author` / `screen-objects.mdc`.
+- Specs live in `appium/specs/`; screen objects in `appium/screens/`. Config: `appium/wdio.conf.ts`.
+- Customer v1 flows only (login, shop, product, cart, checkout, orders, account) unless the user expands scope.
+- Require local API on `:4000` (`npm run dev`). Run with `npm run appium:ios` (build + test) or `npm run appium:ios:run` (prebuilt `.app`).
+- Device: `MARLOW_IOS_DEVICE` (default `iPhone 16`); app path: `MARLOW_APP_PATH`.
+- Do not commit `ios/Marlow/build/`, `.appium/`, or `**/xcuserdata/`.
+
+## Selectors (required)
+
+- **Always** set SwiftUI `.accessibilityIdentifier("…")` on controls and assertion targets before writing Appium coverage. Add missing ids in `ios/Marlow/Marlow/Features/` (and `App/`) as part of the same change.
+- Prefer ids that mirror web `data-testid`s when the screen exists on both platforms (e.g. `login-email`).
+- Screen-object selector priority:
+  1. **Accessibility id** — Appium `$("~<id>")` (e.g. `$("~login-email")`). Default for every new control.
+  2. **Predicate** — only when an accessibility id is impractical (dynamic trees, system alerts, etc.). Document why in a short comment on the getter.
+  3. **Never XPath** (or class-chain / name/label-only fishing) in screen objects or specs.
+- Specs call screen objects only—no raw selectors in `appium/specs/`.

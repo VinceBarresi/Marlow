@@ -1,0 +1,14 @@
+---
+description: Conventions for Cypress and Playwright page objects
+globs: cypress/pages/**/*.ts,playwright/pages/**/*.ts
+alwaysApply: false
+---
+
+# Page objects
+
+- Prefer the `page-object-author` skill when adding or extending page objects.
+- Cypress: static classes in `cypress/pages/` — selector constants + `visit` / actions.
+- Playwright: instance classes in `playwright/pages/*.page.ts` — constructor takes `Page`; `goto` / actions / `expect*`.
+- Selectors use `data-testid` only (`[data-testid=…]` / `getByTestId`). Add missing test ids in product UI when needed.
+- E2E and mock UI specs must go through page objects—no inline `data-testid` strings in specs.
+- Keep Cypress and Playwright page objects aligned for the same screen.

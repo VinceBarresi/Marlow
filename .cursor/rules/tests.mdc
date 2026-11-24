@@ -1,0 +1,98 @@
+---
+description: Route test work to layer rules/skills; shared logins, paths, and run commands
+alwaysApply: true
+---
+
+# Tests
+
+When the user asks to create tests, use the matching project skill and obey path rules under `.cursor/rules/`:
+
+| Request | Skill | Rules |
+| ------- | ----- | ----- |
+| Manual / QA checklist | `manual-test-case-author` | `manual-test-cases.mdc` |
+| API / endpoint / cy.request | `api-test-author` | `api-tests.mdc` |
+| E2E / Cypress + Playwright live UI | `e2e-test-author` | `e2e-tests.mdc` |
+| Mock UI / intercept + route | `mock-ui-test-author` | `mock-ui-tests.mdc` |
+| Page object / POM | `page-object-author` | `page-objects.mdc` |
+| Screen object (Appium) | `screen-object-author` | `screen-objects.mdc` |
+| Mock component / Jest page test | `mock-component-test-author` | `mock-component-tests.mdc` |
+| iOS e2e / Appium / Simulator | `ios-e2e-test-author` | `ios-e2e-tests.mdc` |
+
+API, e2e, and mock-ui skills write **both Cypress and Playwright** unless the user names one framework. Prefer existing patterns over inventing new ones.
+
+## Manual → automation handoff
+
+When the user says a manual case is **done**, **complete**, **ready to automate**, or asks to **write API/e2e/mock/iOS tests from** a `docs/test-cases/*.md` file:
+
+1. Read that markdown file.
+2. Split cases by layer:
+   - **API** — HTTP status/body (login, list orders empty, etc.) → follow `api-test-author` (shared web + iOS; no separate iOS API suite)
+   - **E2E** — Cypress/Playwright browser UI against the live API → follow `e2e-test-author`
+   - **Mock UI** — browser UI with `cy.intercept` / `page.route` → follow `mock-ui-test-author` (specs under `e2e/mock-ui/`)
+   - **Mock component** — Jest component empty/loading/error with mocked API → follow `mock-component-test-author`
+   - **iOS e2e** — Simulator-visible customer flows → follow `ios-e2e-test-author`
+3. Skip or note cases that are exploratory-only / not automatable.
+4. Prefer extending shared fixtures for API; keep Cypress and Playwright in sync.
+
+## Seed logins
+
+| Role     | Email                | Password |
+| -------- | -------------------- | -------- |
+| Customer | customer@marlow.test | datalab  |
+| Staff    | staff@marlow.test    | datalab  |
+| Admin    | admin@marlow.test    | datalab  |
+
+Customer display name: Mina Adler. Admin: Avery Chen. Staff: Jordan Walsh.
+
+Do **not** hardcode user UUIDs in assertions unless the test truly requires a fixed id; prefer “non-empty string id” or omit id from expected models.
+
+## Web selectors
+
+- Prefer `data-testid` in UI, e2e, and manual steps.
+- Avoid CSS class / text-only selectors unless no test id exists (then add a test id in the product code).
+
+## File placement
+
+| Kind                | Location                                                         |
+| ------------------- | ---------------------------------------------------------------- |
+| Manual              | `docs/test-cases/*.md`                                           |
+| Cypress API         | `cypress/tests/api/*.cy.ts`                                      |
+| Cypress e2e         | `cypress/tests/e2e/*.cy.ts`                                      |
+| Cypress mock UI     | `cypress/tests/e2e/mock-ui/*.cy.ts` (`cy.intercept`)             |
+| Cypress PO          | `cypress/pages/` (required for e2e / mock UI)                    |
+| API fixtures        | `cypress/fixtures/endpoints/`, `cypress/fixtures/models/`        |
+| Binary fixtures     | `fixtures/` (e.g. images)                                        |
+| Playwright API      | `playwright/api/*.spec.ts`                                       |
+| Playwright e2e      | `playwright/e2e/*.spec.ts` (or `playwright/*.spec.ts` until moved) |
+| Playwright mock UI  | `playwright/e2e/mock-ui/*.spec.ts` (`page.route`)                |
+| Playwright PO       | `playwright/pages/*.page.ts` (required for e2e / mock UI)        |
+| Playwright auth     | `playwright/support/login.ts`                                    |
+| Mock component      | next to source as `*.test.tsx`                                   |
+| Appium specs        | `appium/specs/*.spec.ts`                                         |
+| Appium screens      | `appium/screens/*.screen.ts`                                     |
+| iOS SwiftUI app     | `ios/Marlow/Marlow/`                                             |
+
+## How to run
+
+| Suite             | Command                                  |
+| ----------------- | ---------------------------------------- |
+| Unit / mock component | `npm run test:unit`                  |
+| Cypress API       | `npm run cypress:api`                    |
+| Cypress e2e       | `npm run cypress:e2e`                    |
+| Cypress Docker    | `npm run cypress:docker`                 |
+| Playwright API    | `npm run playwright:api`                 |
+| Playwright e2e    | `npx playwright test --project=chromium` |
+| Playwright Docker | `npm run playwright:docker`              |
+| Appium iOS        | `npm run appium:ios`                     |
+
+Docker runners boot the shop via `scripts/e2e-up.sh` and use `host.docker.internal`. Only change Vite `LISTEN_HOST` / `E2E_HOST` / `allowedHosts` when fixing Docker reachability—not for ordinary new tests.
+
+## Layer pointers
+
+- **API** (schema, fixtures, Cypress/Playwright HTTP asserts) → `api-tests.mdc`
+- **Browser e2e** (live API, page objects, login helpers) → `e2e-tests.mdc`
+- **Mock UI** (browser + `cy.intercept` / `page.route`) → `mock-ui-tests.mdc` / `mock-ui-test-author`
+- **Mock component** (Jest) → `mock-component-tests.mdc` / `mock-component-test-author`
+- **Page objects** (Cypress/Playwright) → `page-objects.mdc` / `page-object-author`
+- **Screen objects** (Appium) → `screen-objects.mdc` / `screen-object-author`
+- **iOS e2e** (flows + accessibility ids) → `ios-e2e-tests.mdc`. Keep Swift `Models` aligned with fixtures/OpenAPI; HTTP contracts stay in shared API suites.

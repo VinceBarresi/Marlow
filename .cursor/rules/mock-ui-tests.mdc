@@ -1,0 +1,15 @@
+---
+description: Conventions for Cypress and Playwright mock UI tests (intercept / route)
+globs: cypress/tests/e2e/mock-ui/**/*.ts,playwright/e2e/mock-ui/**/*.ts
+alwaysApply: false
+---
+
+# Mock UI tests (Cypress + Playwright)
+
+Browser UI with a **mocked API**—not live e2e (`e2e-tests`) and not Jest components (`mock-component-tests`).
+
+- Prefer the `mock-ui-test-author` skill. Write **both** Cypress and Playwright unless the user names one framework.
+- Specs: `cypress/tests/e2e/mock-ui/*.cy.ts`, `playwright/e2e/mock-ui/*.spec.ts`.
+- Stub network with Cypress `cy.intercept` or Playwright `page.route`; assert visible UI via page objects (`data-testid`).
+- Auth still via `loginAsCustomer` / `loginAsAdmin`, then navigate with the page object.
+- Keep Cypress and Playwright journeys aligned. Prefer `page-object-author` when extending POs.

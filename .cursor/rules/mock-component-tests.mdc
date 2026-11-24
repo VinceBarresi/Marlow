@@ -1,0 +1,14 @@
+---
+description: Conventions for Jest mocked component / page tests
+globs: "**/*.test.tsx",web/src/test/**/*.ts,frontends/*/src/test/**/*.ts
+alwaysApply: false
+---
+
+# Mock component tests (Jest)
+
+- Prefer the `mock-component-test-author` skill when creating co-located page/component tests.
+- Co-locate `*.test.tsx` next to the source file.
+- `jest.mock` the local `api` module; use that package’s `src/test` helpers (`whenApi` / `mockApi`, `renderPage` / `render`) — `web`, `frontends/catalog`, and `frontends/orders` each have their own.
+- Assert with `screen.getByTestId(...)`. No real network.
+- Prefer `data-testid` already used in the page; add missing ones in the component when needed.
+- Browser UI with `cy.intercept` / `page.route` is **mock UI** (`mock-ui-tests.mdc`), not this layer.
