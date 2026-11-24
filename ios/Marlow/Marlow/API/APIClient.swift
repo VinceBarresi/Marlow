@@ -79,6 +79,26 @@ actor APIClient {
     return response.order
   }
 
+  func paymentMethods() async throws -> [PaymentMethod] {
+    let response: PaymentMethodsResponse = try await request(method: "GET", path: "/api/payment-methods")
+    return response.paymentMethods
+  }
+
+  func createPaymentMethod(card: CardInput) async throws -> PaymentMethod {
+    struct Body: Encodable { let card: CardInput }
+    let response: PaymentMethodResponse = try await request(
+      method: "POST",
+      path: "/api/payment-methods",
+      body: Body(card: card)
+    )
+    return response.paymentMethod
+  }
+
+  func deletePaymentMethod(id: String) async throws {
+    struct Deleted: Decodable { let id: String; let deleted: Bool }
+    let _: Deleted = try await request(method: "DELETE", path: "/api/payment-methods/\(id)")
+  }
+
   func orders(page: Int = 1, pageSize: Int = 20) async throws -> OrderList {
     let items = [
       URLQueryItem(name: "page", value: String(page)),

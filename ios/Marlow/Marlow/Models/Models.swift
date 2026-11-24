@@ -83,6 +83,34 @@ struct CartItemResult: Decodable, Sendable {
   let quantity: Int
 }
 
+struct CardInput: Encodable, Sendable {
+  let number: String
+  let expMonth: Int
+  let expYear: Int
+  let cvc: String
+}
+
+struct PaymentCard: Codable, Equatable, Sendable {
+  let brand: String
+  let last4: String
+  let expMonth: Int
+  let expYear: Int
+  let fingerprint: String?
+}
+
+struct PaymentMethod: Codable, Identifiable, Equatable, Sendable {
+  let id: String
+  let card: PaymentCard
+}
+
+struct PaymentMethodsResponse: Decodable, Sendable {
+  let paymentMethods: [PaymentMethod]
+}
+
+struct PaymentMethodResponse: Decodable, Sendable {
+  let paymentMethod: PaymentMethod
+}
+
 struct CheckoutRequest: Encodable, Sendable {
   let fulfillment: String
   let shipName: String
@@ -91,6 +119,9 @@ struct CheckoutRequest: Encodable, Sendable {
   let shipRegion: String
   let shipPostalCode: String
   let shipCountry: String
+  let paymentMethodId: String?
+  let card: CardInput?
+  let saveCard: Bool?
 
   init(
     shipName: String,
@@ -98,7 +129,10 @@ struct CheckoutRequest: Encodable, Sendable {
     shipCity: String,
     shipRegion: String,
     shipPostalCode: String,
-    shipCountry: String = "US"
+    shipCountry: String = "US",
+    paymentMethodId: String? = nil,
+    card: CardInput? = nil,
+    saveCard: Bool? = nil
   ) {
     self.fulfillment = "ship"
     self.shipName = shipName
@@ -107,6 +141,9 @@ struct CheckoutRequest: Encodable, Sendable {
     self.shipRegion = shipRegion
     self.shipPostalCode = shipPostalCode
     self.shipCountry = shipCountry
+    self.paymentMethodId = paymentMethodId
+    self.card = card
+    self.saveCard = saveCard
   }
 }
 

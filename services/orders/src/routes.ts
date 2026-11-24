@@ -144,9 +144,15 @@ export async function registerOrders(app: FastifyInstance, { pool, redis }: Deps
     return { ok: true };
   });
 
-  app.post<{ Body: Partial<Address> & { fulfillment?: string; locationId?: string } }>(
-    "/checkout",
-    async (request, reply) => {
+  app.post<{
+    Body: Partial<Address> & {
+      fulfillment?: string;
+      locationId?: string;
+      paymentIntentId?: string;
+      paymentLast4?: string;
+      paymentBrand?: string;
+    };
+  }>("/checkout", async (request, reply) => {
       const user = caller(request, reply);
       if (!user) return;
 
@@ -156,6 +162,9 @@ export async function registerOrders(app: FastifyInstance, { pool, redis }: Deps
       }
       const pickup = fulfillment === "pickup";
       const locationId = text(request.body?.locationId);
+      const paymentIntentId = text(request.body?.paymentIntentId) || null;
+      const paymentLast4 = text(request.body?.paymentLast4) || null;
+      const paymentBrand = text(request.body?.paymentBrand) || null;
 
       let address: Address = {
         shipName: text(request.body?.shipName),
@@ -282,12 +291,14 @@ export async function registerOrders(app: FastifyInstance, { pool, redis }: Deps
            id, number, user_id, status, placed_at,
            subtotal_cents, shipping_cents, tax_cents, total_cents,
            ship_name, ship_line1, ship_city, ship_region, ship_postal_code, ship_country,
-           fulfillment, location_id
+           fulfillment, location_id,
+           payment_intent_id, payment_last4, payment_brand
          ) values (
            $1, $2, $3, 'paid', now(),
            $4, $5, $6, $7,
            $8, $9, $10, $11, $12, $13,
-           $14, $15
+           $14, $15,
+           $16, $17, $18
          )`,
           [
             orderId,
@@ -305,6 +316,9 @@ export async function registerOrders(app: FastifyInstance, { pool, redis }: Deps
             address.shipCountry,
             fulfillment,
             pickup ? locationId : null,
+            paymentIntentId,
+            paymentLast4,
+            paymentBrand,
           ],
         );
 
@@ -340,8 +354,7 @@ export async function registerOrders(app: FastifyInstance, { pool, redis }: Deps
       } finally {
         client.release();
       }
-    },
-  );
+  });
 
   app.get<{ Querystring: { page?: string; pageSize?: string; status?: string } }>(
     "/orders",

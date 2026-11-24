@@ -18,7 +18,8 @@ ready() {
     && curl -sf --max-time 2 -o /dev/null http://127.0.0.1:5175/remoteEntry.js \
     && curl -s --max-time 2 -o /dev/null http://127.0.0.1:4001/ \
     && curl -s --max-time 2 -o /dev/null http://127.0.0.1:4002/ \
-    && curl -s --max-time 2 -o /dev/null http://127.0.0.1:4004/
+    && curl -s --max-time 2 -o /dev/null http://127.0.0.1:4004/ \
+    && curl -s --max-time 2 -o /dev/null http://127.0.0.1:4005/
 }
 
 if ready; then
@@ -38,10 +39,16 @@ docker compose up -d --wait
 users=$(docker compose exec -T postgres psql -U datalab -d datalab -tAc "select to_regclass('public.users')" | tr -d '[:space:]')
 if [[ "$users" != "users" ]]; then
   echo "Creating tables and loading the shop."
-  for file in server/sql/001_schema.sql server/sql/002_tracking.sql server/sql/004_locations.sql server/sql/005_careers.sql; do
+  for file in server/sql/001_schema.sql server/sql/002_tracking.sql server/sql/004_locations.sql server/sql/005_careers.sql server/sql/006_payments.sql; do
     docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -f - < "$file"
   done
   node server/scripts/seed.mjs | docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -q
+else
+  payments=$(docker compose exec -T postgres psql -U datalab -d datalab -tAc "select to_regclass('public.payment_methods')" | tr -d '[:space:]')
+  if [[ "$payments" != "payment_methods" ]]; then
+    echo "Applying payments schema."
+    docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -f - < server/sql/006_payments.sql
+  fi
 fi
 
 apps=(
@@ -49,6 +56,7 @@ apps=(
   services/catalog
   services/orders
   services/shipping
+  services/payments
   web
   frontends/catalog
   frontends/orders
@@ -71,6 +79,7 @@ start api server
 start catalog services/catalog
 start orders services/orders
 start shipping services/shipping
+start payments services/payments
 start web web
 start catalog-ui frontends/catalog
 start orders-ui frontends/orders
