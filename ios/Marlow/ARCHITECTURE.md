@@ -48,15 +48,15 @@ flowchart TB
   tabs -->|"Shop Product Cart Checkout Orders Account"| client
 ```
 
-| Area | Path | Role |
-| ---- | ---- | ---- |
-| Entry | `Marlow/App/MarlowApp.swift` | `@main`, owns `SessionStore`, restores `/api/me` on launch |
-| Session | `Marlow/App/SessionStore.swift` | `@Observable` signed-in user; login / logout / restore |
-| Root | `Marlow/App/RootView.swift` | Loading → login or tab shell |
-| API | `Marlow/API/APIClient.swift` | `URLSession` JSON client + cookie jar |
-| Models | `Marlow/Models/Models.swift` | Codable types aligned with OpenAPI / `fixtures/models/` |
-| Config | `Marlow/Config/AppConfig.swift` | API base URL |
-| Features | `Marlow/Features/*` | One folder per screen |
+| Area     | Path                            | Role                                                       |
+| -------- | ------------------------------- | ---------------------------------------------------------- |
+| Entry    | `Marlow/App/MarlowApp.swift`    | `@main`, owns `SessionStore`, restores `/api/me` on launch |
+| Session  | `Marlow/App/SessionStore.swift` | `@Observable` signed-in user; login / logout / restore     |
+| Root     | `Marlow/App/RootView.swift`     | Loading → login or tab shell                               |
+| API      | `Marlow/API/APIClient.swift`    | `URLSession` JSON client + cookie jar                      |
+| Models   | `Marlow/Models/Models.swift`    | Codable types aligned with OpenAPI / `fixtures/models/`    |
+| Config   | `Marlow/Config/AppConfig.swift` | API base URL                                               |
+| Features | `Marlow/Features/*`             | One folder per screen                                      |
 
 Tabs: Shop, Cart, Orders, Account. Product and Checkout push on the Shop/Cart stacks.
 
@@ -85,23 +85,23 @@ Login `POST /api/login` sets `datalab_session`. Logout clears the Redis session 
 
 ## Screens and endpoints
 
-| Screen | Primary API |
-| ------ | ----------- |
-| Login | `POST /api/login` |
-| Shop | `GET /api/products`, search via `q` |
-| Product | `GET /api/products/:sku`, `PUT /api/cart/items` |
-| Cart | `GET /api/cart`, `DELETE /api/cart/items/:sku` |
-| Checkout (ship) | `POST /api/checkout` |
-| Orders | `GET /api/orders`, `GET /api/orders/:number` |
-| Account | `GET /api/me`, `POST /api/logout` |
+| Screen          | Primary API                                     |
+| --------------- | ----------------------------------------------- |
+| Login           | `POST /api/login`                               |
+| Shop            | `GET /api/products`, search via `q`             |
+| Product         | `GET /api/products/:sku`, `PUT /api/cart/items` |
+| Cart            | `GET /api/cart`, `DELETE /api/cart/items/:sku`  |
+| Checkout (ship) | `POST /api/checkout`                            |
+| Orders          | `GET /api/orders`, `GET /api/orders/:number`    |
+| Account         | `GET /api/me`, `POST /api/logout`               |
 
 ## Testing
 
-| Layer | Where | How to run |
-| ----- | ----- | ---------- |
+| Layer                            | Where                                              | How to run                                       |
+| -------------------------------- | -------------------------------------------------- | ------------------------------------------------ |
 | HTTP contracts (shared with web) | `cypress/tests/api`, `playwright/api`, `fixtures/` | `npm run cypress:api` / `npm run playwright:api` |
-| Simulator UI | `appium/` (WebDriverIO + XCUITest) | `npm run appium:ios` |
-| Skill / rule | `ios-ui-test-author`, `ios-ui-tests.mdc` | See `.cursor/skills/` and `.cursor/rules/` |
+| Simulator UI                     | `appium/` (WebDriverIO + XCUITest)                 | `npm run appium:ios`                             |
+| Skill / rule                     | `ios-ui-test-author`, `ios-ui-tests.mdc`           | See `.cursor/skills/` and `.cursor/rules/`       |
 
 UI selectors use SwiftUI `.accessibilityIdentifier` values (for example `login-email`) exposed to Appium as `~login-email`. Prefer ids that match web `data-testid`s when the concept exists on both platforms.
 

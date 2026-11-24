@@ -21,11 +21,6 @@
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
-  "appium": {
-    "drivers": {
-      "xcuitest": "appium-xcuitest-driver"
-    }
-  },
   "devDependencies": {
     "@babel/core": "^8.1.2",
     "@babel/preset-env": "^8.0.7",
@@ -45,7 +40,6 @@
     "@wdio/mocha-framework": "^10.2.0",
     "@wdio/spec-reporter": "^10.2.0",
     "appium": "^4.0.1",
-    "appium-xcuitest-driver": "^13.7.0",
     "babel-jest": "^30.5.2",
     "cypress": "^16.3.0",
     "eslint": "^9.39.5",
