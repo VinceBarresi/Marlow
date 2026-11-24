@@ -114,7 +114,7 @@ export async function registerImages(app: FastifyInstance, deps: Deps) {
     return reply.send(createReadStream(full));
   });
 
-  app.get<{ Params: { sku: string } }>("/v1/skus/:sku", async (request, reply) => {
+  app.get<{ Params: { sku: string } }>("/v1/skus/:sku", async (request) => {
     const list = await pool.query<{
       id: string;
       sku: string;

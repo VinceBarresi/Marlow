@@ -4,12 +4,12 @@ Local retail shop for practicing test automation across the stack. Postgres and 
 
 **Test layers**
 
-| Layer | Tools | What it covers |
-| ----- | ----- | -------------- |
-| Unit / stubbed UI | Jest + Testing Library | Page components with a mocked API (`*.test.tsx`); also server/web unit tests |
-| API | Cypress + Playwright | HTTP status/body against the live gateway (`cypress/tests/api`, `playwright/api`) |
-| Browser e2e | Cypress + Playwright | Full shop flows in the browser (`cypress/tests/e2e`, `playwright/e2e`) |
-| iOS UI | Appium + WebDriverIO | Simulator flows for `ios/Marlow` (`appium/`) |
+| Layer             | Tools                  | What it covers                                                                    |
+| ----------------- | ---------------------- | --------------------------------------------------------------------------------- |
+| Unit / stubbed UI | Jest + Testing Library | Page components with a mocked API (`*.test.tsx`); also server/web unit tests      |
+| API               | Cypress + Playwright   | HTTP status/body against the live gateway (`cypress/tests/api`, `playwright/api`) |
+| Browser e2e       | Cypress + Playwright   | Full shop flows in the browser (`cypress/tests/e2e`, `playwright/e2e`)            |
+| iOS UI            | Appium + WebDriverIO   | Simulator flows for `ios/Marlow` (`appium/`)                                      |
 
 Cypress and Playwright mirror each other for API and e2e so you can compare frameworks on the same product.
 

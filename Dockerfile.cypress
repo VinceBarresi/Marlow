@@ -8,6 +8,7 @@ RUN npm ci
 
 COPY cypress.config.ts ./
 COPY cypress ./cypress
+COPY fixtures ./fixtures
 
 # Image entrypoint is `cypress`; compose supplies `run --spec ...`.
 ENTRYPOINT ["cypress"]
