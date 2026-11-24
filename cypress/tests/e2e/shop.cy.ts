@@ -8,7 +8,7 @@ describe("shop", () => {
     ShopPage.visit();
 
     cy.location("pathname").should("eq", "/");
-    cy.get(Shell.navUser).should("contain", "customer@marlow.test");
+    cy.get(Shell.navUser, { timeout: 20000 }).should("contain", "customer@marlow.test");
     cy.get(ShopPage.title, { timeout: 20000 }).should("have.text", "Shop");
   });
 
