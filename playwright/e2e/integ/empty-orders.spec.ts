@@ -1,7 +1,7 @@
 import { test, type Page } from "@playwright/test";
-import { emptyOrdersListResponseModel } from "../../fixtures/models/ordersModel";
-import { OrdersPage } from "../pages/orders.page";
-import { loginAsAdmin, loginAsCustomer } from "../support/login";
+import { emptyOrdersListResponseModel } from "../../../fixtures/models/ordersModel";
+import { OrdersPage } from "../../pages/orders.page";
+import { loginAsAdmin, loginAsCustomer } from "../../support/login";
 
 async function stubEmptyOrders(page: Page) {
   await page.route("**/api/orders**", async (route) => {
