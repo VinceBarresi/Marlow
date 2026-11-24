@@ -77,6 +77,10 @@ API docs are at [http://127.0.0.1:4000/docs](http://127.0.0.1:4000/docs). The sh
 
 How the processes, screens, and data fit together is in [ARCHITECTURE.md](ARCHITECTURE.md).
 
+## Mobile
+
+Native SwiftUI customer app lives in [`ios/Marlow`](ios/Marlow). Open `ios/Marlow/Marlow.xcodeproj` in Xcode, start the API with `npm run dev`, and run on the Simulator (API at `http://127.0.0.1:4000`). See [ios/Marlow/README.md](ios/Marlow/README.md).
+
 ## Tools
 
 Each app has its own README with the libraries it uses. These are shared:

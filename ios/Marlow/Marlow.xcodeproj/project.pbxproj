@@ -1,0 +1,402 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F865F5EBB6484C319580223E /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99079D69CED45CD93A5E3EF /* APIClient.swift */; };
+		4218795E62D94130940DE1D4 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 976EFE491E534477BA3A3B2C /* APIError.swift */; };
+		514D3A8E720C470DB5E86448 /* MarlowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 345A2A0D5808490A8E44F9D8 /* MarlowApp.swift */; };
+		6F66422648654227AB2A9670 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E4D3F7197740229B6613F7 /* RootView.swift */; };
+		0791DDFE996A41018A72B9FA /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 215C316C4AD84E508325C314 /* SessionStore.swift */; };
+		BFB16B4BF64E48B3A38E84AC /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = D94CE2AAFE484097A80D3B55 /* AppConfig.swift */; };
+		D4B076E6E3D146A0839D20CB /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A041F023EAD40CAAD106BDA /* AccountView.swift */; };
+		729D77BE6EC24DA1BEAC6D45 /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF5D372BF4C6487FA81DCCC3 /* CartView.swift */; };
+		1B73459FAEC8461A8383A8A0 /* CheckoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648D1B5D9E1C40478A8F09EB /* CheckoutView.swift */; };
+		F4D2BB190DEE4B60B3026E71 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC140E23DF9E480F8719868F /* LoginView.swift */; };
+		8F48F8DF8D7647AFB82C78FC /* OrderDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F521957991294C88A5E812D8 /* OrderDetailView.swift */; };
+		2E9BD2349EAB4B28845D8694 /* OrdersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3059B3FC192140E18ED8F54A /* OrdersView.swift */; };
+		B547D35348264CEBA0D87DBC /* ProductView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D601CA3E4439459B833C27F6 /* ProductView.swift */; };
+		E2E0E22ED7594E5F9CFEC58E /* ShopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C6E5AA0A3F047488FD68D59 /* ShopView.swift */; };
+		4AAE73DFB60C4C5FBB4549F6 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0048EC6F22B4AB48FB5231B /* Models.swift */; };
+		20389893E6F94086BA51FE9A /* Money.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB7EC630EEC14A1787A87C22 /* Money.swift */; };
+		72468231F1A14457A085F0A7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2B2A25A730FD4F5E82719CCC /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		ADFECCDE42164931AC25F9E0 /* Marlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Marlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D99079D69CED45CD93A5E3EF /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		976EFE491E534477BA3A3B2C /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
+		345A2A0D5808490A8E44F9D8 /* MarlowApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarlowApp.swift; sourceTree = "<group>"; };
+		A7E4D3F7197740229B6613F7 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		215C316C4AD84E508325C314 /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
+		D94CE2AAFE484097A80D3B55 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
+		6A041F023EAD40CAAD106BDA /* AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountView.swift; sourceTree = "<group>"; };
+		EF5D372BF4C6487FA81DCCC3 /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartView.swift; sourceTree = "<group>"; };
+		648D1B5D9E1C40478A8F09EB /* CheckoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutView.swift; sourceTree = "<group>"; };
+		EC140E23DF9E480F8719868F /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		F521957991294C88A5E812D8 /* OrderDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderDetailView.swift; sourceTree = "<group>"; };
+		3059B3FC192140E18ED8F54A /* OrdersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdersView.swift; sourceTree = "<group>"; };
+		D601CA3E4439459B833C27F6 /* ProductView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductView.swift; sourceTree = "<group>"; };
+		8C6E5AA0A3F047488FD68D59 /* ShopView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShopView.swift; sourceTree = "<group>"; };
+		A0048EC6F22B4AB48FB5231B /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		EB7EC630EEC14A1787A87C22 /* Money.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Money.swift; sourceTree = "<group>"; };
+		194B5011A82645E598D4996E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2B2A25A730FD4F5E82719CCC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E4216BB866DB4A0FAD8A0456 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AD34E2740E60408D936100FA = {
+			isa = PBXGroup;
+			children = (
+				BA968660DBC54083B3FCC756 /* Marlow */,
+				7E31927E31E34A18BF35F79F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		7E31927E31E34A18BF35F79F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				ADFECCDE42164931AC25F9E0 /* Marlow.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BA968660DBC54083B3FCC756 /* Marlow */ = {
+			isa = PBXGroup;
+			children = (
+				307C205C8E184859BFDC758C /* API */,
+				FC9CF113D1174CC281C1DB78 /* App */,
+				08D23EAAF94B440E8D55A8C8 /* Config */,
+				042FE9195CF64E9FAC73B7FC /* Features */,
+				2F38A23A25C2483E9382A613 /* Models */,
+				A05C4454AA334042A008965E /* Utilities */,
+				2B2A25A730FD4F5E82719CCC /* Assets.xcassets */,
+				194B5011A82645E598D4996E /* Info.plist */,
+			);
+			path = Marlow;
+			sourceTree = "<group>";
+		};
+		307C205C8E184859BFDC758C /* API */ = {
+			isa = PBXGroup;
+			children = (
+				D99079D69CED45CD93A5E3EF /* APIClient.swift */,
+				976EFE491E534477BA3A3B2C /* APIError.swift */,
+			);
+			path = APIError.swift;
+			sourceTree = "<group>";
+		};
+		FC9CF113D1174CC281C1DB78 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				345A2A0D5808490A8E44F9D8 /* MarlowApp.swift */,
+				A7E4D3F7197740229B6613F7 /* RootView.swift */,
+				215C316C4AD84E508325C314 /* SessionStore.swift */,
+			);
+			path = SessionStore.swift;
+			sourceTree = "<group>";
+		};
+		08D23EAAF94B440E8D55A8C8 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				D94CE2AAFE484097A80D3B55 /* AppConfig.swift */,
+			);
+			path = AppConfig.swift;
+			sourceTree = "<group>";
+		};
+		042FE9195CF64E9FAC73B7FC /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				59BC930735AF4C3788576441 /* Account */,
+				61EB1D3C88B64953A1289D24 /* Cart */,
+				14CBDE89C92A4414A6E27A97 /* Checkout */,
+				2F0448ECF9D24C878F4C9070 /* Login */,
+				D9C3252BD7BF4BB69C9BA4F9 /* Orders */,
+				B643A3EB29D948F8AE3CD1FE /* Product */,
+				EAC45070661D4D2C8111AC7A /* Shop */,
+			);
+			path = Shop;
+			sourceTree = "<group>";
+		};
+		59BC930735AF4C3788576441 /* Account */ = {
+			isa = PBXGroup;
+			children = (
+				6A041F023EAD40CAAD106BDA /* AccountView.swift */,
+			);
+			path = AccountView.swift;
+			sourceTree = "<group>";
+		};
+		61EB1D3C88B64953A1289D24 /* Cart */ = {
+			isa = PBXGroup;
+			children = (
+				EF5D372BF4C6487FA81DCCC3 /* CartView.swift */,
+			);
+			path = CartView.swift;
+			sourceTree = "<group>";
+		};
+		14CBDE89C92A4414A6E27A97 /* Checkout */ = {
+			isa = PBXGroup;
+			children = (
+				648D1B5D9E1C40478A8F09EB /* CheckoutView.swift */,
+			);
+			path = CheckoutView.swift;
+			sourceTree = "<group>";
+		};
+		2F0448ECF9D24C878F4C9070 /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				EC140E23DF9E480F8719868F /* LoginView.swift */,
+			);
+			path = LoginView.swift;
+			sourceTree = "<group>";
+		};
+		D9C3252BD7BF4BB69C9BA4F9 /* Orders */ = {
+			isa = PBXGroup;
+			children = (
+				F521957991294C88A5E812D8 /* OrderDetailView.swift */,
+				3059B3FC192140E18ED8F54A /* OrdersView.swift */,
+			);
+			path = OrdersView.swift;
+			sourceTree = "<group>";
+		};
+		B643A3EB29D948F8AE3CD1FE /* Product */ = {
+			isa = PBXGroup;
+			children = (
+				D601CA3E4439459B833C27F6 /* ProductView.swift */,
+			);
+			path = ProductView.swift;
+			sourceTree = "<group>";
+		};
+		EAC45070661D4D2C8111AC7A /* Shop */ = {
+			isa = PBXGroup;
+			children = (
+				8C6E5AA0A3F047488FD68D59 /* ShopView.swift */,
+			);
+			path = ShopView.swift;
+			sourceTree = "<group>";
+		};
+		2F38A23A25C2483E9382A613 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A0048EC6F22B4AB48FB5231B /* Models.swift */,
+			);
+			path = Models.swift;
+			sourceTree = "<group>";
+		};
+		A05C4454AA334042A008965E /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				EB7EC630EEC14A1787A87C22 /* Money.swift */,
+			);
+			path = Money.swift;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5D2F9EABCBFB4D5DA4A95915 /* Marlow */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D710B619B0C4410DBA5476B0 /* Build configuration list for PBXNativeTarget "Marlow" */;
+			buildPhases = (
+				32A0D468E7B34A7B9302568E /* Sources */,
+				E4216BB866DB4A0FAD8A0456 /* Frameworks */,
+				F20AB32D0E114895B2DA9395 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Marlow;
+			productName = Marlow;
+			productReference = ADFECCDE42164931AC25F9E0 /* Marlow.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D8E3FE627FFD443692195F88 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+			};
+			buildConfigurationList = B200B90E21774A5A8BE3ACEE /* Build configuration list for PBXProject "Marlow" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = AD34E2740E60408D936100FA;
+			productRefGroup = 7E31927E31E34A18BF35F79F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5D2F9EABCBFB4D5DA4A95915 /* Marlow */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F20AB32D0E114895B2DA9395 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72468231F1A14457A085F0A7 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		32A0D468E7B34A7B9302568E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F865F5EBB6484C319580223E /* APIClient.swift in Sources */,
+				4218795E62D94130940DE1D4 /* APIError.swift in Sources */,
+				514D3A8E720C470DB5E86448 /* MarlowApp.swift in Sources */,
+				6F66422648654227AB2A9670 /* RootView.swift in Sources */,
+				0791DDFE996A41018A72B9FA /* SessionStore.swift in Sources */,
+				BFB16B4BF64E48B3A38E84AC /* AppConfig.swift in Sources */,
+				D4B076E6E3D146A0839D20CB /* AccountView.swift in Sources */,
+				729D77BE6EC24DA1BEAC6D45 /* CartView.swift in Sources */,
+				1B73459FAEC8461A8383A8A0 /* CheckoutView.swift in Sources */,
+				F4D2BB190DEE4B60B3026E71 /* LoginView.swift in Sources */,
+				8F48F8DF8D7647AFB82C78FC /* OrderDetailView.swift in Sources */,
+				2E9BD2349EAB4B28845D8694 /* OrdersView.swift in Sources */,
+				B547D35348264CEBA0D87DBC /* ProductView.swift in Sources */,
+				E2E0E22ED7594E5F9CFEC58E /* ShopView.swift in Sources */,
+				4AAE73DFB60C4C5FBB4549F6 /* Models.swift in Sources */,
+				20389893E6F94086BA51FE9A /* Money.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A36580B9177F4A3A90ECDF71 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A2FBB4A196304656BA669B41 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		600AF3FD735E4AF790CA5185 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Marlow/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = shop.marlow.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E883B5A19106421B896F247E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Marlow/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = shop.marlow.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B200B90E21774A5A8BE3ACEE /* Build configuration list for PBXProject "Marlow" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A36580B9177F4A3A90ECDF71 /* Debug */,
+				A2FBB4A196304656BA669B41 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D710B619B0C4410DBA5476B0 /* Build configuration list for PBXNativeTarget "Marlow" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				600AF3FD735E4AF790CA5185 /* Debug */,
+				E883B5A19106421B896F247E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D8E3FE627FFD443692195F88 /* Project object */;
+}
