@@ -15,6 +15,7 @@ struct CartView: View {
           systemImage: "cart",
           description: Text("Browse the shop and add something.")
         )
+        .accessibilityElement(children: .combine)
         .accessibilityIdentifier("cart-empty")
       } else if let cart {
         List {

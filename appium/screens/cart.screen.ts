@@ -4,7 +4,8 @@ export class CartScreen {
   }
 
   get empty() {
-    return $("~cart-empty");
+    // ContentUnavailableView can expose duplicate nodes; take the first match.
+    return $$("~cart-empty")[0];
   }
 
   get checkout() {

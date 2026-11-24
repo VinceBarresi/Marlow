@@ -15,6 +15,7 @@ struct OrdersView: View {
           systemImage: "shippingbox",
           description: Text("Orders you place will show up here.")
         )
+        .accessibilityElement(children: .combine)
         .accessibilityIdentifier("orders-empty")
       } else {
         List {
