@@ -168,6 +168,46 @@ struct OrderEvent: Codable, Identifiable, Equatable, Sendable {
   let actorEmail: String?
 }
 
+struct TrackingScan: Codable, Equatable, Identifiable, Sendable {
+  var id: String { "\(status)-\(happenedAt)-\(message)" }
+  let status: String
+  let location: String
+  let message: String
+  let happenedAt: String
+}
+
+struct Shipment: Codable, Equatable, Sendable {
+  let carrier: String
+  let service: String
+  let trackingNumber: String
+  let status: String
+  let shippedAt: String?
+  let estimatedDelivery: String?
+  let deliveredAt: String?
+  let scans: [TrackingScan]?
+}
+
+struct TrackingInfo: Codable, Equatable, Sendable {
+  let trackingNumber: String
+  let carrier: String
+  let service: String
+  let status: String
+  let shippedAt: String?
+  let estimatedDelivery: String?
+  let deliveredAt: String?
+  let scans: [TrackingScan]
+}
+
+struct ShippingAccessToken: Decodable, Sendable {
+  let accessToken: String
+  let tokenType: String
+  let expiresIn: Int
+}
+
+struct TrackingResponse: Decodable, Sendable {
+  let tracking: TrackingInfo
+}
+
 struct OrderDetail: Codable, Equatable, Sendable {
   let number: String
   let status: String
@@ -179,6 +219,7 @@ struct OrderDetail: Codable, Equatable, Sendable {
   let shipTo: ShipTo
   let lines: [OrderLine]
   let events: [OrderEvent]
+  let shipment: Shipment?
 }
 
 struct OrderDetailResponse: Decodable, Sendable {

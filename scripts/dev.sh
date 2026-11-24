@@ -26,7 +26,7 @@ if [[ "$users" != "users" ]]; then
   node server/scripts/seed.mjs | docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -q
 fi
 
-ports=(4000 4001 4002 4003 5173 5174 5175)
+ports=(4000 4001 4002 4003 4004 5173 5174 5175)
 if command -v lsof >/dev/null 2>&1; then
   for port in "${ports[@]}"; do
     if lsof -nP -iTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1; then
@@ -40,6 +40,7 @@ apps=(
   "api|server"
   "catalog|services/catalog"
   "orders|services/orders"
+  "shipping|services/shipping"
   "db|services/db"
   "web|web"
   "catalog-ui|frontends/catalog"

@@ -4,6 +4,7 @@ struct OrderDetailView: View {
   let number: String
 
   @State private var order: OrderDetail?
+  @State private var tracking: TrackingInfo?
   @State private var isLoading = true
   @State private var errorMessage: String?
 
@@ -25,6 +26,27 @@ struct OrderDetailView: View {
             Text(order.shipTo.name)
             Text(order.shipTo.line1)
             Text("\(order.shipTo.city), \(order.shipTo.region) \(order.shipTo.postalCode)")
+          }
+
+          if let tracking {
+            Section("Tracking") {
+              Text("\(tracking.carrier) \(tracking.service)")
+                .accessibilityIdentifier("order-tracking-carrier")
+              Text(tracking.trackingNumber)
+                .font(.caption.monospaced())
+                .accessibilityIdentifier("order-tracking-number")
+              Text(tracking.status.replacingOccurrences(of: "_", with: " ").capitalized)
+                .accessibilityIdentifier("order-tracking-status")
+              ForEach(tracking.scans) { scan in
+                VStack(alignment: .leading, spacing: 2) {
+                  Text(scan.message)
+                    .font(.subheadline)
+                  Text("\(scan.location) · \(scan.happenedAt)")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                }
+              }
+            }
           }
 
           Section("Items") {
@@ -91,14 +113,25 @@ struct OrderDetailView: View {
     isLoading = true
     defer { isLoading = false }
     do {
-      order = try await APIClient.shared.order(number: number)
+      let detail = try await APIClient.shared.order(number: number)
+      order = detail
       errorMessage = nil
+      tracking = nil
+      if let shipment = detail.shipment {
+        let token = try await APIClient.shared.shippingAccessToken()
+        tracking = try await APIClient.shared.tracking(
+          trackingNumber: shipment.trackingNumber,
+          bearerToken: token.accessToken
+        )
+      }
     } catch let error as APIError {
       errorMessage = error.message
       order = nil
+      tracking = nil
     } catch {
       errorMessage = error.localizedDescription
       order = nil
+      tracking = nil
     }
   }
 }

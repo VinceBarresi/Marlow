@@ -52,7 +52,7 @@ Store maps use the Google Maps JavaScript API when `VITE_GOOGLE_MAPS_API_KEY` is
    npm run dev
    ```
 
-   The directories are `server`, `services/catalog`, `services/orders`, `services/db`, `web`, `frontends/catalog`, and `frontends/orders`.
+   The directories are `server`, `services/catalog`, `services/orders`, `services/shipping`, `services/db`, `web`, `frontends/catalog`, and `frontends/orders`.
 
    If `npm install` stops on the esbuild postinstall script, approve it and install again:
 
@@ -68,12 +68,15 @@ Store maps use the Google Maps JavaScript API when `VITE_GOOGLE_MAPS_API_KEY` is
 | `server`            | Sign-in, inventory, pick, ship, and tracking. Forwards catalog and order calls to those services. | [http://127.0.0.1:4000](http://127.0.0.1:4000) |
 | `services/catalog`  | Products and categories                                                                           | [http://127.0.0.1:4001](http://127.0.0.1:4001) |
 | `services/orders`   | Cart, checkout, order history, and cancel                                                         | [http://127.0.0.1:4002](http://127.0.0.1:4002) |
+| `services/shipping` | Carrier shipments and tracking (OAuth2 Bearer; mock FedEx-shaped)                                 | [http://127.0.0.1:4004](http://127.0.0.1:4004) |
 | `services/db`       | Database console                                                                                  | [http://127.0.0.1:4003](http://127.0.0.1:4003) |
 | `web`               | Shop shell                                                                                        | [http://localhost:5173](http://localhost:5173) |
 | `frontends/catalog` | Product grid and product page, loaded by the shell                                                | [http://localhost:5174](http://localhost:5174) |
 | `frontends/orders`  | Cart, checkout, and order pages, loaded by the shell                                              | [http://localhost:5175](http://localhost:5175) |
 
 API docs are at [http://127.0.0.1:4000/docs](http://127.0.0.1:4000/docs). The shop proxies `/api` to the main API, so the session cookie stays on the shop origin.
+
+Shipping is a separate service with **Bearer** auth (`POST /oauth/token`). The gateway uses a service token for staff ship/track, and web/iOS can mint a user tracking token via `POST /api/shipping/access-token` then call `GET /api/tracking/:trackingNumber` with `Authorization: Bearer …`. See [`services/shipping/README.md`](services/shipping/README.md).
 
 How the processes, screens, and data fit together is in [ARCHITECTURE.md](ARCHITECTURE.md).
 

@@ -2,6 +2,8 @@
 
 The native SwiftUI app talks **directly** to the API on port 4000. It does not use the Vite shop shell (`:5173`). Auth is the same Redis-backed cookie session the web app uses: `datalab_session` stored in `HTTPCookieStorage` and sent on later `URLSession` calls.
 
+Order tracking also uses **Bearer** tokens: after cookie login, `POST /api/shipping/access-token`, then `GET /api/tracking/:trackingNumber` with `Authorization: Bearer …` (same gateway paths as web). The shipping service on `:4004` never sees the session cookie.
+
 Customer v1 only: login, shop, product, cart, ship checkout, orders, account. Staff/admin stay on the web app. Broader platform layout is in the root [ARCHITECTURE.md](../../ARCHITECTURE.md).
 
 ## Processes
@@ -12,18 +14,21 @@ flowchart LR
   api["API<br/>Fastify :4000"]
   catalog["Catalog service<br/>Fastify :4001"]
   orders["Orders service<br/>Fastify :4002"]
+  shipping["Shipping service<br/>Fastify :4004"]
   pg[("Postgres 16")]
   redis[("Redis 7")]
 
-  iosApp -->|"JSON + datalab_session cookie"| api
+  iosApp -->|"cookie session + Bearer tracking"| api
   api -->|"products and categories"| catalog
   api -->|"cart, checkout, orders"| orders
+  api -->|"Bearer ship/track"| shipping
   api --> pg
   api --> redis
   catalog --> pg
   catalog --> redis
   orders --> pg
   orders --> redis
+  shipping --> pg
 ```
 
 Simulator reaches the host at `http://127.0.0.1:4000` (`AppConfig.apiBaseURL`). A physical device needs the Mac’s LAN IP via `MARLOW_API_BASE`. `Info.plist` allows local cleartext HTTP (`NSAllowsLocalNetworking`).
