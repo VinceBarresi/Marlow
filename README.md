@@ -139,6 +139,8 @@ npm run allure:open      # open the report
 
 `npm run cypress:docker` generates the report when the workers finish.
 
+In GitHub Actions, the Cypress job uploads an **Artifacts** zip (`cypress-allure-report-<run id>`) and links it from the job summary. Download it from the workflow run page, then open `allure-report/index.html`.
+
 ## Lint and format
 
 From this directory:

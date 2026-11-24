@@ -113,23 +113,55 @@ jobs:
           CYPRESS_INSTALL_BINARY: "0"
 
       - name: Cypress (Docker workers)
+        id: cypress
         run: npm run cypress:docker
 
       - name: Shop logs
         if: failure()
         run: tail -n 80 .e2e-logs/*.log || true
 
+      - name: Ensure Allure HTML exists
+        if: always()
+        run: |
+          if [[ ! -f allure-report/index.html ]]; then
+            if compgen -G "allure-results/api/*" >/dev/null || compgen -G "allure-results/e2e/*" >/dev/null; then
+              npx allure generate allure-results/api allure-results/e2e -o allure-report --clean
+            elif [[ -d allure-results ]] && compgen -G "allure-results/*" >/dev/null; then
+              npx allure generate allure-results -o allure-report --clean
+            fi
+          fi
+          ls -la allure-report 2>/dev/null || echo "No allure-report directory yet."
+
       - name: Upload Allure report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-allure-report
+          name: cypress-allure-report-${{ github.run_id }}
           path: |
             allure-report/
             allure-results/
             cypress/screenshots/
-          if-no-files-found: ignore
+          if-no-files-found: warn
+          retention-days: 14
 
+      - name: Allure summary
+        if: always()
+        run: |
+          {
+            echo "## Cypress Allure report"
+            echo ""
+            if [[ -f allure-report/index.html ]]; then
+              echo "HTML report uploaded as artifact \`cypress-allure-report-${{ github.run_id }}\`."
+              echo ""
+              echo "1. Open this workflow run → **Artifacts**"
+              echo "2. Download \`cypress-allure-report-${{ github.run_id }}\`"
+              echo "3. Unzip and open \`allure-report/index.html\` (or run \`npx allure open allure-report\` locally)"
+              echo ""
+              echo "Failure screenshots are attached inside the Allure report when tests fail."
+            else
+              echo "No Allure HTML was generated for this run (workers may have failed before writing results)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
   playwright:
     name: Playwright
     runs-on: ubuntu-latest
