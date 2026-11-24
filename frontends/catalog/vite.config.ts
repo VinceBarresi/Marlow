@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 const publicHost = process.env.E2E_HOST ?? "localhost";
-const listenHost = process.env.LISTEN_HOST ?? "127.0.0.1";
+const listenHost = process.env.LISTEN_HOST ?? "localhost";
 
 export default defineConfig({
   base: `http://${publicHost}:5174`,
