@@ -17,7 +17,8 @@ ready() {
     && curl -sf --max-time 2 -o /dev/null http://127.0.0.1:5174/remoteEntry.js \
     && curl -sf --max-time 2 -o /dev/null http://127.0.0.1:5175/remoteEntry.js \
     && curl -s --max-time 2 -o /dev/null http://127.0.0.1:4001/ \
-    && curl -s --max-time 2 -o /dev/null http://127.0.0.1:4002/
+    && curl -s --max-time 2 -o /dev/null http://127.0.0.1:4002/ \
+    && curl -s --max-time 2 -o /dev/null http://127.0.0.1:4004/
 }
 
 if ready; then
@@ -47,6 +48,7 @@ apps=(
   server
   services/catalog
   services/orders
+  services/shipping
   web
   frontends/catalog
   frontends/orders
@@ -68,6 +70,7 @@ start() {
 start api server
 start catalog services/catalog
 start orders services/orders
+start shipping services/shipping
 start web web
 start catalog-ui frontends/catalog
 start orders-ui frontends/orders

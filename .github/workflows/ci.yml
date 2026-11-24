@@ -96,6 +96,7 @@ jobs:
             server/package-lock.json
             services/catalog/package-lock.json
             services/orders/package-lock.json
+            services/shipping/package-lock.json
             web/package-lock.json
             frontends/catalog/package-lock.json
             frontends/orders/package-lock.json
@@ -106,6 +107,7 @@ jobs:
           npm ci --prefix server
           npm ci --prefix services/catalog
           npm ci --prefix services/orders
+          npm ci --prefix services/shipping
           npm ci --prefix web
           npm ci --prefix frontends/catalog
           npm ci --prefix frontends/orders
@@ -136,6 +138,7 @@ jobs:
             server/package-lock.json
             services/catalog/package-lock.json
             services/orders/package-lock.json
+            services/shipping/package-lock.json
             web/package-lock.json
             frontends/catalog/package-lock.json
             frontends/orders/package-lock.json
@@ -146,6 +149,7 @@ jobs:
           npm ci --prefix server
           npm ci --prefix services/catalog
           npm ci --prefix services/orders
+          npm ci --prefix services/shipping
           npm ci --prefix web
           npm ci --prefix frontends/catalog
           npm ci --prefix frontends/orders

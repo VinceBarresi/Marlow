@@ -95,6 +95,19 @@ actor APIClient {
     return response.order
   }
 
+  func shippingAccessToken() async throws -> ShippingAccessToken {
+    try await request(method: "POST", path: "/api/shipping/access-token")
+  }
+
+  func tracking(trackingNumber: String, bearerToken: String) async throws -> TrackingInfo {
+    let response: TrackingResponse = try await request(
+      method: "GET",
+      path: "/api/tracking/\(trackingNumber)",
+      bearerToken: bearerToken
+    )
+    return response.tracking
+  }
+
   func clearCookies() {
     guard let cookies = HTTPCookieStorage.shared.cookies(for: baseURL) else { return }
     for cookie in cookies {
@@ -106,7 +119,8 @@ actor APIClient {
     method: String,
     path: String,
     query: [URLQueryItem] = [],
-    body: (any Encodable)? = nil
+    body: (any Encodable)? = nil,
+    bearerToken: String? = nil
   ) async throws -> T {
     guard var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else {
       throw APIError(status: -1, message: "Invalid base URL.")
@@ -121,6 +135,9 @@ actor APIClient {
 
     var request = URLRequest(url: url)
     request.httpMethod = method
+    if let bearerToken {
+      request.setValue("Bearer \(bearerToken)", forHTTPHeaderField: "Authorization")
+    }
     if let body {
       request.setValue("application/json", forHTTPHeaderField: "Content-Type")
       request.httpBody = try encoder.encode(AnyEncodable(body))

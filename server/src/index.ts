@@ -15,6 +15,7 @@ import { registerLocations } from "./locations.js";
 import { registerOrdersProxy } from "./orders-proxy.js";
 import { verifyPassword } from "./passwords.js";
 import { pageQuery } from "./query.js";
+import { registerShippingGateway } from "./shipping.js";
 
 const WEEK = 60 * 60 * 24 * 7;
 const pool = new pg.Pool({
@@ -213,6 +214,7 @@ await registerOrdersProxy(app, requireUser);
 await registerLocations(app, { pool, requireUser });
 await registerCareers(app, { pool, requireUser });
 await registerCommerce(app, { pool, redis, requireUser });
+await registerShippingGateway(app, { requireUser });
 
 await app.register(swagger, {
   mode: "static",
