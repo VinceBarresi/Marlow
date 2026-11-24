@@ -166,20 +166,22 @@ jobs:
         env:
           REPORT_URL: https://vincebarresi.github.io/data-lab/allure/${{ github.run_id }}/
         run: |
-          {
-            echo "## Cypress Allure report"
-            echo ""
-            if [[ -f allure-report/index.html ]]; then
+          if [[ -f allure-report/index.html ]]; then
+            echo "========================================"
+            echo "Allure report: ${REPORT_URL}"
+            echo "========================================"
+            {
+              echo "## Cypress Allure report"
+              echo ""
               echo "- **Live report:** [${REPORT_URL}](${REPORT_URL})"
               echo "- **Artifact:** \`cypress-allure-report-${{ github.run_id }}\` (download from this run if Pages is unavailable)"
               echo ""
               echo "Failure screenshots are attached inside the Allure report when tests fail."
-              echo ""
-              echo "First-time setup: repo **Settings → Pages → Build and deployment → Deploy from a branch → \`gh-pages\` / root**."
-            else
-              echo "No Allure HTML was generated for this run (workers may have failed before writing results)."
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No Allure HTML was generated for this run."
+            echo "No Allure HTML was generated for this run (workers may have failed before writing results)." >> "$GITHUB_STEP_SUMMARY"
+          fi
   playwright:
     name: Playwright
     runs-on: ubuntu-latest
