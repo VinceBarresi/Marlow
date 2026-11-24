@@ -2,13 +2,21 @@ import { expect, test, type APIRequestContext } from "@playwright/test";
 import { catalogEndpoints } from "../../fixtures/endpoints/catalogEndpoints";
 import { loginEndpoints } from "../../fixtures/endpoints/loginEndpoints";
 import { ordersEndpoints } from "../../fixtures/endpoints/ordersEndpoints";
-import { cartItemKeys, emptyCartResponseModel } from "../../fixtures/models/ordersModel";
+import { emptyCartResponseModel } from "../../fixtures/models/ordersModel";
+import {
+  cartItemResultSchema,
+  cartSchema,
+  errorSchema,
+  okSchema,
+  productListSchema,
+} from "../../fixtures/schemas/apiSchemas";
+import { assertSchema } from "../../fixtures/schemas/assertSchema";
 
 async function clearCart(request: APIRequestContext) {
   const response = await request.get(ordersEndpoints.cart);
   expect(response.status()).toBe(200);
-  const body = await response.json();
-  for (const item of body.items as { sku: string }[]) {
+  const body = assertSchema(cartSchema, await response.json(), "cart clear");
+  for (const item of body.items) {
     const del = await request.delete(ordersEndpoints.cartItem(item.sku));
     expect(del.status()).toBe(200);
   }
@@ -17,10 +25,8 @@ async function clearCart(request: APIRequestContext) {
 async function firstAvailableSku(request: APIRequestContext) {
   const response = await request.get(catalogEndpoints.products);
   expect(response.status()).toBe(200);
-  const body = await response.json();
-  const product = (body.products as { sku: string; available: number }[]).find(
-    (row) => row.available > 0,
-  );
+  const body = assertSchema(productListSchema, await response.json(), "products");
+  const product = body.products.find((row) => row.available > 0);
   expect(product).toBeTruthy();
   return product!.sku;
 }
@@ -41,25 +47,24 @@ test.describe("cart API", () => {
       data: { sku, quantity: 1 },
     });
     expect(put.status()).toBe(200);
-    expect(await put.json()).toMatchObject({ ok: true, sku, quantity: 1 });
+    const putBody = assertSchema(cartItemResultSchema, await put.json(), "cart put");
+    expect(putBody).toMatchObject({ ok: true, sku, quantity: 1 });
 
     const cart = await request.get(ordersEndpoints.cart);
     expect(cart.status()).toBe(200);
-    const cartBody = await cart.json();
-    expect(Object.keys(cartBody).sort()).toEqual(["items", "subtotalCents"]);
+    const cartBody = assertSchema(cartSchema, await cart.json(), "cart");
     expect(cartBody.items).toHaveLength(1);
-    expect(Object.keys(cartBody.items[0]).sort()).toEqual([...cartItemKeys].sort());
     expect(cartBody.items[0].sku).toBe(sku);
     expect(cartBody.items[0].quantity).toBe(1);
     expect(cartBody.subtotalCents).toBeGreaterThan(0);
 
     const del = await request.delete(ordersEndpoints.cartItem(sku));
     expect(del.status()).toBe(200);
-    expect(await del.json()).toEqual({ ok: true });
+    assertSchema(okSchema, await del.json(), "cart delete");
 
     const empty = await request.get(ordersEndpoints.cart);
     expect(empty.status()).toBe(200);
-    const emptyBody = await empty.json();
+    const emptyBody = assertSchema(cartSchema, await empty.json(), "empty cart");
     expect(emptyBody).toMatchObject(emptyCartResponseModel);
     expect(emptyBody.items).toEqual([]);
   });
@@ -70,7 +75,7 @@ test.describe("cart API", () => {
       data: { sku: "ANY", quantity: 1 },
     });
     expect(response.status()).toBe(401);
-    expect(await response.json()).toHaveProperty("error");
+    assertSchema(errorSchema, await response.json(), "cart unauthorized");
     await anon.dispose();
   });
 });

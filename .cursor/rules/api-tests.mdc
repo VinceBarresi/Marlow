@@ -8,9 +8,11 @@ alwaysApply: false
 
 - Prefer the `api-test-author` skill when creating new API coverage.
 - Put shared paths/models in `fixtures/endpoints/` and `fixtures/models/`; import them—do not duplicate payloads.
+- Put Zod response schemas in `fixtures/schemas/` and assert with `assertSchema(...)` on happy-path (and error) bodies.
 - Add **both** Cypress (`cypress/tests/api/*.cy.ts`) and Playwright (`playwright/api/*.spec.ts`) unless the user names one framework.
 - Do not hardcode seed user UUIDs; assert id is a non-empty string or omit it from expected models.
 - Seed users: `customer@marlow.test` / `admin@marlow.test` / `staff@marlow.test`, password `datalab`.
+- Manual/Newman: keep `postman/Marlow.API.postman_collection.json` in sync when adding gateway endpoints.
 
 ## Cypress
 

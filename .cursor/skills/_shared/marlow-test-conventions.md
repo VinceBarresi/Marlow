@@ -25,8 +25,11 @@ Framework-agnostic TypeScript under `fixtures/`:
 
 - `fixtures/endpoints/` — path constants (e.g. `loginEndpoints.login`)
 - `fixtures/models/` — request/response types and expected bodies (`satisfies` + `Omit<..., "id">` when id is dynamic)
+- `fixtures/schemas/` — Zod schemas (`apiSchemas.ts`) + `assertSchema()` for response contract checks
 
-Both Cypress and Playwright API tests import from here. Extend these files when adding endpoints; do not duplicate payload shapes in each suite.
+Both Cypress and Playwright API tests import from here. Extend these files when adding endpoints; do not duplicate payload shapes in each suite. Prefer `assertSchema(schema, body, label)` on responses in addition to status/value asserts.
+
+Postman: `postman/Marlow.API.postman_collection.json` (+ local environment) for manual/Newman runs against `:4000` or the Vite proxy.
 
 ## Cypress vs Playwright assertions (API)
 
@@ -90,3 +93,5 @@ Docker runners boot the shop via `scripts/e2e-up.sh` and use `host.docker.intern
 | Playwright PO    | `playwright/pages/*.page.ts` (required for e2e/integ)            |
 | Playwright auth  | `playwright/support/login.ts`                                    |
 | Stubbed UI       | next to source as `*.test.tsx` (every page already has coverage) |
+| Zod API schemas  | `fixtures/schemas/`                                              |
+| Postman API      | `postman/Marlow.API.postman_collection.json`                     |

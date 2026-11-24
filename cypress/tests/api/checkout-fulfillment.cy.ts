@@ -5,11 +5,13 @@ import {
   seedLocationSlug,
 } from "../../../fixtures/endpoints/locationsEndpoints";
 import { ordersEndpoints } from "../../../fixtures/endpoints/ordersEndpoints";
+import { shipCheckoutRequestModel, shipRequestModel } from "../../../fixtures/models/ordersModel";
 import {
-  checkoutOrderKeys,
-  shipCheckoutRequestModel,
-  shipRequestModel,
-} from "../../../fixtures/models/ordersModel";
+  checkoutResponseSchema,
+  errorSchema,
+  orderResponseSchema,
+} from "../../../fixtures/schemas/apiSchemas";
+import { assertSchema } from "../../../fixtures/schemas/assertSchema";
 
 const clearCart = () => {
   cy.request("GET", ordersEndpoints.cart).then((response) => {
@@ -47,11 +49,9 @@ const createShipOrder = () => {
       .request("POST", ordersEndpoints.checkout, shipCheckoutRequestModel)
       .then((response) => {
         expect(response.status).to.eq(201);
-        expect(response.body).to.have.all.keys("order");
-        expect(response.body.order).to.have.all.keys(...checkoutOrderKeys);
-        expect(response.body.order.status).to.eq("paid");
-        expect(response.body.order.number).to.be.a("string").and.not.equal("");
-        return response.body.order.number as string;
+        const parsed = assertSchema(checkoutResponseSchema, response.body, "checkout");
+        expect(parsed.order.status).to.eq("paid");
+        return parsed.order.number;
       });
   });
 };
@@ -61,11 +61,11 @@ describe("checkout and fulfillment API", () => {
     createShipOrder().then((number) => {
       cy.request("GET", ordersEndpoints.order(number)).then((response) => {
         expect(response.status).to.eq(200);
-        expect(response.body).to.have.all.keys("order");
-        expect(response.body.order.number).to.eq(number);
-        expect(response.body.order.status).to.eq("paid");
+        const parsed = assertSchema(orderResponseSchema, response.body, "order detail");
+        expect(parsed.order.number).to.eq(number);
+        expect(parsed.order.status).to.eq("paid");
         expect(response.body.order.fulfillment).to.eq("ship");
-        expect(response.body.order.lines).to.be.an("array").and.not.have.length(0);
+        expect(parsed.order.lines).to.not.have.length(0);
       });
     });
   });
@@ -180,6 +180,7 @@ describe("checkout and fulfillment API", () => {
         failOnStatusCode: false,
       }).then((response) => {
         expect(response.status).to.eq(403);
+        assertSchema(errorSchema, response.body, "pick forbidden");
         expect(response.body).to.deep.equal({ error: "Staff only." });
       });
 

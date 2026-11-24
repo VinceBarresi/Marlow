@@ -17,13 +17,14 @@ description: >-
    - `cypress/tests/api/login.cy.ts`
    - `playwright/api/login.spec.ts`
    - `fixtures/endpoints/`, `fixtures/models/`
-4. Extend shared fixtures first (endpoint constant + request/response model). Omit dynamic `id` from expected bodies via `Omit<..., "id">` / `satisfies`.
+4. Extend shared fixtures first (endpoint constant + request/response model + Zod schema in `fixtures/schemas/`). Omit dynamic `id` from expected bodies via `Omit<..., "id">` / `satisfies`.
 5. **Unless the user specifies a single framework, add both:**
    - `cypress/tests/api/<name>.cy.ts`
    - `playwright/api/<name>.spec.ts`
-6. Mirror scenarios across frameworks (same requests and expectations).
+6. Mirror scenarios across frameworks (same requests and expectations). Call `assertSchema(...)` on response bodies.
 7. Do not hardcode seed UUIDs; assert id is a non-empty string when present.
-8. Mention how to run: `npm run cypress:api`, `npm run playwright:api`, or docker scripts.
+8. When adding a gateway endpoint, extend `postman/Marlow.API.postman_collection.json` with a matching request + JSON Schema test when practical.
+9. Mention how to run: `npm run cypress:api`, `npm run playwright:api`, or docker scripts. Postman: import `postman/`.
 
 ## Cypress shape
 

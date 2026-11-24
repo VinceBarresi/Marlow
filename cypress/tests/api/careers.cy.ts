@@ -7,6 +7,8 @@ import {
   minimalResumePdfContents,
   uniqueRemoteJobRequest,
 } from "../../../fixtures/models/careersModel";
+import { errorSchema, jobListSchema } from "../../../fixtures/schemas/apiSchemas";
+import { assertSchema } from "../../../fixtures/schemas/assertSchema";
 
 describe("careers API", () => {
   beforeEach(() => {
@@ -21,13 +23,11 @@ describe("careers API", () => {
   it("lists jobs and returns the seed job by slug", () => {
     cy.request("GET", careersEndpoints.jobs).then((response) => {
       expect(response.status).to.eq(200);
-      expect(response.body).to.have.all.keys("jobs");
-      expect(response.body.jobs).to.be.an("array").and.not.have.length(0);
+      const list = assertSchema(jobListSchema, response.body, "jobs");
+      expect(list.jobs).to.not.have.length(0);
       expect(response.body.jobs[0]).to.have.all.keys(...jobListItemKeys);
 
-      const seed = (response.body.jobs as { slug: string }[]).find(
-        (row) => row.slug === seedJobSlug,
-      );
+      const seed = list.jobs.find((row) => row.slug === seedJobSlug);
       expect(seed, "seed software-engineer").to.not.equal(undefined);
     });
 
@@ -47,7 +47,7 @@ describe("careers API", () => {
       failOnStatusCode: false,
     }).then((response) => {
       expect(response.status).to.eq(401);
-      expect(response.body).to.have.property("error");
+      assertSchema(errorSchema, response.body, "jobs unauthorized");
     });
   });
 

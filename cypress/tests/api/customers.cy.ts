@@ -5,6 +5,8 @@ import {
   customerListItemKeys,
   customerOrderKeys,
 } from "../../../fixtures/models/customersModel";
+import { customerListSchema, errorSchema } from "../../../fixtures/schemas/apiSchemas";
+import { assertSchema } from "../../../fixtures/schemas/assertSchema";
 
 describe("customers API", () => {
   it("rejects customers for a customer role", () => {
@@ -21,6 +23,7 @@ describe("customers API", () => {
       failOnStatusCode: false,
     }).then((response) => {
       expect(response.status).to.eq(403);
+      assertSchema(errorSchema, response.body, "customers forbidden");
       expect(response.body).to.deep.equal({ error: "Staff only." });
     });
   });
@@ -32,7 +35,7 @@ describe("customers API", () => {
       failOnStatusCode: false,
     }).then((response) => {
       expect(response.status).to.eq(401);
-      expect(response.body).to.have.property("error");
+      assertSchema(errorSchema, response.body, "customers unauthorized");
     });
   });
 
@@ -46,13 +49,11 @@ describe("customers API", () => {
 
     cy.request("GET", customersEndpoints.customers).then((response) => {
       expect(response.status).to.eq(200);
-      expect(response.body).to.have.all.keys("customers", "page", "pageSize", "total");
-      expect(response.body.customers).to.be.an("array").and.not.have.length(0);
+      const list = assertSchema(customerListSchema, response.body, "customers");
+      expect(list.customers).to.not.have.length(0);
 
       const customer =
-        response.body.customers.find(
-          (row: { email: string }) => row.email === "customer@marlow.test",
-        ) ?? response.body.customers[0];
+        list.customers.find((row) => row.email === "customer@marlow.test") ?? list.customers[0];
       expect(customer).to.have.all.keys(...customerListItemKeys);
       expect(customer.id).to.be.a("string").and.not.equal("");
 

@@ -8,6 +8,8 @@ import {
   minimalResumePdfContents,
   uniqueRemoteJobRequest,
 } from "../../fixtures/models/careersModel";
+import { errorSchema, jobListSchema } from "../../fixtures/schemas/apiSchemas";
+import { assertSchema } from "../../fixtures/schemas/assertSchema";
 
 test.describe("careers API", () => {
   test.beforeEach(async ({ request }) => {
@@ -21,11 +23,10 @@ test.describe("careers API", () => {
     const response = await request.get(careersEndpoints.jobs);
     expect(response.status()).toBe(200);
 
-    const body = await response.json();
-    expect(Object.keys(body).sort()).toEqual(["jobs"]);
+    const body = assertSchema(jobListSchema, await response.json(), "jobs");
     expect(body.jobs.length).toBeGreaterThan(0);
     expect(Object.keys(body.jobs[0]).sort()).toEqual([...jobListItemKeys].sort());
-    expect(body.jobs.some((row: { slug: string }) => row.slug === seedJobSlug)).toBe(true);
+    expect(body.jobs.some((row) => row.slug === seedJobSlug)).toBe(true);
 
     const detail = await request.get(careersEndpoints.job(seedJobSlug));
     expect(detail.status()).toBe(200);
@@ -39,7 +40,7 @@ test.describe("careers API", () => {
     const anon = await playwright.request.newContext({ baseURL });
     const response = await anon.get(careersEndpoints.jobs);
     expect(response.status()).toBe(401);
-    expect(await response.json()).toHaveProperty("error");
+    assertSchema(errorSchema, await response.json(), "jobs unauthorized");
     await anon.dispose();
   });
 

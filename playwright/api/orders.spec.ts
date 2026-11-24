@@ -5,6 +5,8 @@ import {
   emptyCartResponseModel,
   emptyOrdersListResponseModel,
 } from "../../fixtures/models/ordersModel";
+import { cartSchema, errorSchema, orderListSchema } from "../../fixtures/schemas/apiSchemas";
+import { assertSchema } from "../../fixtures/schemas/assertSchema";
 
 test.describe("orders and cart API", () => {
   test.beforeEach(async ({ request }) => {
@@ -18,8 +20,7 @@ test.describe("orders and cart API", () => {
     const response = await request.get(ordersEndpoints.cart);
     expect(response.status()).toBe(200);
 
-    const body = await response.json();
-    expect(Object.keys(body).sort()).toEqual(["items", "subtotalCents"]);
+    const body = assertSchema(cartSchema, await response.json(), "cart");
     expect(body).toMatchObject(emptyCartResponseModel);
     expect(body.items).toEqual([]);
   });
@@ -30,8 +31,7 @@ test.describe("orders and cart API", () => {
     );
     expect(response.status()).toBe(200);
 
-    const body = await response.json();
-    expect(Object.keys(body).sort()).toEqual(["orders", "page", "pageSize", "total"]);
+    const body = assertSchema(orderListSchema, await response.json(), "orders");
     expect(body).toMatchObject(emptyOrdersListResponseModel);
     expect(body.orders).toEqual([]);
   });
@@ -40,7 +40,7 @@ test.describe("orders and cart API", () => {
     const anon = await playwright.request.newContext({ baseURL });
     const response = await anon.get(ordersEndpoints.cart);
     expect(response.status()).toBe(401);
-    expect(await response.json()).toHaveProperty("error");
+    assertSchema(errorSchema, await response.json(), "cart unauthorized");
     await anon.dispose();
   });
 });

@@ -2,6 +2,8 @@ import { expect, test } from "@playwright/test";
 import { loginEndpoints } from "../../fixtures/endpoints/loginEndpoints";
 import { locationsEndpoints, seedLocationSlug } from "../../fixtures/endpoints/locationsEndpoints";
 import { locationKeys, uniqueLocationRequest } from "../../fixtures/models/locationsModel";
+import { errorSchema, locationListSchema } from "../../fixtures/schemas/apiSchemas";
+import { assertSchema } from "../../fixtures/schemas/assertSchema";
 
 test.describe("locations API", () => {
   test.beforeEach(async ({ request }) => {
@@ -15,13 +17,10 @@ test.describe("locations API", () => {
     const response = await request.get(locationsEndpoints.locations);
     expect(response.status()).toBe(200);
 
-    const body = await response.json();
-    expect(Object.keys(body).sort()).toEqual(["locations"]);
+    const body = assertSchema(locationListSchema, await response.json(), "locations");
     expect(body.locations.length).toBeGreaterThan(0);
     expect(Object.keys(body.locations[0]).sort()).toEqual([...locationKeys].sort());
-    expect(body.locations.some((row: { slug: string }) => row.slug === seedLocationSlug)).toBe(
-      true,
-    );
+    expect(body.locations.some((row) => row.slug === seedLocationSlug)).toBe(true);
 
     const detail = await request.get(locationsEndpoints.location(seedLocationSlug));
     expect(detail.status()).toBe(200);
@@ -42,7 +41,7 @@ test.describe("locations API", () => {
     const anon = await playwright.request.newContext({ baseURL });
     const response = await anon.get(locationsEndpoints.locations);
     expect(response.status()).toBe(401);
-    expect(await response.json()).toHaveProperty("error");
+    assertSchema(errorSchema, await response.json(), "locations unauthorized");
     await anon.dispose();
   });
 
