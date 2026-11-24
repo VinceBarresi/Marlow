@@ -3,6 +3,12 @@ name: CI
 on:
   push:
 
+# Needed to publish Allure HTML to the gh-pages branch for GitHub Pages.
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   unit-tests:
     name: Unit tests
@@ -144,20 +150,32 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+      - name: Publish Allure to GitHub Pages
+        id: allure_pages
+        if: always() && hashFiles('allure-report/index.html') != ''
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./allure-report
+          destination_dir: allure/${{ github.run_id }}
+          keep_files: true
+          commit_message: "Allure Cypress report for run ${{ github.run_id }}"
+
       - name: Allure summary
         if: always()
+        env:
+          REPORT_URL: https://VinceBarresi.github.io/data-lab/allure/${{ github.run_id }}/
         run: |
           {
             echo "## Cypress Allure report"
             echo ""
             if [[ -f allure-report/index.html ]]; then
-              echo "HTML report uploaded as artifact \`cypress-allure-report-${{ github.run_id }}\`."
-              echo ""
-              echo "1. Open this workflow run → **Artifacts**"
-              echo "2. Download \`cypress-allure-report-${{ github.run_id }}\`"
-              echo "3. Unzip and open \`allure-report/index.html\` (or run \`npx allure open allure-report\` locally)"
+              echo "- **Live report:** [${REPORT_URL}](${REPORT_URL})"
+              echo "- **Artifact:** \`cypress-allure-report-${{ github.run_id }}\` (download from this run if Pages is unavailable)"
               echo ""
               echo "Failure screenshots are attached inside the Allure report when tests fail."
+              echo ""
+              echo "First-time setup: repo **Settings → Pages → Build and deployment → Deploy from a branch → \`gh-pages\` / root**."
             else
               echo "No Allure HTML was generated for this run (workers may have failed before writing results)."
             fi

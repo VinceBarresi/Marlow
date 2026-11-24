@@ -139,7 +139,12 @@ npm run allure:open      # open the report
 
 `npm run cypress:docker` generates the report when the workers finish.
 
-In GitHub Actions, the Cypress job uploads an **Artifacts** zip (`cypress-allure-report-<run id>`) and links it from the job summary. Download it from the workflow run page, then open `allure-report/index.html`.
+In GitHub Actions, the Cypress job:
+
+- Publishes a live report to GitHub Pages at `https://VinceBarresi.github.io/data-lab/allure/<run id>/` (linked from the job summary)
+- Also uploads an **Artifacts** zip (`cypress-allure-report-<run id>`) as a backup
+
+One-time Pages setup: **Settings → Pages → Deploy from a branch → `gh-pages` / `(root)`**. Private-repo Pages needs a plan that allows it; otherwise use the artifact.
 
 ## Lint and format
 
