@@ -144,204 +144,215 @@ export async function registerOrders(app: FastifyInstance, { pool, redis }: Deps
     return { ok: true };
   });
 
-  app.post<{ Body: Partial<Address> & { fulfillment?: string; locationId?: string } }>(
-    "/checkout",
-    async (request, reply) => {
-      const user = caller(request, reply);
-      if (!user) return;
+  app.post<{
+    Body: Partial<Address> & {
+      fulfillment?: string;
+      locationId?: string;
+      paymentIntentId?: string;
+      paymentLast4?: string;
+      paymentBrand?: string;
+    };
+  }>("/checkout", async (request, reply) => {
+    const user = caller(request, reply);
+    if (!user) return;
 
-      const fulfillment = text(request.body?.fulfillment) || "ship";
-      if (fulfillment !== "ship" && fulfillment !== "pickup") {
-        return reply.code(400).send({ error: "Choose shipping or pickup." });
+    const fulfillment = text(request.body?.fulfillment) || "ship";
+    if (fulfillment !== "ship" && fulfillment !== "pickup") {
+      return reply.code(400).send({ error: "Choose shipping or pickup." });
+    }
+    const pickup = fulfillment === "pickup";
+    const locationId = text(request.body?.locationId);
+    const paymentIntentId = text(request.body?.paymentIntentId) || null;
+    const paymentLast4 = text(request.body?.paymentLast4) || null;
+    const paymentBrand = text(request.body?.paymentBrand) || null;
+
+    let address: Address = {
+      shipName: text(request.body?.shipName),
+      shipLine1: text(request.body?.shipLine1),
+      shipCity: text(request.body?.shipCity),
+      shipRegion: text(request.body?.shipRegion),
+      shipPostalCode: text(request.body?.shipPostalCode),
+      shipCountry: text(request.body?.shipCountry) || "US",
+    };
+    if (pickup) {
+      if (!address.shipName || !locationId) {
+        return reply.code(400).send({ error: "A name and a store are required for pickup." });
       }
-      const pickup = fulfillment === "pickup";
-      const locationId = text(request.body?.locationId);
+    } else if (
+      !address.shipName ||
+      !address.shipLine1 ||
+      !address.shipCity ||
+      !address.shipRegion ||
+      !address.shipPostalCode
+    ) {
+      return reply.code(400).send({ error: "A shipping name and address are required." });
+    }
 
-      let address: Address = {
-        shipName: text(request.body?.shipName),
-        shipLine1: text(request.body?.shipLine1),
-        shipCity: text(request.body?.shipCity),
-        shipRegion: text(request.body?.shipRegion),
-        shipPostalCode: text(request.body?.shipPostalCode),
-        shipCountry: text(request.body?.shipCountry) || "US",
-      };
+    const cart = await readCart(redis, user.id);
+    if (cart.length === 0) return reply.code(400).send({ error: "Cart is empty." });
+
+    const client = await pool.connect();
+    try {
+      await client.query("begin");
+      await client.query("select pg_advisory_xact_lock(42)");
       if (pickup) {
-        if (!address.shipName || !locationId) {
-          return reply.code(400).send({ error: "A name and a store are required for pickup." });
+        const store = await client.query<{
+          id: string;
+          name: string;
+          line1: string;
+          city: string;
+          region: string;
+          postal_code: string;
+        }>(`select id, name, line1, city, region, postal_code from locations where id = $1`, [
+          locationId,
+        ]);
+        const location = store.rows[0];
+        if (!location) {
+          await client.query("rollback");
+          return reply.code(404).send({ error: "Store not found." });
         }
-      } else if (
-        !address.shipName ||
-        !address.shipLine1 ||
-        !address.shipCity ||
-        !address.shipRegion ||
-        !address.shipPostalCode
-      ) {
-        return reply.code(400).send({ error: "A shipping name and address are required." });
+        address = {
+          ...address,
+          shipLine1: location.line1,
+          shipCity: location.city,
+          shipRegion: location.region,
+          shipPostalCode: location.postal_code,
+          shipCountry: "US",
+        };
       }
+      const priced: { sku: string; name: string; quantity: number; priceCents: number }[] = [];
 
-      const cart = await readCart(redis, user.id);
-      if (cart.length === 0) return reply.code(400).send({ error: "Cart is empty." });
-
-      const client = await pool.connect();
-      try {
-        await client.query("begin");
-        await client.query("select pg_advisory_xact_lock(42)");
-        if (pickup) {
-          const store = await client.query<{
-            id: string;
-            name: string;
-            line1: string;
-            city: string;
-            region: string;
-            postal_code: string;
-          }>(`select id, name, line1, city, region, postal_code from locations where id = $1`, [
-            locationId,
-          ]);
-          const location = store.rows[0];
-          if (!location) {
-            await client.query("rollback");
-            return reply.code(404).send({ error: "Store not found." });
-          }
-          address = {
-            ...address,
-            shipLine1: location.line1,
-            shipCity: location.city,
-            shipRegion: location.region,
-            shipPostalCode: location.postal_code,
-            shipCountry: "US",
-          };
-        }
-        const priced: { sku: string; name: string; quantity: number; priceCents: number }[] = [];
-
-        for (const line of cart) {
-          const locked = pickup
-            ? await client.query<{ name: string; price_cents: number; available: number }>(
-                `select p.name, p.price_cents, li.on_hand as available
+      for (const line of cart) {
+        const locked = pickup
+          ? await client.query<{ name: string; price_cents: number; available: number }>(
+              `select p.name, p.price_cents, li.on_hand as available
                from products p
                join location_inventory li on li.sku = p.sku and li.location_id = $2
                where p.sku = $1
                for update of li`,
-                [line.sku, locationId],
-              )
-            : await client.query<{ name: string; price_cents: number; available: number }>(
-                `select p.name, p.price_cents, i.on_hand - i.reserved as available
+              [line.sku, locationId],
+            )
+          : await client.query<{ name: string; price_cents: number; available: number }>(
+              `select p.name, p.price_cents, i.on_hand - i.reserved as available
                from products p
                join inventory i on i.sku = p.sku
                where p.sku = $1
                for update of i`,
-                [line.sku],
-              );
-          const row = locked.rows[0];
-          if (!row) {
-            await client.query("rollback");
-            return reply.code(404).send({
-              error: pickup
-                ? `${line.sku} is not at this store.`
-                : `Product ${line.sku} not found.`,
-            });
-          }
-          if (row.available < line.quantity) {
-            await client.query("rollback");
-            return reply.code(409).send({ error: `Not enough stock for ${line.sku}.` });
-          }
-          if (pickup) {
-            await client.query(
-              `update location_inventory
-             set on_hand = on_hand - $3
-             where location_id = $1 and sku = $2`,
-              [locationId, line.sku, line.quantity],
+              [line.sku],
             );
-          } else {
-            await client.query(
-              `update inventory
-             set reserved = reserved + $2, updated_at = now()
-             where sku = $1`,
-              [line.sku, line.quantity],
-            );
-          }
-          priced.push({
-            sku: line.sku,
-            name: row.name,
-            quantity: line.quantity,
-            priceCents: row.price_cents,
+        const row = locked.rows[0];
+        if (!row) {
+          await client.query("rollback");
+          return reply.code(404).send({
+            error: pickup ? `${line.sku} is not at this store.` : `Product ${line.sku} not found.`,
           });
         }
+        if (row.available < line.quantity) {
+          await client.query("rollback");
+          return reply.code(409).send({ error: `Not enough stock for ${line.sku}.` });
+        }
+        if (pickup) {
+          await client.query(
+            `update location_inventory
+             set on_hand = on_hand - $3
+             where location_id = $1 and sku = $2`,
+            [locationId, line.sku, line.quantity],
+          );
+        } else {
+          await client.query(
+            `update inventory
+             set reserved = reserved + $2, updated_at = now()
+             where sku = $1`,
+            [line.sku, line.quantity],
+          );
+        }
+        priced.push({
+          sku: line.sku,
+          name: row.name,
+          quantity: line.quantity,
+          priceCents: row.price_cents,
+        });
+      }
 
-        const subtotal = priced.reduce((sum, line) => sum + line.priceCents * line.quantity, 0);
-        const pricedQuote = quote(subtotal);
-        const shipping = pickup ? 0 : pricedQuote.shippingCents;
-        const tax = pricedQuote.taxCents;
-        const next = await client.query<{ next: number }>(
-          `select coalesce(max(substring(number from 5)::int), 100000) + 1 as next from orders`,
-        );
-        const number = `MRW-${next.rows[0]?.next ?? 100001}`;
-        const orderId = randomUUID();
+      const subtotal = priced.reduce((sum, line) => sum + line.priceCents * line.quantity, 0);
+      const pricedQuote = quote(subtotal);
+      const shipping = pickup ? 0 : pricedQuote.shippingCents;
+      const tax = pricedQuote.taxCents;
+      const next = await client.query<{ next: number }>(
+        `select coalesce(max(substring(number from 5)::int), 100000) + 1 as next from orders`,
+      );
+      const number = `MRW-${next.rows[0]?.next ?? 100001}`;
+      const orderId = randomUUID();
 
-        await client.query(
-          `insert into orders (
+      await client.query(
+        `insert into orders (
            id, number, user_id, status, placed_at,
            subtotal_cents, shipping_cents, tax_cents, total_cents,
            ship_name, ship_line1, ship_city, ship_region, ship_postal_code, ship_country,
-           fulfillment, location_id
+           fulfillment, location_id,
+           payment_intent_id, payment_last4, payment_brand
          ) values (
            $1, $2, $3, 'paid', now(),
            $4, $5, $6, $7,
            $8, $9, $10, $11, $12, $13,
-           $14, $15
+           $14, $15,
+           $16, $17, $18
          )`,
-          [
-            orderId,
-            number,
-            user.id,
-            subtotal,
-            shipping,
-            tax,
-            subtotal + shipping + tax,
-            address.shipName,
-            address.shipLine1,
-            address.shipCity,
-            address.shipRegion,
-            address.shipPostalCode,
-            address.shipCountry,
-            fulfillment,
-            pickup ? locationId : null,
-          ],
-        );
+        [
+          orderId,
+          number,
+          user.id,
+          subtotal,
+          shipping,
+          tax,
+          subtotal + shipping + tax,
+          address.shipName,
+          address.shipLine1,
+          address.shipCity,
+          address.shipRegion,
+          address.shipPostalCode,
+          address.shipCountry,
+          fulfillment,
+          pickup ? locationId : null,
+          paymentIntentId,
+          paymentLast4,
+          paymentBrand,
+        ],
+      );
 
-        for (const line of priced) {
-          await client.query(
-            `insert into order_lines (order_id, sku, name, quantity, unit_price_cents)
-           values ($1, $2, $3, $4, $5)`,
-            [orderId, line.sku, line.name, line.quantity, line.priceCents],
-          );
-        }
-
+      for (const line of priced) {
         await client.query(
-          `insert into order_events (order_id, status, note, created_at, actor_email)
-         values ($1, 'paid', $3, now(), $2)`,
-          [orderId, user.email, pickup ? "Held for pickup" : "Payment captured"],
+          `insert into order_lines (order_id, sku, name, quantity, unit_price_cents)
+           values ($1, $2, $3, $4, $5)`,
+          [orderId, line.sku, line.name, line.quantity, line.priceCents],
         );
-        await client.query("commit");
-        await redis.del(cartKey(user.id));
-        await redis.incr("cache:version");
-        return reply.code(201).send({
-          order: {
-            number,
-            status: "paid",
-            subtotalCents: subtotal,
-            shippingCents: shipping,
-            taxCents: tax,
-            totalCents: subtotal + shipping + tax,
-          },
-        });
-      } catch (error) {
-        await client.query("rollback");
-        throw error;
-      } finally {
-        client.release();
       }
-    },
-  );
+
+      await client.query(
+        `insert into order_events (order_id, status, note, created_at, actor_email)
+         values ($1, 'paid', $3, now(), $2)`,
+        [orderId, user.email, pickup ? "Held for pickup" : "Payment captured"],
+      );
+      await client.query("commit");
+      await redis.del(cartKey(user.id));
+      await redis.incr("cache:version");
+      return reply.code(201).send({
+        order: {
+          number,
+          status: "paid",
+          subtotalCents: subtotal,
+          shippingCents: shipping,
+          taxCents: tax,
+          totalCents: subtotal + shipping + tax,
+        },
+      });
+    } catch (error) {
+      await client.query("rollback");
+      throw error;
+    } finally {
+      client.release();
+    }
+  });
 
   app.get<{ Querystring: { page?: string; pageSize?: string; status?: string } }>(
     "/orders",

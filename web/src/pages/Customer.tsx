@@ -21,19 +21,28 @@ type CustomerDetail = {
   createdAt: string;
 };
 
+type SavedCard = {
+  id: string;
+  card: { brand: string; last4: string; expMonth: number; expYear: number };
+};
+
 export function Customer() {
   const { id = "" } = useParams();
   const [customer, setCustomer] = useState<CustomerDetail | null>(null);
   const [orders, setOrders] = useState<CustomerOrder[]>([]);
+  const [paymentMethods, setPaymentMethods] = useState<SavedCard[]>([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
     let stop = false;
-    api<{ customer: CustomerDetail; orders: CustomerOrder[] }>(`/api/customers/${id}`)
+    api<{ customer: CustomerDetail; orders: CustomerOrder[]; paymentMethods?: SavedCard[] }>(
+      `/api/customers/${id}`,
+    )
       .then((result) => {
         if (stop) return;
         setCustomer(result.customer);
         setOrders(result.orders);
+        setPaymentMethods(result.paymentMethods ?? []);
       })
       .catch((err: Error) => {
         if (!stop) setError(err.message);
@@ -62,6 +71,34 @@ export function Customer() {
       <p className="lede" data-testid="customer-email">
         {customer.email}
       </p>
+
+      <section
+        className="panel stack"
+        style={{ maxWidth: 480 }}
+        data-testid="customer-payment-methods"
+      >
+        <h2 data-testid="customer-cards-title">Saved cards</h2>
+        <p className="hint" data-testid="customer-cards-hint">
+          Tokenized only — brand, last four, and expiry. Full numbers and CVC are never shown.
+        </p>
+        {paymentMethods.length === 0 ? (
+          <p data-testid="customer-cards-empty">No cards on file.</p>
+        ) : (
+          <ul className="stack" data-testid="customer-cards-list">
+            {paymentMethods.map((method) => (
+              <li key={method.id} data-testid={`customer-card-${method.id}`}>
+                <span data-testid={`customer-card-display-${method.id}`}>
+                  {method.card.brand.toUpperCase()} ···· {method.card.last4}
+                </span>
+                <div className="hint">
+                  Exp {method.card.expMonth}/{method.card.expYear}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
       {orders.length > 0 ? (
         <table data-testid="customer-orders">
           <thead>

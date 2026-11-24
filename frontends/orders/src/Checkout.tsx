@@ -13,6 +13,13 @@ type Store = {
   hours: string;
 };
 
+type SavedCard = {
+  id: string;
+  card: { brand: string; last4: string; expMonth: number; expYear: number };
+};
+
+const defaultExpYear = new Date().getFullYear() + 2;
+
 export function Checkout() {
   const navigate = useNavigate();
   const [fulfillment, setFulfillment] = useState<"ship" | "pickup">("ship");
@@ -23,7 +30,25 @@ export function Checkout() {
   const [shipCity, setShipCity] = useState("Austin");
   const [shipRegion, setShipRegion] = useState("TX");
   const [shipPostalCode, setShipPostalCode] = useState("78701");
+  const [savedCards, setSavedCards] = useState<SavedCard[]>([]);
+  const [paymentMethodId, setPaymentMethodId] = useState("");
+  const [cardNumber, setCardNumber] = useState("4242424242424242");
+  const [expMonth, setExpMonth] = useState("12");
+  const [expYear, setExpYear] = useState(String(defaultExpYear));
+  const [cvc, setCvc] = useState("123");
+  const [saveCard, setSaveCard] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    api<{ paymentMethods: SavedCard[] }>("/api/payment-methods")
+      .then((result) => {
+        setSavedCards(result.paymentMethods);
+        if (result.paymentMethods[0]) {
+          setPaymentMethodId((current) => current || result.paymentMethods[0]!.id);
+        }
+      })
+      .catch(() => undefined);
+  }, []);
 
   useEffect(() => {
     if (fulfillment !== "pickup" || stores.length > 0) return;
@@ -36,18 +61,30 @@ export function Checkout() {
   }, [fulfillment, stores.length]);
 
   const store = stores.find((item) => item.id === locationId);
+  const useSaved = Boolean(paymentMethodId);
 
   async function place(event: FormEvent) {
     event.preventDefault();
     setError("");
     try {
-      const body =
+      const base =
         fulfillment === "pickup"
           ? { fulfillment, locationId, shipName }
           : { fulfillment, shipName, shipLine1, shipCity, shipRegion, shipPostalCode };
+      const payment = useSaved
+        ? { paymentMethodId }
+        : {
+            card: {
+              number: cardNumber,
+              expMonth: Number(expMonth),
+              expYear: Number(expYear),
+              cvc,
+            },
+            saveCard,
+          };
       const result = await api<{ order: { number: string } }>("/api/checkout", {
         method: "POST",
-        body: JSON.stringify(body),
+        body: JSON.stringify({ ...base, ...payment }),
       });
       navigate(`/orders/${result.order.number}/confirmed`);
     } catch (err) {
@@ -157,6 +194,83 @@ export function Checkout() {
             </label>
           </>
         )}
+
+        <fieldset className="stack" data-testid="checkout-payment">
+          <legend>Payment</legend>
+          {savedCards.length > 0 ? (
+            <label>
+              Saved card
+              <select
+                data-testid="checkout-saved-card"
+                value={paymentMethodId}
+                onChange={(event) => setPaymentMethodId(event.target.value)}
+              >
+                <option value="">New card</option>
+                {savedCards.map((method) => (
+                  <option key={method.id} value={method.id}>
+                    {method.card.brand.toUpperCase()} ···· {method.card.last4} (
+                    {method.card.expMonth}/{method.card.expYear})
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
+          {!useSaved ? (
+            <>
+              <label>
+                Card number
+                <input
+                  data-testid="checkout-card-number"
+                  inputMode="numeric"
+                  autoComplete="cc-number"
+                  value={cardNumber}
+                  onChange={(event) => setCardNumber(event.target.value)}
+                />
+              </label>
+              <div className="row">
+                <label>
+                  Exp month
+                  <input
+                    data-testid="checkout-card-exp-month"
+                    inputMode="numeric"
+                    value={expMonth}
+                    onChange={(event) => setExpMonth(event.target.value)}
+                  />
+                </label>
+                <label>
+                  Exp year
+                  <input
+                    data-testid="checkout-card-exp-year"
+                    inputMode="numeric"
+                    value={expYear}
+                    onChange={(event) => setExpYear(event.target.value)}
+                  />
+                </label>
+                <label>
+                  CVC
+                  <input
+                    data-testid="checkout-card-cvc"
+                    inputMode="numeric"
+                    autoComplete="cc-csc"
+                    value={cvc}
+                    onChange={(event) => setCvc(event.target.value)}
+                  />
+                </label>
+              </div>
+              <label className="row">
+                <input
+                  type="checkbox"
+                  data-testid="checkout-save-card"
+                  checked={saveCard}
+                  onChange={(event) => setSaveCard(event.target.checked)}
+                />{" "}
+                Save this card for next time
+              </label>
+              <p className="hint">Sandbox: use 4242…4242 to pay, 4000…0002 to decline.</p>
+            </>
+          ) : null}
+        </fieldset>
+
         {error ? (
           <p className="error" data-testid="checkout-error">
             {error}

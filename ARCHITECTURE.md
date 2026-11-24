@@ -16,6 +16,7 @@ flowchart LR
   catalog["Catalog service<br/>Fastify :4001"]
   orders["Orders service<br/>Fastify :4002"]
   shipping["Shipping service<br/>Fastify :4004<br/>Bearer OAuth"]
+  payments["Payments service<br/>Fastify :4005<br/>Bearer OAuth"]
   console["Database console<br/>Fastify :4003"]
   pg[("Postgres 16")]
   redis[("Redis 7")]
@@ -25,7 +26,8 @@ flowchart LR
   shell -->|"remoteEntry.js"| ordersUi
   shell -->|"proxy /api"| api
   api -->|"products and categories"| catalog
-  api -->|"cart, checkout, orders, cancel"| orders
+  api -->|"cart, orders, cancel"| orders
+  api -->|"checkout charges then places order"| payments
   api -->|"createShipment / track<br/>Bearer client_credentials"| shipping
   api --> pg
   api --> redis
@@ -34,6 +36,7 @@ flowchart LR
   orders --> pg
   orders --> redis
   shipping --> pg
+  payments --> pg
   console --> pg
   console --> redis
 ```
@@ -74,16 +77,19 @@ Login writes `session:<sid>` in Redis and sets the `datalab_session` cookie. Lat
 | ---------------------------------------------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------ |
 | `/api/login`, `/api/logout`, `/api/me`                                                   | API                                        | Redis session                                                                        |
 | `/api/customers`                                                                         | API                                        | Postgres `users`, `orders`                                                           |
+| `/api/customers/:id`                                                                     | API (+ payments list for staff)            | Customer profile, orders, tokenized cards (brand/last4 only)                         |
 | `/api/products`, `/api/categories`                                                       | Catalog service, through the API           | Postgres `products`. Category counts cached in Redis for 60 seconds                  |
 | `/api/inventory`                                                                         | API                                        | Postgres `inventory` (warehouse)                                                     |
 | `/api/locations`                                                                         | API                                        | Postgres `locations`, `location_inventory`                                           |
 | `/api/jobs`, `/api/applications`                                                         | API                                        | Postgres `jobs`, `applications`. Resume files on disk under `server/uploads/resumes` |
-| `/api/cart`, `/api/checkout`                                                             | Orders service, through the API            | Cart in Redis. Checkout writes Postgres `orders` and clears the cart                 |
+| `/api/cart`                                                                              | Orders service, through the API            | Cart in Redis                                                                        |
+| `/api/checkout`                                                                          | API → payments (Bearer) then orders        | PaymentIntent on `:4005`; order written only after `succeeded`                       |
+| `/api/payment-methods`                                                                   | API → payments (Bearer)                    | Tokenized cards (`pm_…`); brand/last4 only in responses                              |
 | `/api/orders`, `/api/orders/:number/cancel`                                              | Orders service, through the API            | Postgres `orders`                                                                    |
 | `/api/orders/:number/pick`, `ship`, `out-for-delivery`, `deliver`, `tracking`, `collect` | API (ship/track call shipping with Bearer) | Postgres `orders`; shipping writes `shipments`, `tracking_events`                    |
 | `/api/shipping/access-token`, `/api/tracking/:trackingNumber`                            | API → shipping (Bearer)                    | Cookie session mints user token; tracking uses Bearer on `:4004`                     |
 
-Checkout for a shipped order reserves warehouse `inventory`. Checkout for pickup copies the store address onto the order, charges no shipping, and decrements `location_inventory`.
+Checkout requires a saved `paymentMethodId` or new card fields. The API confirms a PaymentIntent for the cart total, then places the order. Shipped orders reserve warehouse `inventory`; pickup copies the store address, charges no shipping, and decrements `location_inventory`.
 
 ## What each store is for
 
@@ -95,6 +101,7 @@ flowchart TB
     warehouse["inventory"]
     stores["locations and location_inventory"]
     orders["orders, lines, events, shipments"]
+    payments["payment_methods, payment_intents"]
     jobs["jobs and applications"]
   end
   subgraph redis ["Redis"]

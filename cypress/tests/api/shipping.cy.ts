@@ -27,6 +27,13 @@ describe("shipping Bearer API", () => {
           shipCity: "Austin",
           shipRegion: "TX",
           shipPostalCode: "78701",
+          card: {
+            number: "4242424242424242",
+            expMonth: 12,
+            expYear: new Date().getFullYear() + 2,
+            cvc: "123",
+          },
+          saveCard: false,
         })
         .then((checkout) => {
           expect(checkout.status).to.eq(201);

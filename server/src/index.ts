@@ -15,6 +15,8 @@ import { registerLocations } from "./locations.js";
 import { registerOrdersProxy } from "./orders-proxy.js";
 import { verifyPassword } from "./passwords.js";
 import { pageQuery } from "./query.js";
+import { listPaymentMethods } from "./payments-client.js";
+import { registerPaymentsGateway } from "./payments.js";
 import { registerShippingGateway } from "./shipping.js";
 
 const WEEK = 60 * 60 * 24 * 7;
@@ -189,6 +191,27 @@ app.get<{ Params: { id: string } }>("/api/customers/:id", async (request, reply)
      order by o.placed_at desc`,
     [row.id],
   );
+
+  // Tokenized cards only (brand / last4 / exp) — never PAN or CVC.
+  let paymentMethods: Array<{
+    id: string;
+    card: { brand: string; last4: string; expMonth: number; expYear: number };
+  }> = [];
+  try {
+    const methods = await listPaymentMethods(row.id);
+    paymentMethods = methods.data.map((method) => ({
+      id: method.id,
+      card: {
+        brand: method.card.brand,
+        last4: method.card.last4,
+        expMonth: method.card.expMonth,
+        expYear: method.card.expYear,
+      },
+    }));
+  } catch {
+    paymentMethods = [];
+  }
+
   return {
     customer: {
       id: row.id,
@@ -196,6 +219,7 @@ app.get<{ Params: { id: string } }>("/api/customers/:id", async (request, reply)
       name: row.name,
       createdAt: row.created_at,
     },
+    paymentMethods,
     orders: orders.rows.map((order) => ({
       number: order.number,
       status: order.status,
@@ -215,6 +239,7 @@ await registerLocations(app, { pool, requireUser });
 await registerCareers(app, { pool, requireUser });
 await registerCommerce(app, { pool, redis, requireUser });
 await registerShippingGateway(app, { requireUser });
+await registerPaymentsGateway(app, { requireUser });
 
 await app.register(swagger, {
   mode: "static",

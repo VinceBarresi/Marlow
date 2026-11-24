@@ -15,12 +15,14 @@ flowchart LR
   catalog["Catalog service<br/>Fastify :4001"]
   orders["Orders service<br/>Fastify :4002"]
   shipping["Shipping service<br/>Fastify :4004"]
+  payments["Payments service<br/>Fastify :4005"]
   pg[("Postgres 16")]
   redis[("Redis 7")]
 
   iosApp -->|"cookie session + Bearer tracking"| api
   api -->|"products and categories"| catalog
-  api -->|"cart, checkout, orders"| orders
+  api -->|"cart, orders"| orders
+  api -->|"Bearer PaymentIntents / cards"| payments
   api -->|"Bearer ship/track"| shipping
   api --> pg
   api --> redis
@@ -29,6 +31,7 @@ flowchart LR
   orders --> pg
   orders --> redis
   shipping --> pg
+  payments --> pg
 ```
 
 Simulator reaches the host at `http://127.0.0.1:4000` (`AppConfig.apiBaseURL`). A physical device needs the Mac’s LAN IP via `MARLOW_API_BASE`. `Info.plist` allows local cleartext HTTP (`NSAllowsLocalNetworking`).
@@ -90,15 +93,15 @@ Login `POST /api/login` sets `datalab_session`. Logout clears the Redis session 
 
 ## Screens and endpoints
 
-| Screen          | Primary API                                     |
-| --------------- | ----------------------------------------------- |
-| Login           | `POST /api/login`                               |
-| Shop            | `GET /api/products`, search via `q`             |
-| Product         | `GET /api/products/:sku`, `PUT /api/cart/items` |
-| Cart            | `GET /api/cart`, `DELETE /api/cart/items/:sku`  |
-| Checkout (ship) | `POST /api/checkout`                            |
-| Orders          | `GET /api/orders`, `GET /api/orders/:number`    |
-| Account         | `GET /api/me`, `POST /api/logout`               |
+| Screen          | Primary API                                        |
+| --------------- | -------------------------------------------------- |
+| Login           | `POST /api/login`                                  |
+| Shop            | `GET /api/products`, search via `q`                |
+| Product         | `GET /api/products/:sku`, `PUT /api/cart/items`    |
+| Cart            | `GET /api/cart`, `DELETE /api/cart/items/:sku`     |
+| Checkout (ship) | `POST /api/checkout` (card or `paymentMethodId`)   |
+| Orders          | `GET /api/orders`, `GET /api/orders/:number`       |
+| Account         | `GET /api/me`, payment-methods, `POST /api/logout` |
 
 ## Testing
 

@@ -49,7 +49,7 @@ export async function registerOrdersProxy(
   app.delete<{ Params: { sku: string } }>("/api/cart/items/:sku", (request, reply) =>
     proxy(request, reply, `/cart/items/${encodeURIComponent(request.params.sku)}`),
   );
-  app.post("/api/checkout", (request, reply) => proxy(request, reply, "/checkout"));
+  // Checkout is owned by the payments gateway (charge, then place order).
   app.get("/api/orders", (request, reply) => proxy(request, reply, "/orders"));
   app.get<{ Params: { number: string } }>("/api/orders/:number", (request, reply) =>
     proxy(request, reply, `/orders/${encodeURIComponent(request.params.number)}`),

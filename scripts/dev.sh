@@ -20,13 +20,19 @@ docker compose up -d --wait
 users=$(docker compose exec -T postgres psql -U datalab -d datalab -tAc "select to_regclass('public.users')" | tr -d '[:space:]')
 if [[ "$users" != "users" ]]; then
   echo "Empty database. Creating tables and loading the shop."
-  for file in server/sql/001_schema.sql server/sql/002_tracking.sql server/sql/004_locations.sql server/sql/005_careers.sql; do
+  for file in server/sql/001_schema.sql server/sql/002_tracking.sql server/sql/004_locations.sql server/sql/005_careers.sql server/sql/006_payments.sql; do
     docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -f - < "$file"
   done
   node server/scripts/seed.mjs | docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -q
+else
+  payments=$(docker compose exec -T postgres psql -U datalab -d datalab -tAc "select to_regclass('public.payment_methods')" | tr -d '[:space:]')
+  if [[ "$payments" != "payment_methods" ]]; then
+    echo "Applying payments schema."
+    docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -f - < server/sql/006_payments.sql
+  fi
 fi
 
-ports=(4000 4001 4002 4003 4004 5173 5174 5175)
+ports=(4000 4001 4002 4003 4004 4005 5173 5174 5175)
 if command -v lsof >/dev/null 2>&1; then
   for port in "${ports[@]}"; do
     if lsof -nP -iTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1; then
@@ -41,6 +47,7 @@ apps=(
   "catalog|services/catalog"
   "orders|services/orders"
   "shipping|services/shipping"
+  "payments|services/payments"
   "db|services/db"
   "web|web"
   "catalog-ui|frontends/catalog"
