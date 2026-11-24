@@ -8,6 +8,6 @@ alwaysApply: false
 
 - Prefer the `manual-test-case-author` skill when writing QA checklists.
 - Files live in `docs/test-cases/*.md`.
-- Prefer steps that use `data-testid` (and iOS accessibility ids when covering Simulator) so cases hand off cleanly to automation.
+- Prefer steps that use `data-testid` (and native accessibility ids when covering Simulator / Emulator) so cases hand off cleanly to automation.
 - Seed logins and file placement: see `tests.mdc`.
-- When a case is **done** / **ready to automate**, split by layer per `tests.mdc` (API / e2e / mock UI / mock component / iOS e2e).
+- When a case is **done** / **ready to automate**, split by layer per `tests.mdc` (API / e2e / mock UI / mock component / iOS e2e / Android e2e).

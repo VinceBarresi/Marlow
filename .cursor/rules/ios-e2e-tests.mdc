@@ -7,7 +7,7 @@ alwaysApply: false
 # iOS e2e tests (Appium)
 
 - Prefer the `ios-e2e-test-author` skill when creating Simulator e2e coverage. For screen wrappers only, prefer `screen-object-author` / `screen-objects.mdc`.
-- Specs live in `appium/specs/`; screen objects in `appium/screens/`. Config: `appium/wdio.conf.ts`.
+- Specs live in `appium/specs/` (shared with Android); screen objects in `appium/screens/`. Config: `appium/wdio.ios.conf.ts`.
 - Customer v1 flows only (login, shop, product, cart, checkout, orders, account) unless the user expands scope.
 - Require local API on `:4000` (`npm run dev`). Run with `npm run appium:ios` (build + test) or `npm run appium:ios:run` (prebuilt `.app`).
 - Device: `MARLOW_IOS_DEVICE` (default `iPhone 16`); app path: `MARLOW_APP_PATH`.

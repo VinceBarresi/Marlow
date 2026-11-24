@@ -17,12 +17,13 @@ When the user asks to create tests, use the matching project skill and obey path
 | Screen object (Appium) | `screen-object-author` | `screen-objects.mdc` |
 | Mock component / Jest page test | `mock-component-test-author` | `mock-component-tests.mdc` |
 | iOS e2e / Appium / Simulator | `ios-e2e-test-author` | `ios-e2e-tests.mdc` |
+| Android e2e / Appium / Emulator | `android-e2e-test-author` | `android-e2e-tests.mdc` |
 
 API, e2e, and mock-ui skills write **both Cypress and Playwright** unless the user names one framework. Prefer existing patterns over inventing new ones.
 
 ## Manual → automation handoff
 
-When the user says a manual case is **done**, **complete**, **ready to automate**, or asks to **write API/e2e/mock/iOS tests from** a `docs/test-cases/*.md` file:
+When the user says a manual case is **done**, **complete**, **ready to automate**, or asks to **write API/e2e/mock/iOS/Android tests from** a `docs/test-cases/*.md` file:
 
 1. Read that markdown file.
 2. Split cases by layer:
@@ -31,6 +32,7 @@ When the user says a manual case is **done**, **complete**, **ready to automate*
    - **Mock UI** — browser UI with `cy.intercept` / `page.route` → follow `mock-ui-test-author` (specs under `e2e/mock-ui/`)
    - **Mock component** — Jest component empty/loading/error with mocked API → follow `mock-component-test-author`
    - **iOS e2e** — Simulator-visible customer flows → follow `ios-e2e-test-author`
+   - **Android e2e** — Emulator-visible customer flows → follow `android-e2e-test-author`
 3. Skip or note cases that are exploratory-only / not automatable.
 4. Prefer extending shared fixtures for API; keep Cypress and Playwright in sync.
 
@@ -68,9 +70,10 @@ Do **not** hardcode user UUIDs in assertions unless the test truly requires a fi
 | Playwright PO       | `playwright/pages/*.page.ts` (required for e2e / mock UI)        |
 | Playwright auth     | `playwright/support/login.ts`                                    |
 | Mock component      | next to source as `*.test.tsx`                                   |
-| Appium specs        | `appium/specs/*.spec.ts`                                         |
+| Appium specs        | `appium/specs/*.spec.ts` (shared iOS + Android)                  |
 | Appium screens      | `appium/screens/*.screen.ts`                                     |
 | iOS SwiftUI app     | `ios/Marlow/Marlow/`                                             |
+| Android Compose app | `android/Marlow/app/src/main/`                                   |
 
 ## How to run
 
@@ -84,6 +87,7 @@ Do **not** hardcode user UUIDs in assertions unless the test truly requires a fi
 | Playwright e2e    | `npx playwright test --project=chromium` |
 | Playwright Docker | `npm run playwright:docker`              |
 | Appium iOS        | `npm run appium:ios`                     |
+| Appium Android    | `npm run appium:android`                 |
 
 Docker runners boot the shop via `scripts/e2e-up.sh` and use `host.docker.internal`. Only change Vite `LISTEN_HOST` / `E2E_HOST` / `allowedHosts` when fixing Docker reachability—not for ordinary new tests.
 
@@ -96,3 +100,4 @@ Docker runners boot the shop via `scripts/e2e-up.sh` and use `host.docker.intern
 - **Page objects** (Cypress/Playwright) → `page-objects.mdc` / `page-object-author`
 - **Screen objects** (Appium) → `screen-objects.mdc` / `screen-object-author`
 - **iOS e2e** (flows + accessibility ids) → `ios-e2e-tests.mdc`. Keep Swift `Models` aligned with fixtures/OpenAPI; HTTP contracts stay in shared API suites.
+- **Android e2e** (Compose + accessibility ids) → `android-e2e-tests.mdc`. Keep Kotlin models aligned with iOS/fixtures; HTTP contracts stay in shared API suites.

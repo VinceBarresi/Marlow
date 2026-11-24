@@ -6,7 +6,7 @@ alwaysApply: false
 
 # E2E tests (Cypress + Playwright live UI)
 
-Browser UI against the **live API**—**not** HTTP API suites (`api-tests`), **not** mock UI (`mock-ui-tests`), and **not** Appium (`ios-e2e-tests`).
+Browser UI against the **live API**—**not** HTTP API suites (`api-tests`), **not** mock UI (`mock-ui-tests`), and **not** Appium (`ios-e2e-tests` / `android-e2e-tests`).
 
 - Prefer the `e2e-test-author` skill. Write **both** Cypress and Playwright unless the user names one framework.
 - Specs: `cypress/tests/e2e/*.cy.ts`, `playwright/e2e/*.spec.ts` or top-level `playwright/*.spec.ts` until moved under `e2e/`. Mock UI specs live under `e2e/mock-ui/` and use `mock-ui-test-author`.

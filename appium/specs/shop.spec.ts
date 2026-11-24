@@ -2,7 +2,7 @@ import { cartScreen } from "../screens/cart.screen.js";
 import { loginScreen } from "../screens/login.screen.js";
 import { shopScreen } from "../screens/shop.screen.js";
 
-describe("Marlow iOS shop", () => {
+describe("Marlow shop", () => {
   before(async () => {
     await loginScreen.signIn("customer@marlow.test", "datalab");
     await shopScreen.waitForLoaded();
