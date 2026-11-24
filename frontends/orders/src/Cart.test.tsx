@@ -27,3 +27,12 @@ test("shows a line in the cart", async () => {
   expect(screen.getByTestId("cart-link-LAMP-1")).toHaveTextContent("Linen shade");
   expect(screen.getByTestId("cart-line-total-LAMP-1")).toHaveTextContent("$48.00");
 });
+
+test("shows empty cart state", async () => {
+  whenApi({ "/api/cart": { items: [], subtotalCents: 0 } });
+  await renderPage(<CartPage />);
+
+  expect(screen.getByTestId("cart-title")).toHaveTextContent("Cart");
+  expect(screen.getByTestId("cart-empty")).toHaveTextContent("The cart is empty.");
+  expect(screen.getByTestId("cart-browse")).toHaveTextContent("Browse the shop.");
+});

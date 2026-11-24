@@ -11,5 +11,7 @@ blob-report
 cypress/videos
 cypress/screenshots
 cypress/downloads
+allure-results
+allure-report
 coverage
 .e2e-logs
