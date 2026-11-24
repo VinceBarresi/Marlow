@@ -34,20 +34,20 @@ npm run appium:android:run
 
 ## Layout
 
-| Path                   | Role                          |
-| ---------------------- | ----------------------------- |
-| `wdio.ios.conf.ts`     | iOS capabilities + service    |
+| Path                   | Role                           |
+| ---------------------- | ------------------------------ |
+| `wdio.ios.conf.ts`     | iOS capabilities + service     |
 | `wdio.android.conf.ts` | Android capabilities + service |
-| `screens/`             | Screen helpers (`$("~id")`)   |
-| `specs/`               | Mocha specs (shared)          |
+| `screens/`             | Screen helpers (`$("~id")`)    |
+| `specs/`               | Mocha specs (shared)           |
 
 ## Env overrides
 
-| Variable                 | Default / notes                                      |
-| ------------------------ | ---------------------------------------------------- |
-| `MARLOW_APP_PATH`        | Built iOS `.app`                                     |
-| `MARLOW_IOS_DEVICE`      | `iPhone 16`                                          |
-| `MARLOW_ANDROID_APP_PATH`| Built debug APK                                      |
-| `MARLOW_ANDROID_DEVICE`  | `Android Emulator`                                   |
-| `MARLOW_ANDROID_UDID`    | Optional `adb` serial                                |
-| `APPIUM_HOME`            | `$REPO/.appium`                                      |
+| Variable                  | Default / notes       |
+| ------------------------- | --------------------- |
+| `MARLOW_APP_PATH`         | Built iOS `.app`      |
+| `MARLOW_IOS_DEVICE`       | `iPhone 16`           |
+| `MARLOW_ANDROID_APP_PATH` | Built debug APK       |
+| `MARLOW_ANDROID_DEVICE`   | `Android Emulator`    |
+| `MARLOW_ANDROID_UDID`     | Optional `adb` serial |
+| `APPIUM_HOME`             | `$REPO/.appium`       |

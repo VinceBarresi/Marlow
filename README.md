@@ -109,10 +109,10 @@ How the processes, screens, and data fit together is in [ARCHITECTURE.md](ARCHIT
 
 Native customer apps (login, shop, cart, checkout, orders, account) talk straight to the API on `:4000` with the same session cookie as web. Shared Appium specs live in [`appium/`](appium/).
 
-| Platform | App | Dev | API host (local) | Appium |
-| -------- | --- | --- | ---------------- | ------ |
-| iOS | [`ios/Marlow`](ios/Marlow) SwiftUI | Xcode Simulator | `http://127.0.0.1:4000` | `npm run appium:ios` |
-| Android | [`android/Marlow`](android/Marlow) Compose | Android Studio / emulator | `http://10.0.2.2:4000` | `npm run appium:android` |
+| Platform | App                                        | Dev                       | API host (local)        | Appium                   |
+| -------- | ------------------------------------------ | ------------------------- | ----------------------- | ------------------------ |
+| iOS      | [`ios/Marlow`](ios/Marlow) SwiftUI         | Xcode Simulator           | `http://127.0.0.1:4000` | `npm run appium:ios`     |
+| Android  | [`android/Marlow`](android/Marlow) Compose | Android Studio / emulator | `http://10.0.2.2:4000`  | `npm run appium:android` |
 
 See [ios/Marlow/README.md](ios/Marlow/README.md), [ios/Marlow/ARCHITECTURE.md](ios/Marlow/ARCHITECTURE.md), [android/Marlow/README.md](android/Marlow/README.md), [android/Marlow/ARCHITECTURE.md](android/Marlow/ARCHITECTURE.md), and [appium/README.md](appium/README.md).
 
@@ -120,23 +120,23 @@ See [ios/Marlow/README.md](ios/Marlow/README.md), [ios/Marlow/ARCHITECTURE.md](i
 
 Each app has its own README with the libraries it uses. These are shared:
 
-| Tool              | Where                  | Role                                                                        |
-| ----------------- | ---------------------- | --------------------------------------------------------------------------- |
-| Docker Compose    | this directory         | Runs Postgres 16 and Redis 7                                                |
-| Vite              | `web`, `frontends/*`   | Dev server and production build                                             |
-| Module Federation | `web`, `frontends/*`   | The shell loads the catalog and orders screens at runtime                   |
-| React             | `web`, `frontends/*`   | UI                                                                          |
-| React Router      | `web`, `frontends/*`   | Routes in the shell and in the loaded screens                               |
-| Fastify           | `server`, `services/*` | HTTP                                                                        |
-| tsx               | `server`, `services/*` | Runs TypeScript and restarts the process when a file changes                |
-| node-postgres     | `server`, `services/*` | Postgres client (`pg`)                                                      |
-| ioredis           | `server`, `services/*` | Redis client                                                                |
-| TypeScript        | every app              | Types. Vite and tsx both transform it with esbuild                          |
-| ESLint            | this directory         | Lint, including React and TypeScript rules                                  |
-| Prettier          | this directory         | Format                                                                      |
-| Jest              | this directory         | Unit tests for each page. `npm test` renders the page with a mocked API     |
-| Cypress           | this directory         | API tests in `cypress/tests/api` and browser tests in `cypress/tests/e2e`   |
-| Playwright        | this directory         | API + browser tests in `playwright/`. Local: `playwright` / `playwright:ui` |
+| Tool              | Where                  | Role                                                                                     |
+| ----------------- | ---------------------- | ---------------------------------------------------------------------------------------- |
+| Docker Compose    | this directory         | Runs Postgres 16 and Redis 7                                                             |
+| Vite              | `web`, `frontends/*`   | Dev server and production build                                                          |
+| Module Federation | `web`, `frontends/*`   | The shell loads the catalog and orders screens at runtime                                |
+| React             | `web`, `frontends/*`   | UI                                                                                       |
+| React Router      | `web`, `frontends/*`   | Routes in the shell and in the loaded screens                                            |
+| Fastify           | `server`, `services/*` | HTTP                                                                                     |
+| tsx               | `server`, `services/*` | Runs TypeScript and restarts the process when a file changes                             |
+| node-postgres     | `server`, `services/*` | Postgres client (`pg`)                                                                   |
+| ioredis           | `server`, `services/*` | Redis client                                                                             |
+| TypeScript        | every app              | Types. Vite and tsx both transform it with esbuild                                       |
+| ESLint            | this directory         | Lint, including React and TypeScript rules                                               |
+| Prettier          | this directory         | Format                                                                                   |
+| Jest              | this directory         | Unit tests for each page. `npm test` renders the page with a mocked API                  |
+| Cypress           | this directory         | API tests in `cypress/tests/api` and browser tests in `cypress/tests/e2e`                |
+| Playwright        | this directory         | API + browser tests in `playwright/`. Local: `playwright` / `playwright:ui`              |
 | Appium / WDIO     | `appium/`              | iOS + Android UI tests (`ios/Marlow`, `android/Marlow`). `appium:ios` / `appium:android` |
 
 ## Logins

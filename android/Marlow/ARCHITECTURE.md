@@ -56,14 +56,14 @@ flowchart TB
   tabs -->|"Shop Product Cart Checkout Orders Account"| client
 ```
 
-| Area     | Path                                      | Role                                              |
-| -------- | ----------------------------------------- | ------------------------------------------------- |
-| App      | `…/MarlowApp.kt`, `MainActivity.kt`       | Session + Compose entry                           |
-| Session  | `SessionStore.kt`                         | Restore / sign-in / sign-out                      |
-| API      | `api/ApiClient.kt`                        | OkHttp + kotlinx.serialization + cookies         |
-| Models   | `model/Models.kt`                         | Match iOS / OpenAPI fixtures                      |
-| UI       | `ui/{login,shop,product,cart,…}`          | Customer screens + `Modifier.a11y`                |
-| Config   | `config/AppConfig.kt`                     | API base URL from BuildConfig                     |
+| Area    | Path                                | Role                                     |
+| ------- | ----------------------------------- | ---------------------------------------- |
+| App     | `…/MarlowApp.kt`, `MainActivity.kt` | Session + Compose entry                  |
+| Session | `SessionStore.kt`                   | Restore / sign-in / sign-out             |
+| API     | `api/ApiClient.kt`                  | OkHttp + kotlinx.serialization + cookies |
+| Models  | `model/Models.kt`                   | Match iOS / OpenAPI fixtures             |
+| UI      | `ui/{login,shop,product,cart,…}`    | Customer screens + `Modifier.a11y`       |
+| Config  | `config/AppConfig.kt`               | API base URL from BuildConfig            |
 
 ## Accessibility + Appium
 

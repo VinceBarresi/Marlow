@@ -15,7 +15,7 @@ description: >-
 3. **Always** add missing accessibility ids before wiring selectors:
    - iOS: SwiftUI `.accessibilityIdentifier("…")` in `ios/Marlow/Marlow/Features/`
    - Android: Compose `Modifier.a11y("…")` in `android/Marlow/.../ui/`
-   Prefer ids that match web `data-testid`s when the concept exists on both.
+     Prefer ids that match web `data-testid`s when the concept exists on both.
 4. Selectors: `$("~id")` first; iOS predicate / Android UiAutomator only with a short comment; **never XPath**.
 5. Specs stay in `appium/specs/` and only call the screen object.
 6. For full native flows (not just the screen wrapper), prefer `ios-e2e-test-author` or `android-e2e-test-author`.

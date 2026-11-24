@@ -27,7 +27,7 @@ export class LoginScreen {
     await field.click();
     if (driver.isAndroid) {
       // UiAutomator — focused editable child (Compose a11y id is on the wrapper).
-      const edit = $("android=new UiSelector().className(\"android.widget.EditText\").focused(true)");
+      const edit = $('android=new UiSelector().className("android.widget.EditText").focused(true)');
       await edit.waitForExist({ timeout: 5000 });
       await edit.clearValue();
       await edit.setValue(value);
