@@ -15,5 +15,9 @@ coverage
 .e2e-logs
 .appium
 ios/Marlow/build
+android/Marlow/.gradle
+android/Marlow/build
+android/Marlow/app/build
+android/Marlow/local.properties
 **/xcuserdata/
 .DS_Store

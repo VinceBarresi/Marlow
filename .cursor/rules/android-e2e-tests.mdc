@@ -1,0 +1,28 @@
+---
+description: Conventions for Marlow Android Appium / WebDriverIO e2e tests
+globs: appium/**/*.ts,android/Marlow/app/src/main/**/*.kt,scripts/appium-android.sh
+alwaysApply: false
+---
+
+# Android e2e tests (Appium)
+
+- Prefer the `android-e2e-test-author` skill when creating Emulator e2e coverage. For screen wrappers only, prefer `screen-object-author` / `screen-objects.mdc`.
+- Specs live in `appium/specs/` (shared with iOS); screen objects in `appium/screens/`. Config: `appium/wdio.android.conf.ts`.
+- Customer v1 flows only (login, shop, product, cart, checkout, orders, account) unless the user expands scope.
+- Require local API on `:4000` (`npm run dev`). Emulator reaches the host via `http://10.0.2.2:4000` (Compose `BuildConfig.API_BASE_URL`).
+- Require `ANDROID_HOME` (or `~/Library/Android/sdk`) and a booted AVD (`adb devices`).
+- Run with `npm run appium:android` (build APK + test) or `npm run appium:android:run` (prebuilt APK).
+- Device: `MARLOW_ANDROID_DEVICE` / `MARLOW_ANDROID_UDID`; app path: `MARLOW_ANDROID_APP_PATH`.
+- Do not commit `android/Marlow/app/build/`, `android/Marlow/.gradle/`, `local.properties`, or `.appium/`.
+
+## Selectors (required)
+
+- **Always** set Compose accessibility via `Modifier.a11y("…")` (contentDescription + testTag) before writing Appium coverage. Add missing ids in `android/Marlow/app/src/main/java/com/marlow/shop/ui/` as part of the same change.
+- Prefer ids that mirror iOS `.accessibilityIdentifier` and web `data-testid` (e.g. `login-email`).
+- Screen-object selector priority:
+  1. **Accessibility id** — Appium `$("~<id>")`. Default for every new control.
+  2. **UiAutomator** — only when an accessibility id is impractical (e.g. focused `EditText` under a Compose field wrapper). Document why in a short comment on the getter.
+  3. **Never XPath** in screen objects or specs.
+- Specs call screen objects only—no raw selectors in `appium/specs/`.
+- Keep iOS and Android ids in sync when both apps expose the screen.
+- Text entry: see `appium/screens/login.screen.ts` for the Android Compose fill pattern.

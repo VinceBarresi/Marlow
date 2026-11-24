@@ -2,7 +2,7 @@ import { accountScreen } from "../screens/account.screen.js";
 import { loginScreen } from "../screens/login.screen.js";
 import { shopScreen } from "../screens/shop.screen.js";
 
-describe("Marlow iOS login", () => {
+describe("Marlow login", () => {
   it("signs in as the seeded customer and opens the shop", async () => {
     await loginScreen.signIn("customer@marlow.test", "datalab");
     await shopScreen.waitForLoaded();

@@ -10,7 +10,7 @@ description: >-
 
 ## Instructions
 
-1. Follow [`.cursor/rules/e2e-tests.mdc`](../../rules/e2e-tests.mdc) and [`.cursor/rules/tests.mdc`](../../rules/tests.mdc). This layer is **browser UI only**—not `api-tests`, not `ios-e2e-tests`.
+1. Follow [`.cursor/rules/e2e-tests.mdc`](../../rules/e2e-tests.mdc) and [`.cursor/rules/tests.mdc`](../../rules/tests.mdc). This layer is **browser UI only**—not `api-tests`, not Appium (`ios-e2e-tests` / `android-e2e-tests`).
 2. Write **both** Cypress and Playwright unless the user names one framework.
 3. Specs: `cypress/tests/e2e/*.cy.ts`; `playwright/e2e/*.spec.ts` or top-level `playwright/*.spec.ts` until moved. For `cy.intercept` / `page.route`, use `mock-ui-test-author` (`e2e/mock-ui/`).
 4. Use / extend page objects (`cypress/pages/`, `playwright/pages/`). Prefer `page-object-author` when adding POs. No raw `data-testid` strings in specs.

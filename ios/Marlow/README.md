@@ -1,6 +1,6 @@
 # Marlow iOS
 
-Native SwiftUI customer app for the Marlow shop. Talks to the existing API at `http://127.0.0.1:4000` with the `datalab_session` cookie.
+Native SwiftUI customer app for the Marlow shop. Talks to the existing API at `http://127.0.0.1:4000` with the `datalab_session` cookie. Android twin: [`android/Marlow`](../../android/Marlow).
 
 How the app, API client, screens, and tests fit together: [ARCHITECTURE.md](ARCHITECTURE.md).
 
@@ -44,7 +44,7 @@ From the repo root, with the API running (`npm run dev`) and Xcode available:
 npm run appium:ios
 ```
 
-That builds `Marlow.app` for the Simulator, ensures the XCUITest driver is installed under `.appium/`, and runs WebDriverIO specs in [`appium/`](../../appium/).
+That builds `Marlow.app` for the Simulator, ensures the XCUITest driver is installed under `.appium/`, and runs shared WebDriverIO specs in [`appium/`](../../appium/) (same suite as `npm run appium:android`).
 
 Optional env:
 

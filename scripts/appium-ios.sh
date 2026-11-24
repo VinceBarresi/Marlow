@@ -56,4 +56,4 @@ if ! npx appium driver list --installed 2>/dev/null | grep -q xcuitest; then
 fi
 
 cd "$ROOT"
-npx wdio run appium/wdio.conf.ts "$@"
+npx wdio run appium/wdio.ios.conf.ts "$@"

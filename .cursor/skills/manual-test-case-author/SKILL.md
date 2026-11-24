@@ -12,9 +12,9 @@ description: >-
 
 1. Follow [`.cursor/rules/manual-test-cases.mdc`](../../rules/manual-test-cases.mdc) and [`.cursor/rules/tests.mdc`](../../rules/tests.mdc).
 2. Create or update `docs/test-cases/<topic>.md`.
-3. Use clear preconditions, steps, and expected results. Prefer `data-testid` (and iOS accessibility ids when relevant) in steps.
+3. Use clear preconditions, steps, and expected results. Prefer `data-testid` (and iOS/Android accessibility ids when relevant) in steps.
 4. Use seed logins from `tests.mdc` (customer / staff / admin).
-5. Tag or section cases by likely automation layer (API / browser e2e / mock UI / mock component / iOS e2e) when obvious.
+5. Tag or section cases by likely automation layer (API / browser e2e / mock UI / mock component / iOS e2e / Android e2e) when obvious.
 6. When the user later says a case is ready to automate, hand off via the split in `tests.mdc`.
 
 ## Doc shape

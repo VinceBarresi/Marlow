@@ -1,6 +1,6 @@
 # Marlow
 
-Local retail shop for practicing test automation across the stack. Postgres and Redis run in Docker. The shop shell and the product and order screens are separate frontends (Vite + Module Federation). The API, catalog, orders, shipping, payments, and database console are separate Fastify services. There is also a native SwiftUI iOS app.
+Local retail shop for practicing test automation across the stack. Postgres and Redis run in Docker. The shop shell and the product and order screens are separate frontends (Vite + Module Federation). The API, catalog, orders, shipping, payments, and database console are separate Fastify services. There are also native customer apps for iOS (SwiftUI) and Android (Jetpack Compose).
 
 **Test layers**
 
@@ -11,6 +11,7 @@ Local retail shop for practicing test automation across the stack. Postgres and 
 | Browser e2e    | Cypress + Playwright   | Live flows under `e2e/`                                                           |
 | Mock UI        | Cypress + Playwright   | Browser UI with mocked API under `e2e/mock-ui/` (`cy.intercept` / `page.route`)   |
 | iOS e2e        | Appium + WebDriverIO   | Simulator flows for `ios/Marlow` (`appium/`)                                      |
+| Android e2e    | Appium + WebDriverIO   | Emulator flows for `android/Marlow` (shared `appium/` specs)                      |
 
 Cypress and Playwright mirror each other for API and e2e so you can compare frameworks on the same product.
 
@@ -98,7 +99,7 @@ Store maps use the Google Maps JavaScript API when `VITE_GOOGLE_MAPS_API_KEY` is
 
 API docs are at [http://127.0.0.1:4000/docs](http://127.0.0.1:4000/docs). The shop proxies `/api` to the main API, so the session cookie stays on the shop origin.
 
-Shipping is a separate service with **Bearer** auth (`POST /oauth/token`). The gateway uses a service token for staff ship/track, and web/iOS can mint a user tracking token via `POST /api/shipping/access-token` then call `GET /api/tracking/:trackingNumber` with `Authorization: Bearer …`. See [`services/shipping/README.md`](services/shipping/README.md).
+Shipping is a separate service with **Bearer** auth (`POST /oauth/token`). The gateway uses a service token for staff ship/track, and web/iOS/Android can mint a user tracking token via `POST /api/shipping/access-token` then call `GET /api/tracking/:trackingNumber` with `Authorization: Bearer …`. See [`services/shipping/README.md`](services/shipping/README.md).
 
 Payments is the same pattern on `:4005`: the API mints a service Bearer token and proxies `/api/payment-methods` plus card-charged `/api/checkout`. PAN/CVC never leave the payments service; Marlow stores `pm_…` / `pi_…` ids and last4/brand. See [`services/payments/README.md`](services/payments/README.md).
 
@@ -106,13 +107,14 @@ How the processes, screens, and data fit together is in [ARCHITECTURE.md](ARCHIT
 
 ## Mobile
 
-Native SwiftUI customer app lives in [`ios/Marlow`](ios/Marlow). Open `ios/Marlow/Marlow.xcodeproj` in Xcode, start the API with `npm run dev`, and run on the Simulator (API at `http://127.0.0.1:4000`). See [ios/Marlow/README.md](ios/Marlow/README.md) and [ios/Marlow/ARCHITECTURE.md](ios/Marlow/ARCHITECTURE.md).
+Native customer apps (login, shop, cart, checkout, orders, account) talk straight to the API on `:4000` with the same session cookie as web. Shared Appium specs live in [`appium/`](appium/).
 
-Appium + WebDriverIO Simulator tests live in [`appium/`](appium/). With the API up and Xcode installed:
+| Platform | App | Dev | API host (local) | Appium |
+| -------- | --- | --- | ---------------- | ------ |
+| iOS | [`ios/Marlow`](ios/Marlow) SwiftUI | Xcode Simulator | `http://127.0.0.1:4000` | `npm run appium:ios` |
+| Android | [`android/Marlow`](android/Marlow) Compose | Android Studio / emulator | `http://10.0.2.2:4000` | `npm run appium:android` |
 
-```bash
-npm run appium:ios
-```
+See [ios/Marlow/README.md](ios/Marlow/README.md), [ios/Marlow/ARCHITECTURE.md](ios/Marlow/ARCHITECTURE.md), [android/Marlow/README.md](android/Marlow/README.md), [android/Marlow/ARCHITECTURE.md](android/Marlow/ARCHITECTURE.md), and [appium/README.md](appium/README.md).
 
 ## Tools
 
@@ -135,7 +137,7 @@ Each app has its own README with the libraries it uses. These are shared:
 | Jest              | this directory         | Unit tests for each page. `npm test` renders the page with a mocked API     |
 | Cypress           | this directory         | API tests in `cypress/tests/api` and browser tests in `cypress/tests/e2e`   |
 | Playwright        | this directory         | API + browser tests in `playwright/`. Local: `playwright` / `playwright:ui` |
-| Appium / WDIO     | `appium/`              | iOS Simulator UI tests for `ios/Marlow`. Local: `appium:ios`                |
+| Appium / WDIO     | `appium/`              | iOS + Android UI tests (`ios/Marlow`, `android/Marlow`). `appium:ios` / `appium:android` |
 
 ## Logins
 
@@ -159,7 +161,7 @@ On the database console, staff can run read-only queries. The admin can also ins
 
 **Playwright** — `npm run playwright` / `npm run playwright:api` / `npm run playwright:ui`. Specs live under `playwright/`.
 
-**Appium + WDIO** — with the API up and Xcode installed, `npm run appium:ios` runs Simulator UI tests from `appium/`. See [appium/README.md](appium/README.md).
+**Appium + WDIO** — with the API up, `npm run appium:ios` (Xcode Simulator) or `npm run appium:android` (Android emulator/`adb`) runs shared specs from `appium/`. See [appium/README.md](appium/README.md) and [android/Marlow/README.md](android/Marlow/README.md).
 
 A push to GitHub runs unit tests, Prettier, ESLint, Cypress, and Playwright. The Cypress and Playwright checks start the shop, then run tests in Docker workers (Cypress splits API vs e2e specs; Playwright uses `--shard` — no Cypress Cloud).
 

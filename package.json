@@ -16,7 +16,9 @@
     "playwright:docker": "bash scripts/playwright-docker.sh",
     "playwright:ui": "playwright test --ui",
     "appium:ios": "bash scripts/appium-ios.sh",
-    "appium:ios:run": "APPIUM_HOME=${APPIUM_HOME:-$PWD/.appium} wdio run appium/wdio.conf.ts",
+    "appium:ios:run": "APPIUM_HOME=${APPIUM_HOME:-$PWD/.appium} wdio run appium/wdio.ios.conf.ts",
+    "appium:android": "bash scripts/appium-android.sh",
+    "appium:android:run": "APPIUM_HOME=${APPIUM_HOME:-$PWD/.appium} wdio run appium/wdio.android.conf.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

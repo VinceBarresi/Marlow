@@ -7,11 +7,12 @@ alwaysApply: false
 # Screen objects
 
 - Prefer the `screen-object-author` skill when adding or extending Appium screen objects.
-- Files: `appium/screens/*.screen.ts`. Specs in `appium/specs/` call screens only—no raw selectors in specs.
-- Selector priority (same as `ios-e2e-tests.mdc`):
+- Files: `appium/screens/*.screen.ts`. Specs in `appium/specs/` call screens only—no raw selectors in specs. Screens are shared by iOS and Android.
+- Selector priority (same as `ios-e2e-tests.mdc` / `android-e2e-tests.mdc`):
   1. Accessibility id — `$("~<id>")`
-  2. Predicate — only when needed; short comment why
+  2. Predicate / UiAutomator — only when needed; short comment why
   3. **Never XPath**
-- Prefer ids that mirror web `data-testid`s when the screen exists on both platforms.
-- Add missing SwiftUI `.accessibilityIdentifier`s in `ios/Marlow/Marlow/Features/` (and `App/`) as part of the same change.
+- Prefer ids that mirror web `data-testid`s when the screen exists on web and native.
+- Add missing SwiftUI `.accessibilityIdentifier`s in `ios/Marlow/Marlow/Features/` (and `App/`) and Compose `Modifier.a11y("…")` in `android/Marlow/.../ui/` as part of the same change; keep ids aligned across platforms.
+- Android Compose text fields: follow `login.screen.ts` (click a11y node, then focused `EditText`).
 - Keep one screen object per major screen (login, shop, cart, account, …).
