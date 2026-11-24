@@ -16,18 +16,21 @@ struct ShopView: View {
 
       ForEach(products) { product in
         NavigationLink(value: product.sku) {
-          VStack(alignment: .leading, spacing: 4) {
-            Text(product.name)
-              .font(.headline)
-            Text(product.category)
-              .font(.subheadline)
-              .foregroundStyle(.secondary)
-            HStack {
-              Text(Money.format(cents: product.priceCents))
-              Spacer()
-              Text("\(product.available) available")
-                .font(.caption)
+          HStack(alignment: .top, spacing: 12) {
+            productThumb(product)
+            VStack(alignment: .leading, spacing: 4) {
+              Text(product.name)
+                .font(.headline)
+              Text(product.category)
+                .font(.subheadline)
                 .foregroundStyle(.secondary)
+              HStack {
+                Text(Money.format(cents: product.priceCents))
+                Spacer()
+                Text("\(product.available) available")
+                  .font(.caption)
+                  .foregroundStyle(.secondary)
+              }
             }
           }
           .padding(.vertical, 4)
@@ -60,6 +63,25 @@ struct ShopView: View {
             .accessibilityIdentifier("shop-total")
         }
       }
+    }
+  }
+
+  @ViewBuilder
+  private func productThumb(_ product: Product) -> some View {
+    if let url = product.absoluteImageURL {
+      AsyncImage(url: url) { phase in
+        switch phase {
+        case .success(let image):
+          image
+            .resizable()
+            .scaledToFill()
+        default:
+          Color.secondary.opacity(0.15)
+        }
+      }
+      .frame(width: 64, height: 48)
+      .clipShape(RoundedRectangle(cornerRadius: 6))
+      .accessibilityIdentifier("product-image-\(product.sku)")
     }
   }
 

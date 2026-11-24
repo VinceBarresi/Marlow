@@ -182,6 +182,17 @@ button:disabled {
   gap: 6px;
   align-content: start;
 }
+.product-image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 8px;
+  background: var(--line);
+}
+.product-image-hero {
+  max-width: 480px;
+  margin: 12px 0 18px;
+}
 .card-link {
   text-decoration: none;
   color: inherit;

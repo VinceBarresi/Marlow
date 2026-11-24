@@ -17,6 +17,7 @@ type ProductRow = {
   on_hand: number;
   reserved: number;
   available: number;
+  image_id: string | null;
 };
 
 function productJson(row: ProductRow) {
@@ -29,6 +30,8 @@ function productJson(row: ProductRow) {
     onHand: row.on_hand,
     reserved: row.reserved,
     available: row.available,
+    imageId: row.image_id,
+    imageUrl: row.image_id ? `/api/images/${row.image_id}` : null,
   };
 }
 
@@ -91,9 +94,11 @@ export async function registerCatalog(app: FastifyInstance, { pool, redis }: Dep
       `;
       const list = await pool.query<ProductRow>(
         `select p.sku, p.name, p.category, p.description, p.price_cents,
-                i.on_hand, i.reserved, i.on_hand - i.reserved as available
+                i.on_hand, i.reserved, i.on_hand - i.reserved as available,
+                img.id as image_id
          from products p
          join inventory i on i.sku = p.sku
+         left join product_images img on img.sku = p.sku and img.is_primary
          ${where}
          order by p.name
          limit $3 offset $4`,
@@ -117,9 +122,11 @@ export async function registerCatalog(app: FastifyInstance, { pool, redis }: Dep
 
     const result = await pool.query<ProductRow>(
       `select p.sku, p.name, p.category, p.description, p.price_cents,
-              i.on_hand, i.reserved, i.on_hand - i.reserved as available
+              i.on_hand, i.reserved, i.on_hand - i.reserved as available,
+              img.id as image_id
        from products p
        join inventory i on i.sku = p.sku
+       left join product_images img on img.sku = p.sku and img.is_primary
        where p.sku = $1`,
       [request.params.sku],
     );

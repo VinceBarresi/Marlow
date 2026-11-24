@@ -67,6 +67,14 @@ export function CategoryPage() {
               to={`/products/${product.sku}`}
               data-testid={`product-card-${product.sku}`}
             >
+              {product.imageUrl ? (
+                <img
+                  className="product-image"
+                  src={product.imageUrl}
+                  alt=""
+                  data-testid={`product-image-${product.sku}`}
+                />
+              ) : null}
               <strong data-testid={`product-name-${product.sku}`}>{product.name}</strong>
               <span className="price" data-testid={`product-price-${product.sku}`}>
                 {money(product.priceCents)}

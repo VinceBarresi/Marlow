@@ -19,7 +19,8 @@ ready() {
     && curl -s --max-time 2 -o /dev/null http://127.0.0.1:4001/ \
     && curl -s --max-time 2 -o /dev/null http://127.0.0.1:4002/ \
     && curl -s --max-time 2 -o /dev/null http://127.0.0.1:4004/ \
-    && curl -s --max-time 2 -o /dev/null http://127.0.0.1:4005/
+    && curl -s --max-time 2 -o /dev/null http://127.0.0.1:4005/ \
+    && curl -s --max-time 2 -o /dev/null http://127.0.0.1:4006/
 }
 
 if ready; then
@@ -39,7 +40,7 @@ docker compose up -d --wait
 users=$(docker compose exec -T postgres psql -U datalab -d datalab -tAc "select to_regclass('public.users')" | tr -d '[:space:]')
 if [[ "$users" != "users" ]]; then
   echo "Creating tables and loading the shop."
-  for file in server/sql/001_schema.sql server/sql/002_tracking.sql server/sql/004_locations.sql server/sql/005_careers.sql server/sql/006_payments.sql; do
+  for file in server/sql/001_schema.sql server/sql/002_tracking.sql server/sql/004_locations.sql server/sql/005_careers.sql server/sql/006_payments.sql server/sql/007_product_images.sql; do
     docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -f - < "$file"
   done
   node server/scripts/seed.mjs | docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -q
@@ -49,6 +50,11 @@ else
     echo "Applying payments schema."
     docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -f - < server/sql/006_payments.sql
   fi
+  images=$(docker compose exec -T postgres psql -U datalab -d datalab -tAc "select to_regclass('public.product_images')" | tr -d '[:space:]')
+  if [[ "$images" != "product_images" ]]; then
+    echo "Applying product images schema."
+    docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -f - < server/sql/007_product_images.sql
+  fi
 fi
 
 apps=(
@@ -57,6 +63,7 @@ apps=(
   services/orders
   services/shipping
   services/payments
+  services/images
   web
   frontends/catalog
   frontends/orders
@@ -75,11 +82,19 @@ start() {
   echo $! >"$logdir/$name.pid"
 }
 
+if [[ ! -d services/images/node_modules ]]; then
+  echo "Installing services/images"
+  (cd "$root/services/images" && npm install)
+fi
+echo "Seeding product image placeholders (missing only)"
+(cd "$root/services/images" && npm run seed-placeholders) || true
+
 start api server
 start catalog services/catalog
 start orders services/orders
 start shipping services/shipping
 start payments services/payments
+start images services/images
 start web web
 start catalog-ui frontends/catalog
 start orders-ui frontends/orders

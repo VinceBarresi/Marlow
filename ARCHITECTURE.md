@@ -17,6 +17,7 @@ flowchart LR
   orders["Orders service<br/>Fastify :4002"]
   shipping["Shipping service<br/>Fastify :4004<br/>Bearer OAuth"]
   payments["Payments service<br/>Fastify :4005<br/>Bearer OAuth"]
+  images["Images service<br/>Fastify :4006<br/>Bearer OAuth + disk"]
   console["Database console<br/>Fastify :4003"]
   pg[("Postgres 16")]
   redis[("Redis 7")]
@@ -29,6 +30,7 @@ flowchart LR
   api -->|"cart, orders, cancel"| orders
   api -->|"checkout charges then places order"| payments
   api -->|"createShipment / track<br/>Bearer client_credentials"| shipping
+  api -->|"upload + /api/images proxy"| images
   api --> pg
   api --> redis
   catalog --> pg
@@ -37,6 +39,7 @@ flowchart LR
   orders --> redis
   shipping --> pg
   payments --> pg
+  images --> pg
   console --> pg
   console --> redis
 ```
@@ -78,7 +81,9 @@ Login writes `session:<sid>` in Redis and sets the `datalab_session` cookie. Lat
 | `/api/login`, `/api/logout`, `/api/me`                                                   | API                                        | Redis session                                                                        |
 | `/api/customers`                                                                         | API                                        | Postgres `users`, `orders`                                                           |
 | `/api/customers/:id`                                                                     | API (+ payments list for staff)            | Customer profile, orders, tokenized cards (brand/last4 only)                         |
-| `/api/products`, `/api/categories`                                                       | Catalog service, through the API           | Postgres `products`. Category counts cached in Redis for 60 seconds                  |
+| `/api/products`, `/api/categories`                                                       | Catalog service, through the API           | Postgres `products` (+ primary `product_images`). Category counts cached 60s         |
+| `/api/images/:id`                                                                        | API → images (public bytes)                | Disk under `services/images/data`; metadata in `product_images`                      |
+| `/api/products/:sku/image`                                                               | API → images (Bearer upload, staff only)   | Replaces primary image for SKU                                                       |
 | `/api/inventory`                                                                         | API                                        | Postgres `inventory` (warehouse)                                                     |
 | `/api/locations`                                                                         | API                                        | Postgres `locations`, `location_inventory`                                           |
 | `/api/jobs`, `/api/applications`                                                         | API                                        | Postgres `jobs`, `applications`. Resume files on disk under `server/uploads/resumes` |
@@ -102,6 +107,7 @@ flowchart TB
     stores["locations and location_inventory"]
     orders["orders, lines, events, shipments"]
     payments["payment_methods, payment_intents"]
+    productImages["product_images"]
     jobs["jobs and applications"]
   end
   subgraph redis ["Redis"]

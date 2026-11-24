@@ -18,7 +18,7 @@ if [[ -d "$logdir" ]]; then
 fi
 
 # Also clear listeners on shop ports (covers stale vite/tsx not tracked by pid files).
-ports=(4000 4001 4002 4004 4005 5173 5174 5175)
+ports=(4000 4001 4002 4004 4005 4006 5173 5174 5175)
 for port in "${ports[@]}"; do
   if command -v lsof >/dev/null 2>&1; then
     pids=$(lsof -nP -iTCP:"$port" -sTCP:LISTEN -t 2>/dev/null || true)
