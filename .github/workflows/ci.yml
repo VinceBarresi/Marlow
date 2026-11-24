@@ -164,7 +164,7 @@ jobs:
       - name: Allure summary
         if: always()
         env:
-          REPORT_URL: https://VinceBarresi.github.io/data-lab/allure/${{ github.run_id }}/
+          REPORT_URL: https://vincebarresi.github.io/data-lab/allure/${{ github.run_id }}/
         run: |
           {
             echo "## Cypress Allure report"
