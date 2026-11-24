@@ -6,49 +6,49 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F865F5EBB6484C319580223E /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99079D69CED45CD93A5E3EF /* APIClient.swift */; };
-		4218795E62D94130940DE1D4 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 976EFE491E534477BA3A3B2C /* APIError.swift */; };
-		514D3A8E720C470DB5E86448 /* MarlowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 345A2A0D5808490A8E44F9D8 /* MarlowApp.swift */; };
-		6F66422648654227AB2A9670 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E4D3F7197740229B6613F7 /* RootView.swift */; };
-		0791DDFE996A41018A72B9FA /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 215C316C4AD84E508325C314 /* SessionStore.swift */; };
-		BFB16B4BF64E48B3A38E84AC /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = D94CE2AAFE484097A80D3B55 /* AppConfig.swift */; };
-		D4B076E6E3D146A0839D20CB /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A041F023EAD40CAAD106BDA /* AccountView.swift */; };
-		729D77BE6EC24DA1BEAC6D45 /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF5D372BF4C6487FA81DCCC3 /* CartView.swift */; };
-		1B73459FAEC8461A8383A8A0 /* CheckoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648D1B5D9E1C40478A8F09EB /* CheckoutView.swift */; };
-		F4D2BB190DEE4B60B3026E71 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC140E23DF9E480F8719868F /* LoginView.swift */; };
-		8F48F8DF8D7647AFB82C78FC /* OrderDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F521957991294C88A5E812D8 /* OrderDetailView.swift */; };
-		2E9BD2349EAB4B28845D8694 /* OrdersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3059B3FC192140E18ED8F54A /* OrdersView.swift */; };
-		B547D35348264CEBA0D87DBC /* ProductView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D601CA3E4439459B833C27F6 /* ProductView.swift */; };
-		E2E0E22ED7594E5F9CFEC58E /* ShopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C6E5AA0A3F047488FD68D59 /* ShopView.swift */; };
-		4AAE73DFB60C4C5FBB4549F6 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0048EC6F22B4AB48FB5231B /* Models.swift */; };
-		20389893E6F94086BA51FE9A /* Money.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB7EC630EEC14A1787A87C22 /* Money.swift */; };
+		F913DAF76CE14F17A070800E /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBDB7886EF7F48C8BD4AA6C3 /* APIClient.swift */; };
+		D1F854F8C8684F8B8B2D5947 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5025E7F9CD6F4787BDE8AFD4 /* APIError.swift */; };
+		03BB7920268B4CF0BF66C115 /* MarlowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDA9313C02B94C6A92B2DDFB /* MarlowApp.swift */; };
+		D9500968C5344DA798A05D9C /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99AE0AC566504E18A9C407E7 /* RootView.swift */; };
+		AEE9BB9EA7814E05BCF98471 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9302D9822F4E4EA0FA7276 /* SessionStore.swift */; };
+		9F1FD597E7414F9687CC6094 /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC951B380A85442790B786EF /* AppConfig.swift */; };
+		EEDF458C98DE49ABB13390C4 /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF2E063AB644D93B30FD322 /* AccountView.swift */; };
+		CBF6E717367A431090E23E34 /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A6918BB073149DDB9AF6FD7 /* CartView.swift */; };
+		9E25E5C578C1458AB6C6E65F /* CheckoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7F2F32262054447B38ACCBF /* CheckoutView.swift */; };
+		C078474D49AA4A34A35FAAF5 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01EA515F5B04DF3A952251D /* LoginView.swift */; };
+		2A17BDB15293443D8D5DAEDE /* OrderDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76602D21CEBE4D73A4739A14 /* OrderDetailView.swift */; };
+		FF0A07D62903401D88346B03 /* OrdersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F26EE5858A641918128BF4D /* OrdersView.swift */; };
+		E6A2B25DBB6343ED8468F4A0 /* ProductView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6851BDA440E6419F872DB711 /* ProductView.swift */; };
+		7348CF9C67A24D95871DCAB0 /* ShopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9491C41C8424AFD8A9D6393 /* ShopView.swift */; };
+		6B0D0A78DFDB4B169F9311CB /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D045C7D3734C378A8F2733 /* Models.swift */; };
+		41336057CDCC47D7958B414A /* Money.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF5D0FA45241416EBC90C0EA /* Money.swift */; };
 		72468231F1A14457A085F0A7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2B2A25A730FD4F5E82719CCC /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		ADFECCDE42164931AC25F9E0 /* Marlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Marlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		D99079D69CED45CD93A5E3EF /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
-		976EFE491E534477BA3A3B2C /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
-		345A2A0D5808490A8E44F9D8 /* MarlowApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarlowApp.swift; sourceTree = "<group>"; };
-		A7E4D3F7197740229B6613F7 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
-		215C316C4AD84E508325C314 /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
-		D94CE2AAFE484097A80D3B55 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
-		6A041F023EAD40CAAD106BDA /* AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountView.swift; sourceTree = "<group>"; };
-		EF5D372BF4C6487FA81DCCC3 /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartView.swift; sourceTree = "<group>"; };
-		648D1B5D9E1C40478A8F09EB /* CheckoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutView.swift; sourceTree = "<group>"; };
-		EC140E23DF9E480F8719868F /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
-		F521957991294C88A5E812D8 /* OrderDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderDetailView.swift; sourceTree = "<group>"; };
-		3059B3FC192140E18ED8F54A /* OrdersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdersView.swift; sourceTree = "<group>"; };
-		D601CA3E4439459B833C27F6 /* ProductView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductView.swift; sourceTree = "<group>"; };
-		8C6E5AA0A3F047488FD68D59 /* ShopView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShopView.swift; sourceTree = "<group>"; };
-		A0048EC6F22B4AB48FB5231B /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
-		EB7EC630EEC14A1787A87C22 /* Money.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Money.swift; sourceTree = "<group>"; };
+		BBDB7886EF7F48C8BD4AA6C3 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = API/APIClient.swift; sourceTree = "<group>"; };
+		5025E7F9CD6F4787BDE8AFD4 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = API/APIError.swift; sourceTree = "<group>"; };
+		EDA9313C02B94C6A92B2DDFB /* MarlowApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App/MarlowApp.swift; sourceTree = "<group>"; };
+		99AE0AC566504E18A9C407E7 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App/RootView.swift; sourceTree = "<group>"; };
+		FB9302D9822F4E4EA0FA7276 /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App/SessionStore.swift; sourceTree = "<group>"; };
+		CC951B380A85442790B786EF /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config/AppConfig.swift; sourceTree = "<group>"; };
+		FAF2E063AB644D93B30FD322 /* AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Account/AccountView.swift; sourceTree = "<group>"; };
+		7A6918BB073149DDB9AF6FD7 /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Cart/CartView.swift; sourceTree = "<group>"; };
+		D7F2F32262054447B38ACCBF /* CheckoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Checkout/CheckoutView.swift; sourceTree = "<group>"; };
+		D01EA515F5B04DF3A952251D /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Login/LoginView.swift; sourceTree = "<group>"; };
+		76602D21CEBE4D73A4739A14 /* OrderDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Orders/OrderDetailView.swift; sourceTree = "<group>"; };
+		5F26EE5858A641918128BF4D /* OrdersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Orders/OrdersView.swift; sourceTree = "<group>"; };
+		6851BDA440E6419F872DB711 /* ProductView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Product/ProductView.swift; sourceTree = "<group>"; };
+		E9491C41C8424AFD8A9D6393 /* ShopView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Shop/ShopView.swift; sourceTree = "<group>"; };
+		A0D045C7D3734C378A8F2733 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/Models.swift; sourceTree = "<group>"; };
+		DF5D0FA45241416EBC90C0EA /* Money.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities/Money.swift; sourceTree = "<group>"; };
 		194B5011A82645E598D4996E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2B2A25A730FD4F5E82719CCC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		E4216BB866DB4A0FAD8A0456 /* Frameworks */ = {
+		91CD398CA98D4761B1E8B927 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -77,130 +77,26 @@
 		BA968660DBC54083B3FCC756 /* Marlow */ = {
 			isa = PBXGroup;
 			children = (
-				307C205C8E184859BFDC758C /* API */,
-				FC9CF113D1174CC281C1DB78 /* App */,
-				08D23EAAF94B440E8D55A8C8 /* Config */,
-				042FE9195CF64E9FAC73B7FC /* Features */,
-				2F38A23A25C2483E9382A613 /* Models */,
-				A05C4454AA334042A008965E /* Utilities */,
+				BBDB7886EF7F48C8BD4AA6C3 /* APIClient.swift */,
+				5025E7F9CD6F4787BDE8AFD4 /* APIError.swift */,
+				EDA9313C02B94C6A92B2DDFB /* MarlowApp.swift */,
+				99AE0AC566504E18A9C407E7 /* RootView.swift */,
+				FB9302D9822F4E4EA0FA7276 /* SessionStore.swift */,
+				CC951B380A85442790B786EF /* AppConfig.swift */,
+				FAF2E063AB644D93B30FD322 /* AccountView.swift */,
+				7A6918BB073149DDB9AF6FD7 /* CartView.swift */,
+				D7F2F32262054447B38ACCBF /* CheckoutView.swift */,
+				D01EA515F5B04DF3A952251D /* LoginView.swift */,
+				76602D21CEBE4D73A4739A14 /* OrderDetailView.swift */,
+				5F26EE5858A641918128BF4D /* OrdersView.swift */,
+				6851BDA440E6419F872DB711 /* ProductView.swift */,
+				E9491C41C8424AFD8A9D6393 /* ShopView.swift */,
+				A0D045C7D3734C378A8F2733 /* Models.swift */,
+				DF5D0FA45241416EBC90C0EA /* Money.swift */,
 				2B2A25A730FD4F5E82719CCC /* Assets.xcassets */,
 				194B5011A82645E598D4996E /* Info.plist */,
 			);
 			path = Marlow;
-			sourceTree = "<group>";
-		};
-		307C205C8E184859BFDC758C /* API */ = {
-			isa = PBXGroup;
-			children = (
-				D99079D69CED45CD93A5E3EF /* APIClient.swift */,
-				976EFE491E534477BA3A3B2C /* APIError.swift */,
-			);
-			path = APIError.swift;
-			sourceTree = "<group>";
-		};
-		FC9CF113D1174CC281C1DB78 /* App */ = {
-			isa = PBXGroup;
-			children = (
-				345A2A0D5808490A8E44F9D8 /* MarlowApp.swift */,
-				A7E4D3F7197740229B6613F7 /* RootView.swift */,
-				215C316C4AD84E508325C314 /* SessionStore.swift */,
-			);
-			path = SessionStore.swift;
-			sourceTree = "<group>";
-		};
-		08D23EAAF94B440E8D55A8C8 /* Config */ = {
-			isa = PBXGroup;
-			children = (
-				D94CE2AAFE484097A80D3B55 /* AppConfig.swift */,
-			);
-			path = AppConfig.swift;
-			sourceTree = "<group>";
-		};
-		042FE9195CF64E9FAC73B7FC /* Features */ = {
-			isa = PBXGroup;
-			children = (
-				59BC930735AF4C3788576441 /* Account */,
-				61EB1D3C88B64953A1289D24 /* Cart */,
-				14CBDE89C92A4414A6E27A97 /* Checkout */,
-				2F0448ECF9D24C878F4C9070 /* Login */,
-				D9C3252BD7BF4BB69C9BA4F9 /* Orders */,
-				B643A3EB29D948F8AE3CD1FE /* Product */,
-				EAC45070661D4D2C8111AC7A /* Shop */,
-			);
-			path = Shop;
-			sourceTree = "<group>";
-		};
-		59BC930735AF4C3788576441 /* Account */ = {
-			isa = PBXGroup;
-			children = (
-				6A041F023EAD40CAAD106BDA /* AccountView.swift */,
-			);
-			path = AccountView.swift;
-			sourceTree = "<group>";
-		};
-		61EB1D3C88B64953A1289D24 /* Cart */ = {
-			isa = PBXGroup;
-			children = (
-				EF5D372BF4C6487FA81DCCC3 /* CartView.swift */,
-			);
-			path = CartView.swift;
-			sourceTree = "<group>";
-		};
-		14CBDE89C92A4414A6E27A97 /* Checkout */ = {
-			isa = PBXGroup;
-			children = (
-				648D1B5D9E1C40478A8F09EB /* CheckoutView.swift */,
-			);
-			path = CheckoutView.swift;
-			sourceTree = "<group>";
-		};
-		2F0448ECF9D24C878F4C9070 /* Login */ = {
-			isa = PBXGroup;
-			children = (
-				EC140E23DF9E480F8719868F /* LoginView.swift */,
-			);
-			path = LoginView.swift;
-			sourceTree = "<group>";
-		};
-		D9C3252BD7BF4BB69C9BA4F9 /* Orders */ = {
-			isa = PBXGroup;
-			children = (
-				F521957991294C88A5E812D8 /* OrderDetailView.swift */,
-				3059B3FC192140E18ED8F54A /* OrdersView.swift */,
-			);
-			path = OrdersView.swift;
-			sourceTree = "<group>";
-		};
-		B643A3EB29D948F8AE3CD1FE /* Product */ = {
-			isa = PBXGroup;
-			children = (
-				D601CA3E4439459B833C27F6 /* ProductView.swift */,
-			);
-			path = ProductView.swift;
-			sourceTree = "<group>";
-		};
-		EAC45070661D4D2C8111AC7A /* Shop */ = {
-			isa = PBXGroup;
-			children = (
-				8C6E5AA0A3F047488FD68D59 /* ShopView.swift */,
-			);
-			path = ShopView.swift;
-			sourceTree = "<group>";
-		};
-		2F38A23A25C2483E9382A613 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				A0048EC6F22B4AB48FB5231B /* Models.swift */,
-			);
-			path = Models.swift;
-			sourceTree = "<group>";
-		};
-		A05C4454AA334042A008965E /* Utilities */ = {
-			isa = PBXGroup;
-			children = (
-				EB7EC630EEC14A1787A87C22 /* Money.swift */,
-			);
-			path = Money.swift;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -211,7 +107,7 @@
 			buildConfigurationList = D710B619B0C4410DBA5476B0 /* Build configuration list for PBXNativeTarget "Marlow" */;
 			buildPhases = (
 				32A0D468E7B34A7B9302568E /* Sources */,
-				E4216BB866DB4A0FAD8A0456 /* Frameworks */,
+				91CD398CA98D4761B1E8B927 /* Frameworks */,
 				F20AB32D0E114895B2DA9395 /* Resources */,
 			);
 			buildRules = (
@@ -267,22 +163,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F865F5EBB6484C319580223E /* APIClient.swift in Sources */,
-				4218795E62D94130940DE1D4 /* APIError.swift in Sources */,
-				514D3A8E720C470DB5E86448 /* MarlowApp.swift in Sources */,
-				6F66422648654227AB2A9670 /* RootView.swift in Sources */,
-				0791DDFE996A41018A72B9FA /* SessionStore.swift in Sources */,
-				BFB16B4BF64E48B3A38E84AC /* AppConfig.swift in Sources */,
-				D4B076E6E3D146A0839D20CB /* AccountView.swift in Sources */,
-				729D77BE6EC24DA1BEAC6D45 /* CartView.swift in Sources */,
-				1B73459FAEC8461A8383A8A0 /* CheckoutView.swift in Sources */,
-				F4D2BB190DEE4B60B3026E71 /* LoginView.swift in Sources */,
-				8F48F8DF8D7647AFB82C78FC /* OrderDetailView.swift in Sources */,
-				2E9BD2349EAB4B28845D8694 /* OrdersView.swift in Sources */,
-				B547D35348264CEBA0D87DBC /* ProductView.swift in Sources */,
-				E2E0E22ED7594E5F9CFEC58E /* ShopView.swift in Sources */,
-				4AAE73DFB60C4C5FBB4549F6 /* Models.swift in Sources */,
-				20389893E6F94086BA51FE9A /* Money.swift in Sources */,
+				F913DAF76CE14F17A070800E /* APIClient.swift in Sources */,
+				D1F854F8C8684F8B8B2D5947 /* APIError.swift in Sources */,
+				03BB7920268B4CF0BF66C115 /* MarlowApp.swift in Sources */,
+				D9500968C5344DA798A05D9C /* RootView.swift in Sources */,
+				AEE9BB9EA7814E05BCF98471 /* SessionStore.swift in Sources */,
+				9F1FD597E7414F9687CC6094 /* AppConfig.swift in Sources */,
+				EEDF458C98DE49ABB13390C4 /* AccountView.swift in Sources */,
+				CBF6E717367A431090E23E34 /* CartView.swift in Sources */,
+				9E25E5C578C1458AB6C6E65F /* CheckoutView.swift in Sources */,
+				C078474D49AA4A34A35FAAF5 /* LoginView.swift in Sources */,
+				2A17BDB15293443D8D5DAEDE /* OrderDetailView.swift in Sources */,
+				FF0A07D62903401D88346B03 /* OrdersView.swift in Sources */,
+				E6A2B25DBB6343ED8468F4A0 /* ProductView.swift in Sources */,
+				7348CF9C67A24D95871DCAB0 /* ShopView.swift in Sources */,
+				6B0D0A78DFDB4B169F9311CB /* Models.swift in Sources */,
+				41336057CDCC47D7958B414A /* Money.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -300,11 +196,11 @@
 				ENABLE_TESTABILITY = YES;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				SDKROOT = iphoneos;
 			};
 			name = Debug;
 		};
@@ -316,10 +212,10 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				SDKROOT = iphoneos;
 			};
 			name = Release;
 		};
