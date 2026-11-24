@@ -1,0 +1,25 @@
+---
+description: Conventions for Cypress and Playwright API tests and shared fixtures
+globs: cypress/tests/api/**/*.ts,playwright/api/**/*.ts,fixtures/**/*.ts
+alwaysApply: false
+---
+
+# API tests
+
+- Prefer the `api-test-author` skill when creating new API coverage.
+- Put shared paths/models in `fixtures/endpoints/` and `fixtures/models/`; import them—do not duplicate payloads.
+- Add **both** Cypress (`cypress/tests/api/*.cy.ts`) and Playwright (`playwright/api/*.spec.ts`) unless the user names one framework.
+- Do not hardcode seed user UUIDs; assert id is a non-empty string or omit it from expected models.
+- Seed users: `customer@marlow.test` / `admin@marlow.test` / `staff@marlow.test`, password `datalab`.
+
+## Cypress
+
+- Exact keys: `.to.have.all.keys(...)`
+- Partial match: `.to.include(partial)`
+- Prefer `.not.equal("")` over `.empty` (eslint unused-expressions)
+
+## Playwright
+
+- Exact keys: sorted `Object.keys(...)`
+- Partial match: `toMatchObject`
+- Use the `request` fixture (not `page`) for pure API specs
