@@ -79,7 +79,13 @@ How the processes, screens, and data fit together is in [ARCHITECTURE.md](ARCHIT
 
 ## Mobile
 
-Native SwiftUI customer app lives in [`ios/Marlow`](ios/Marlow). Open `ios/Marlow/Marlow.xcodeproj` in Xcode, start the API with `npm run dev`, and run on the Simulator (API at `http://127.0.0.1:4000`). See [ios/Marlow/README.md](ios/Marlow/README.md).
+Native SwiftUI customer app lives in [`ios/Marlow`](ios/Marlow). Open `ios/Marlow/Marlow.xcodeproj` in Xcode, start the API with `npm run dev`, and run on the Simulator (API at `http://127.0.0.1:4000`). See [ios/Marlow/README.md](ios/Marlow/README.md) and [ios/Marlow/ARCHITECTURE.md](ios/Marlow/ARCHITECTURE.md).
+
+Appium + WebDriverIO Simulator tests live in [`appium/`](appium/). With the API up and Xcode installed:
+
+```bash
+npm run appium:ios
+```
 
 ## Tools
 
@@ -102,6 +108,7 @@ Each app has its own README with the libraries it uses. These are shared:
 | Jest              | this directory         | Unit tests for each page. `npm test` renders the page with a mocked API     |
 | Cypress           | this directory         | API tests in `cypress/tests/api` and browser tests in `cypress/tests/e2e`   |
 | Playwright        | this directory         | API + browser tests in `playwright/`. Local: `playwright` / `playwright:ui` |
+| Appium / WDIO     | `appium/`              | iOS Simulator UI tests for `ios/Marlow`. Local: `appium:ios`                |
 
 ## Logins
 

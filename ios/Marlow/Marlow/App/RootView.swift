@@ -22,26 +22,34 @@ struct MainTabView: View {
       NavigationStack {
         ShopView()
       }
-      .tabItem { Label("Shop", systemImage: "bag") }
-      .accessibilityIdentifier("tab-shop")
+      .tabItem {
+        Label("Shop", systemImage: "bag")
+          .accessibilityIdentifier("tab-shop")
+      }
 
       NavigationStack {
         CartView()
       }
-      .tabItem { Label("Cart", systemImage: "cart") }
-      .accessibilityIdentifier("tab-cart")
+      .tabItem {
+        Label("Cart", systemImage: "cart")
+          .accessibilityIdentifier("tab-cart")
+      }
 
       NavigationStack {
         OrdersView()
       }
-      .tabItem { Label("Orders", systemImage: "shippingbox") }
-      .accessibilityIdentifier("tab-orders")
+      .tabItem {
+        Label("Orders", systemImage: "shippingbox")
+          .accessibilityIdentifier("tab-orders")
+      }
 
       NavigationStack {
         AccountView()
       }
-      .tabItem { Label("Account", systemImage: "person") }
-      .accessibilityIdentifier("tab-account")
+      .tabItem {
+        Label("Account", systemImage: "person")
+          .accessibilityIdentifier("tab-account")
+      }
     }
   }
 }

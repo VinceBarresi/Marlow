@@ -2,6 +2,8 @@
 
 Native SwiftUI customer app for the Marlow shop. Talks to the existing API at `http://127.0.0.1:4000` with the `datalab_session` cookie.
 
+How the app, API client, screens, and tests fit together: [ARCHITECTURE.md](ARCHITECTURE.md).
+
 ## Prerequisites
 
 - Xcode 15+ (iOS 17 SDK)
@@ -33,6 +35,30 @@ Default login fields use the seeded customer:
 `AppConfig.apiBaseURL` defaults to `http://127.0.0.1:4000` (Simulator loopback). Override with the `MARLOW_API_BASE` environment variable in the Xcode scheme for a physical device (use your Mac’s LAN IP).
 
 `Info.plist` sets `NSAllowsLocalNetworking` so cleartext HTTP to localhost works in development.
+
+## Appium (Simulator)
+
+From the repo root, with the API running (`npm run dev`) and Xcode available:
+
+```bash
+npm run appium:ios
+```
+
+That builds `Marlow.app` for the Simulator, ensures the XCUITest driver is installed under `.appium/`, and runs WebDriverIO specs in [`appium/`](../../appium/).
+
+Optional env:
+
+| Variable             | Default                           | Purpose                                                           |
+| -------------------- | --------------------------------- | ----------------------------------------------------------------- |
+| `MARLOW_APP_PATH`    | `ios/Marlow/build/.../Marlow.app` | Prebuilt `.app` (skips rebuild only if you call `appium:ios:run`) |
+| `MARLOW_IOS_DEVICE`  | `iPhone 16`                       | Simulator device name                                             |
+| `MARLOW_IOS_VERSION` | (unset)                           | Pin iOS version when needed                                       |
+
+If the app is already built:
+
+```bash
+npm run appium:ios:run
+```
 
 ## v1 scope
 

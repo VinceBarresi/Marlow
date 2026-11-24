@@ -2,6 +2,8 @@
 
 The browser only talks to the shop on port 5173. Vite serves the pages and forwards `/api` to the API. The API keeps the session and either answers the call or forwards it to the catalog or orders service. Postgres holds the shop data. Redis holds sessions, carts, and a short-lived category cache.
 
+The native iOS app bypasses Vite and calls the API on port 4000 with the same `datalab_session` cookie. See [ios/Marlow/ARCHITECTURE.md](ios/Marlow/ARCHITECTURE.md).
+
 ## Processes
 
 ```mermaid

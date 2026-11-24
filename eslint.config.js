@@ -17,6 +17,8 @@ export default tseslint.config(
       "**/cypress/videos/**",
       "**/cypress/screenshots/**",
       "**/cypress/downloads/**",
+      "**/.appium/**",
+      "**/ios/Marlow/build/**",
     ],
   },
   eslint.configs.recommended,
@@ -45,6 +47,19 @@ export default tseslint.config(
   {
     files: ["**/*.{test,spec}.{ts,tsx}", "jest/setup.ts"],
     languageOptions: { globals: globals.jest },
+  },
+  {
+    files: ["appium/**/*.ts"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        $: "readonly",
+        $$: "readonly",
+        browser: "readonly",
+        driver: "readonly",
+        expect: "readonly",
+      },
+    },
   },
   prettier,
 );
