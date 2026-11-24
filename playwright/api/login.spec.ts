@@ -8,6 +8,8 @@ import {
   type LoginRequestModel,
   type LoginResponseModel,
 } from "../../fixtures/models/loginModel";
+import { errorSchema, userResponseSchema } from "../../fixtures/schemas/apiSchemas";
+import { assertSchema } from "../../fixtures/schemas/assertSchema";
 
 const customerLoginRequest: LoginRequestModel = {
   email: "customer@marlow.test",
@@ -23,15 +25,8 @@ const expectLoginResponse = (
   body: unknown,
   expectedUser: Omit<LoginResponseModel["user"], "id">,
 ) => {
-  expect(body).toEqual(expect.any(Object));
-  expect(Object.keys(body as object).sort()).toEqual(["user"]);
-
-  const { user } = body as LoginResponseModel;
-  expect(user).toEqual(expect.any(Object));
-  expect(Object.keys(user).sort()).toEqual(["email", "id", "name", "role"]);
-  expect(user.id).toEqual(expect.any(String));
-  expect(user.id).not.toEqual("");
-  expect(user).toMatchObject(expectedUser);
+  const parsed = assertSchema(userResponseSchema, body, "login");
+  expect(parsed.user).toMatchObject(expectedUser);
 };
 
 test.describe("login", () => {
@@ -59,7 +54,9 @@ test.describe("login", () => {
     });
 
     expect(response.status()).toBe(401);
-    expect(await response.json()).toEqual(loginUnauthorizedErrorModel);
+    const unauthorized = await response.json();
+    assertSchema(errorSchema, unauthorized, "login unauthorized");
+    expect(unauthorized).toEqual(loginUnauthorizedErrorModel);
   });
 
   test("rejects empty credentials", async ({ request }) => {
@@ -68,6 +65,8 @@ test.describe("login", () => {
     });
 
     expect(response.status()).toBe(400);
-    expect(await response.json()).toEqual(loginValidationErrorModel);
+    const validation = await response.json();
+    assertSchema(errorSchema, validation, "login validation");
+    expect(validation).toEqual(loginValidationErrorModel);
   });
 });

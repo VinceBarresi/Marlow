@@ -1,10 +1,13 @@
 import { catalogEndpoints } from "../../../fixtures/endpoints/catalogEndpoints";
 import { loginEndpoints } from "../../../fixtures/endpoints/loginEndpoints";
 import {
-  categoryKeys,
-  inventoryItemKeys,
-  productKeys,
-} from "../../../fixtures/models/catalogModel";
+  categoryListSchema,
+  errorSchema,
+  inventoryListSchema,
+  productListSchema,
+  productResponseSchema,
+} from "../../../fixtures/schemas/apiSchemas";
+import { assertSchema } from "../../../fixtures/schemas/assertSchema";
 
 describe("catalog API", () => {
   beforeEach(() => {
@@ -19,18 +22,15 @@ describe("catalog API", () => {
   it("lists products and returns a product by sku", () => {
     cy.request("GET", catalogEndpoints.products).then((response) => {
       expect(response.status).to.eq(200);
-      expect(response.body).to.have.all.keys("products", "page", "pageSize", "total");
-      expect(response.body.products).to.be.an("array").and.not.have.length(0);
+      const list = assertSchema(productListSchema, response.body, "products");
+      expect(list.products).to.not.have.length(0);
 
-      const product = response.body.products[0];
-      expect(product).to.have.all.keys(...productKeys);
-      expect(product.sku).to.be.a("string").and.not.equal("");
+      const product = list.products[0];
 
       cy.request("GET", catalogEndpoints.product(product.sku)).then((detail) => {
         expect(detail.status).to.eq(200);
-        expect(detail.body).to.have.all.keys("product");
-        expect(detail.body.product).to.have.all.keys(...productKeys);
-        expect(detail.body.product.sku).to.eq(product.sku);
+        const parsed = assertSchema(productResponseSchema, detail.body, "product");
+        expect(parsed.product.sku).to.eq(product.sku);
       });
     });
   });
@@ -38,9 +38,8 @@ describe("catalog API", () => {
   it("lists categories", () => {
     cy.request("GET", catalogEndpoints.categories).then((response) => {
       expect(response.status).to.eq(200);
-      expect(response.body).to.have.all.keys("categories");
-      expect(response.body.categories).to.be.an("array").and.not.have.length(0);
-      expect(response.body.categories[0]).to.have.all.keys(...categoryKeys);
+      const list = assertSchema(categoryListSchema, response.body, "categories");
+      expect(list.categories).to.not.have.length(0);
     });
   });
 
@@ -52,7 +51,7 @@ describe("catalog API", () => {
       failOnStatusCode: false,
     }).then((response) => {
       expect(response.status).to.eq(401);
-      expect(response.body).to.have.property("error");
+      assertSchema(errorSchema, response.body, "products unauthorized");
     });
   });
 
@@ -63,6 +62,7 @@ describe("catalog API", () => {
       failOnStatusCode: false,
     }).then((response) => {
       expect(response.status).to.eq(403);
+      assertSchema(errorSchema, response.body, "inventory forbidden");
       expect(response.body).to.deep.equal({ error: "Staff only." });
     });
   });
@@ -77,9 +77,8 @@ describe("catalog API", () => {
 
     cy.request("GET", catalogEndpoints.inventory).then((response) => {
       expect(response.status).to.eq(200);
-      expect(response.body).to.have.all.keys("inventory", "page", "pageSize", "total");
-      expect(response.body.inventory).to.be.an("array").and.not.have.length(0);
-      expect(response.body.inventory[0]).to.have.all.keys(...inventoryItemKeys);
+      const list = assertSchema(inventoryListSchema, response.body, "inventory");
+      expect(list.inventory).to.not.have.length(0);
     });
   });
 });

@@ -4,6 +4,8 @@ import {
   seedLocationSlug,
 } from "../../../fixtures/endpoints/locationsEndpoints";
 import { locationKeys, uniqueLocationRequest } from "../../../fixtures/models/locationsModel";
+import { errorSchema, locationListSchema } from "../../../fixtures/schemas/apiSchemas";
+import { assertSchema } from "../../../fixtures/schemas/assertSchema";
 
 describe("locations API", () => {
   beforeEach(() => {
@@ -18,13 +20,11 @@ describe("locations API", () => {
   it("lists locations and returns a seed location by slug", () => {
     cy.request("GET", locationsEndpoints.locations).then((response) => {
       expect(response.status).to.eq(200);
-      expect(response.body).to.have.all.keys("locations");
-      expect(response.body.locations).to.be.an("array").and.not.have.length(0);
-      expect(response.body.locations[0]).to.have.all.keys(...locationKeys);
+      const list = assertSchema(locationListSchema, response.body, "locations");
+      expect(list.locations).to.not.have.length(0);
+      expect(list.locations[0]).to.have.all.keys(...locationKeys);
 
-      const seed = (response.body.locations as { slug: string }[]).find(
-        (row) => row.slug === seedLocationSlug,
-      );
+      const seed = list.locations.find((row) => row.slug === seedLocationSlug);
       expect(seed, "seed austin-domain").to.not.equal(undefined);
     });
 
@@ -51,7 +51,7 @@ describe("locations API", () => {
       failOnStatusCode: false,
     }).then((response) => {
       expect(response.status).to.eq(401);
-      expect(response.body).to.have.property("error");
+      assertSchema(errorSchema, response.body, "locations unauthorized");
     });
   });
 

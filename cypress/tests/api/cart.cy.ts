@@ -1,12 +1,21 @@
 import { catalogEndpoints } from "../../../fixtures/endpoints/catalogEndpoints";
 import { loginEndpoints } from "../../../fixtures/endpoints/loginEndpoints";
 import { ordersEndpoints } from "../../../fixtures/endpoints/ordersEndpoints";
-import { cartItemKeys, emptyCartResponseModel } from "../../../fixtures/models/ordersModel";
+import { emptyCartResponseModel } from "../../../fixtures/models/ordersModel";
+import {
+  cartItemResultSchema,
+  cartSchema,
+  errorSchema,
+  okSchema,
+  productListSchema,
+} from "../../../fixtures/schemas/apiSchemas";
+import { assertSchema } from "../../../fixtures/schemas/assertSchema";
 
 const clearCart = () => {
   cy.request("GET", ordersEndpoints.cart).then((response) => {
     expect(response.status).to.eq(200);
-    for (const item of response.body.items as { sku: string }[]) {
+    const body = assertSchema(cartSchema, response.body, "cart clear");
+    for (const item of body.items) {
       cy.request("DELETE", ordersEndpoints.cartItem(item.sku)).its("status").should("eq", 200);
     }
   });
@@ -15,9 +24,8 @@ const clearCart = () => {
 const firstAvailableSku = () =>
   cy.request("GET", catalogEndpoints.products).then((response) => {
     expect(response.status).to.eq(200);
-    const product = (response.body.products as { sku: string; available: number }[]).find(
-      (row) => row.available > 0,
-    );
+    const list = assertSchema(productListSchema, response.body, "products");
+    const product = list.products.find((row) => row.available > 0);
     expect(product, "an in-stock product").to.not.equal(undefined);
     return product!.sku;
   });
@@ -37,28 +45,29 @@ describe("cart API", () => {
     firstAvailableSku().then((sku) => {
       cy.request("PUT", ordersEndpoints.cartItems, { sku, quantity: 1 }).then((put) => {
         expect(put.status).to.eq(200);
-        expect(put.body).to.deep.include({ ok: true, sku, quantity: 1 });
+        const putBody = assertSchema(cartItemResultSchema, put.body, "cart put");
+        expect(putBody).to.deep.include({ ok: true, sku, quantity: 1 });
       });
 
       cy.request("GET", ordersEndpoints.cart).then((cart) => {
         expect(cart.status).to.eq(200);
-        expect(cart.body).to.have.all.keys("items", "subtotalCents");
-        expect(cart.body.items).to.have.length(1);
-        expect(cart.body.items[0]).to.have.all.keys(...cartItemKeys);
-        expect(cart.body.items[0].sku).to.eq(sku);
-        expect(cart.body.items[0].quantity).to.eq(1);
-        expect(cart.body.subtotalCents).to.be.a("number").and.be.greaterThan(0);
+        const cartBody = assertSchema(cartSchema, cart.body, "cart");
+        expect(cartBody.items).to.have.length(1);
+        expect(cartBody.items[0].sku).to.eq(sku);
+        expect(cartBody.items[0].quantity).to.eq(1);
+        expect(cartBody.subtotalCents).to.be.greaterThan(0);
       });
 
       cy.request("DELETE", ordersEndpoints.cartItem(sku)).then((del) => {
         expect(del.status).to.eq(200);
-        expect(del.body).to.deep.equal({ ok: true });
+        assertSchema(okSchema, del.body, "cart delete");
       });
 
       cy.request("GET", ordersEndpoints.cart).then((empty) => {
         expect(empty.status).to.eq(200);
-        expect(empty.body).to.deep.include(emptyCartResponseModel);
-        expect(empty.body.items).to.deep.equal([]);
+        const emptyBody = assertSchema(cartSchema, empty.body, "empty cart");
+        expect(emptyBody).to.deep.include(emptyCartResponseModel);
+        expect(emptyBody.items).to.deep.equal([]);
       });
     });
   });
@@ -72,7 +81,7 @@ describe("cart API", () => {
       failOnStatusCode: false,
     }).then((response) => {
       expect(response.status).to.eq(401);
-      expect(response.body).to.have.property("error");
+      assertSchema(errorSchema, response.body, "cart unauthorized");
     });
   });
 });

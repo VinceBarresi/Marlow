@@ -73,7 +73,7 @@ Store maps use the Google Maps JavaScript API when `VITE_GOOGLE_MAPS_API_KEY` is
 | `frontends/catalog` | Product grid and product page, loaded by the shell                                                | [http://localhost:5174](http://localhost:5174) |
 | `frontends/orders`  | Cart, checkout, and order pages, loaded by the shell                                              | [http://localhost:5175](http://localhost:5175) |
 
-API docs are at [http://127.0.0.1:4000/docs](http://127.0.0.1:4000/docs). The shop proxies `/api` to the main API, so the session cookie stays on the shop origin.
+API docs are at [http://127.0.0.1:4000/docs](http://127.0.0.1:4000/docs). The shop proxies `/api` to the main API, so the session cookie stays on the shop origin. A Postman collection for the same gateway lives in [`postman/`](postman/) (import the collection + `Marlow.local` environment). Cypress/Playwright API tests assert response shapes with Zod schemas under `fixtures/schemas/`.
 
 How the processes, screens, and data fit together is in [ARCHITECTURE.md](ARCHITECTURE.md).
 
@@ -129,6 +129,8 @@ npm run playwright:docker
 ```
 
 Each script starts the shop via `scripts/e2e-up.sh` if needed, then runs parallel containers against `host.docker.internal:5173`.
+
+API-only (shop already running): `npm run cypress:api` / `npm run playwright:api`. For Postman/Newman, see [`postman/README.md`](postman/README.md).
 
 ## Lint and format
 

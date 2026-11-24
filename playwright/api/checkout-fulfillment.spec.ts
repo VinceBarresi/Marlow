@@ -3,11 +3,13 @@ import { catalogEndpoints } from "../../fixtures/endpoints/catalogEndpoints";
 import { loginEndpoints } from "../../fixtures/endpoints/loginEndpoints";
 import { locationsEndpoints, seedLocationSlug } from "../../fixtures/endpoints/locationsEndpoints";
 import { ordersEndpoints } from "../../fixtures/endpoints/ordersEndpoints";
+import { shipCheckoutRequestModel, shipRequestModel } from "../../fixtures/models/ordersModel";
 import {
-  checkoutOrderKeys,
-  shipCheckoutRequestModel,
-  shipRequestModel,
-} from "../../fixtures/models/ordersModel";
+  checkoutResponseSchema,
+  errorSchema,
+  orderResponseSchema,
+} from "../../fixtures/schemas/apiSchemas";
+import { assertSchema } from "../../fixtures/schemas/assertSchema";
 
 async function loginAs(request: APIRequestContext, email: string) {
   const login = await request.post(loginEndpoints.login, {
@@ -50,13 +52,9 @@ async function createShipOrder(request: APIRequestContext) {
     data: shipCheckoutRequestModel,
   });
   expect(checkout.status()).toBe(201);
-  const body = await checkout.json();
-  expect(Object.keys(body).sort()).toEqual(["order"]);
-  expect(Object.keys(body.order).sort()).toEqual([...checkoutOrderKeys].sort());
+  const body = assertSchema(checkoutResponseSchema, await checkout.json(), "checkout");
   expect(body.order.status).toBe("paid");
-  expect(body.order.number).toEqual(expect.any(String));
-  expect(body.order.number).not.toEqual("");
-  return body.order.number as string;
+  return body.order.number;
 }
 
 test.describe("checkout and fulfillment API", () => {
@@ -65,11 +63,11 @@ test.describe("checkout and fulfillment API", () => {
     const response = await request.get(ordersEndpoints.order(number));
     expect(response.status()).toBe(200);
 
-    const body = await response.json();
-    expect(Object.keys(body).sort()).toEqual(["order"]);
+    const raw = await response.json();
+    const body = assertSchema(orderResponseSchema, raw, "order detail");
     expect(body.order.number).toBe(number);
     expect(body.order.status).toBe("paid");
-    expect(body.order.fulfillment).toBe("ship");
+    expect(raw.order.fulfillment).toBe("ship");
     expect(body.order.lines.length).toBeGreaterThan(0);
   });
 
@@ -173,7 +171,9 @@ test.describe("checkout and fulfillment API", () => {
     const number = await createShipOrder(request);
     const pick = await request.post(ordersEndpoints.pick(number));
     expect(pick.status()).toBe(403);
-    expect(await pick.json()).toEqual({ error: "Staff only." });
+    const forbidden = await pick.json();
+    assertSchema(errorSchema, forbidden, "pick forbidden");
+    expect(forbidden).toEqual({ error: "Staff only." });
 
     await loginAs(request, "staff@marlow.test");
     const cancel = await request.post(ordersEndpoints.cancel(number));

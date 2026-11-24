@@ -6,6 +6,8 @@ import {
   customerListItemKeys,
   customerOrderKeys,
 } from "../../fixtures/models/customersModel";
+import { customerListSchema, errorSchema } from "../../fixtures/schemas/apiSchemas";
+import { assertSchema } from "../../fixtures/schemas/assertSchema";
 
 test.describe("customers API", () => {
   test("rejects customers for a customer role", async ({ request }) => {
@@ -16,14 +18,16 @@ test.describe("customers API", () => {
 
     const response = await request.get(customersEndpoints.customers);
     expect(response.status()).toBe(403);
-    expect(await response.json()).toEqual({ error: "Staff only." });
+    const forbidden = await response.json();
+    assertSchema(errorSchema, forbidden, "customers forbidden");
+    expect(forbidden).toEqual({ error: "Staff only." });
   });
 
   test("rejects customers without a session", async ({ playwright, baseURL }) => {
     const anon = await playwright.request.newContext({ baseURL });
     const response = await anon.get(customersEndpoints.customers);
     expect(response.status()).toBe(401);
-    expect(await response.json()).toHaveProperty("error");
+    assertSchema(errorSchema, await response.json(), "customers unauthorized");
     await anon.dispose();
   });
 
@@ -36,13 +40,11 @@ test.describe("customers API", () => {
     const response = await request.get(customersEndpoints.customers);
     expect(response.status()).toBe(200);
 
-    const body = await response.json();
-    expect(Object.keys(body).sort()).toEqual(["customers", "page", "pageSize", "total"]);
+    const body = assertSchema(customerListSchema, await response.json(), "customers");
     expect(body.customers.length).toBeGreaterThan(0);
 
     const customer =
-      body.customers.find((row: { email: string }) => row.email === "customer@marlow.test") ??
-      body.customers[0];
+      body.customers.find((row) => row.email === "customer@marlow.test") ?? body.customers[0];
     expect(Object.keys(customer).sort()).toEqual([...customerListItemKeys].sort());
     expect(customer.id).toEqual(expect.any(String));
     expect(customer.id).not.toEqual("");

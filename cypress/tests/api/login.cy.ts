@@ -7,6 +7,8 @@ import {
   type LoginRequestModel,
   type LoginResponseModel,
 } from "../../../fixtures/models/loginModel";
+import { errorSchema, userResponseSchema } from "../../../fixtures/schemas/apiSchemas";
+import { assertSchema } from "../../../fixtures/schemas/assertSchema";
 
 const customerLoginRequest: LoginRequestModel = {
   email: "customer@marlow.test",
@@ -22,12 +24,8 @@ const expectLoginResponse = (
   body: unknown,
   expectedUser: Omit<LoginResponseModel["user"], "id">,
 ) => {
-  expect(body).to.be.an("object").and.to.have.all.keys("user");
-
-  const { user } = body as LoginResponseModel;
-  expect(user).to.be.an("object").and.to.have.all.keys("email", "id", "name", "role");
-  expect(user.id).to.be.a("string").and.not.equal("");
-  expect(user).to.include(expectedUser);
+  const parsed = assertSchema(userResponseSchema, body, "login");
+  expect(parsed.user).to.include(expectedUser);
 };
 
 describe("login", () => {
@@ -53,6 +51,7 @@ describe("login", () => {
       failOnStatusCode: false,
     }).then((response) => {
       expect(response.status).to.eq(401);
+      assertSchema(errorSchema, response.body, "login unauthorized");
       expect(response.body).to.deep.equal(loginUnauthorizedErrorModel);
     });
   });
@@ -65,6 +64,7 @@ describe("login", () => {
       failOnStatusCode: false,
     }).then((response) => {
       expect(response.status).to.eq(400);
+      assertSchema(errorSchema, response.body, "login validation");
       expect(response.body).to.deep.equal(loginValidationErrorModel);
     });
   });

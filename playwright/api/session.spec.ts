@@ -1,11 +1,15 @@
 import { expect, test } from "@playwright/test";
 import { loginEndpoints } from "../../fixtures/endpoints/loginEndpoints";
 import { sessionEndpoints } from "../../fixtures/endpoints/sessionEndpoints";
-import {
-  customerLoginResponseModel,
-  type LoginResponseModel,
-} from "../../fixtures/models/loginModel";
+import { customerLoginResponseModel } from "../../fixtures/models/loginModel";
 import { healthResponseModel, logoutResponseModel } from "../../fixtures/models/sessionModel";
+import {
+  errorSchema,
+  healthSchema,
+  okSchema,
+  userResponseSchema,
+} from "../../fixtures/schemas/apiSchemas";
+import { assertSchema } from "../../fixtures/schemas/assertSchema";
 
 test.describe("session API", () => {
   test("returns health", async ({ request }) => {
@@ -13,7 +17,7 @@ test.describe("session API", () => {
     expect(response.status()).toBe(200);
 
     const body = await response.json();
-    expect(Object.keys(body).sort()).toEqual(["ok", "postgres", "redis"]);
+    assertSchema(healthSchema, body, "health");
     expect(body).toEqual(healthResponseModel);
   });
 
@@ -26,19 +30,15 @@ test.describe("session API", () => {
     const response = await request.get(sessionEndpoints.me);
     expect(response.status()).toBe(200);
 
-    const body = (await response.json()) as LoginResponseModel;
-    expect(Object.keys(body).sort()).toEqual(["user"]);
-    expect(Object.keys(body.user).sort()).toEqual(["email", "id", "name", "role"]);
-    expect(body.user.id).toEqual(expect.any(String));
-    expect(body.user.id).not.toEqual("");
-    expect(body.user).toMatchObject(customerLoginResponseModel.user);
+    const parsed = assertSchema(userResponseSchema, await response.json(), "me");
+    expect(parsed.user).toMatchObject(customerLoginResponseModel.user);
   });
 
   test("rejects me without a session", async ({ playwright, baseURL }) => {
     const anon = await playwright.request.newContext({ baseURL });
     const response = await anon.get(sessionEndpoints.me);
     expect(response.status()).toBe(401);
-    expect(await response.json()).toHaveProperty("error");
+    assertSchema(errorSchema, await response.json(), "me unauthorized");
     await anon.dispose();
   });
 
@@ -50,10 +50,12 @@ test.describe("session API", () => {
 
     const logout = await request.post(sessionEndpoints.logout);
     expect(logout.status()).toBe(200);
-    expect(await logout.json()).toEqual(logoutResponseModel);
+    const logoutBody = await logout.json();
+    assertSchema(okSchema, logoutBody, "logout");
+    expect(logoutBody).toEqual(logoutResponseModel);
 
     const me = await request.get(sessionEndpoints.me);
     expect(me.status()).toBe(401);
-    expect(await me.json()).toHaveProperty("error");
+    assertSchema(errorSchema, await me.json(), "me after logout");
   });
 });
