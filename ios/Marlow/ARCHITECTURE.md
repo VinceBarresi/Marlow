@@ -109,7 +109,7 @@ Login `POST /api/login` sets `datalab_session`. Logout clears the Redis session 
 | -------------------------------- | -------------------------------------------------- | ------------------------------------------------ |
 | HTTP contracts (shared with web) | `cypress/tests/api`, `playwright/api`, `fixtures/` | `npm run cypress:api` / `npm run playwright:api` |
 | Simulator UI                     | `appium/` (WebDriverIO + XCUITest)                 | `npm run appium:ios`                             |
-| Skill / rule                     | `ios-ui-test-author`, `ios-ui-tests.mdc`           | See `.cursor/skills/` and `.cursor/rules/`       |
+| Skill / rule                     | `ios-e2e-test-author`, `ios-e2e-tests.mdc`         | See `.cursor/skills/` and `.cursor/rules/`       |
 
 UI selectors use SwiftUI `.accessibilityIdentifier` values (for example `login-email`) exposed to Appium as `~login-email`. Prefer ids that match web `data-testid`s when the concept exists on both platforms.
 

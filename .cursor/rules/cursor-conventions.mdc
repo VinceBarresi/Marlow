@@ -1,0 +1,25 @@
+---
+description: Naming conventions for Marlow project skills and rules under .cursor/
+alwaysApply: true
+---
+
+# Cursor skills and rules naming
+
+Role split: **skills** teach how to produce something; **rules** constrain paths and style when matching files are in play.
+
+Primary test layers (rules): **`api-tests`** (HTTP), **`e2e-tests`** (live browser), **`mock-ui-tests`** (browser + intercept/route), **`mock-component-tests`** (Jest), **`ios-e2e-tests`** (Appium).
+
+| Kind | Pattern | Examples |
+| ---- | ------- | -------- |
+| Skill (authoring) | `<layer>-test-author` | `api-test-author`, `e2e-test-author`, `mock-ui-test-author`, `mock-component-test-author`, `ios-e2e-test-author` |
+| Rule (conventions) | `<layer>-tests` | `api-tests.mdc`, `e2e-tests.mdc`, `mock-ui-tests.mdc`, `mock-component-tests.mdc`, `ios-e2e-tests.mdc` |
+| Umbrella / other rules | plural topic; **no** `-author` | `tests.mdc`, `page-objects.mdc`, `screen-objects.mdc`, `manual-test-cases.mdc`, `cursor-conventions.mdc` |
+
+**Pairing:** `api-test-author` ↔ `api-tests.mdc`, `e2e-test-author` ↔ `e2e-tests.mdc`, `mock-ui-test-author` ↔ `mock-ui-tests.mdc`, `mock-component-test-author` ↔ `mock-component-tests.mdc`, `ios-e2e-test-author` ↔ `ios-e2e-tests.mdc`.
+
+**Umbrella:** `tests.mdc` is always-on—routes to layer rules and holds shared logins, file paths, and run commands. Do not add a separate `_shared/` reference file.
+
+**Mechanics:**
+- Skill: folder `.cursor/skills/<name>/SKILL.md` with frontmatter `name:` identical to the folder name
+- Rule: `.cursor/rules/<name>.mdc`
+- Kebab-case only; no `skill-` / `rule-` prefixes (role is implied by directory)

@@ -1,0 +1,17 @@
+---
+description: Conventions for Marlow Cypress and Playwright live browser e2e tests
+globs: cypress/tests/e2e/**/*.ts,cypress/pages/**/*.ts,cypress/support/**/*.ts,playwright/e2e/**/*.ts,playwright/pages/**/*.ts,playwright/support/**/*.ts,playwright/*.spec.ts
+alwaysApply: false
+---
+
+# E2E tests (Cypress + Playwright live UI)
+
+Browser UI against the **live API**—**not** HTTP API suites (`api-tests`), **not** mock UI (`mock-ui-tests`), and **not** Appium (`ios-e2e-tests`).
+
+- Prefer the `e2e-test-author` skill. Write **both** Cypress and Playwright unless the user names one framework.
+- Specs: `cypress/tests/e2e/*.cy.ts`, `playwright/e2e/*.spec.ts` or top-level `playwright/*.spec.ts` until moved under `e2e/`. Mock UI specs live under `e2e/mock-ui/` and use `mock-ui-test-author`.
+- Page objects required: `cypress/pages/`, `playwright/pages/`—no raw `data-testid` strings scattered in specs. Prefer the `page-object-author` skill when adding or extending POs.
+- Selectors: `data-testid` via `cy.get("[data-testid=…]")` / `page.getByTestId(…)`.
+- Auth: `loginAsCustomer` / `loginAsAdmin` from each framework’s `support/login.ts`, then navigate with the page object.
+- Assert visible UI and URL/path—not response JSON schemas (those belong in `api-tests`).
+- Keep Cypress and Playwright flows aligned on the same user journey.

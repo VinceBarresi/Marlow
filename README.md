@@ -1,6 +1,18 @@
-# data-lab
+# Marlow
 
-Local retail shop for practicing Cypress and Playwright. The shop is called Marlow. Postgres and Redis run in Docker. The shop shell and the product and order screens are separate frontends. The API, catalog, orders, and database console are separate services.
+Local retail shop for practicing test automation across the stack. Postgres and Redis run in Docker. The shop shell and the product and order screens are separate frontends (Vite + Module Federation). The API, catalog, orders, shipping, payments, and database console are separate Fastify services. There is also a native SwiftUI iOS app.
+
+**Test layers**
+
+| Layer          | Tools                  | What it covers                                                                    |
+| -------------- | ---------------------- | --------------------------------------------------------------------------------- |
+| Mock component | Jest + Testing Library | Page/components with a mocked API (`*.test.tsx`); also server/web unit tests      |
+| API            | Cypress + Playwright   | HTTP status/body against the live gateway (`cypress/tests/api`, `playwright/api`) |
+| Browser e2e    | Cypress + Playwright   | Live flows under `e2e/`                                                           |
+| Mock UI        | Cypress + Playwright   | Browser UI with mocked API under `e2e/mock-ui/` (`cy.intercept` / `page.route`)   |
+| iOS e2e        | Appium + WebDriverIO   | Simulator flows for `ios/Marlow` (`appium/`)                                      |
+
+Cypress and Playwright mirror each other for API and e2e so you can compare frameworks on the same product.
 
 ## Run it
 
@@ -132,11 +144,15 @@ On the database console, staff can run read-only queries. The admin can also ins
 
 ## Tests
 
-From this directory, `npm run test:unit` runs every unit test: the Jest page tests, then the pricing and query tests in `server`, then the money formatting test in `web`.
+**Jest (mock component)** — `npm run test:unit` runs every unit test: Jest page tests, then pricing and query tests in `server`, then the money formatting test in `web`. Each page has a sample next to it (for example `web/src/pages/Login.test.tsx`). The sample mocks `api`, renders the page, and checks a test id. Browser network stubs are **mock UI** (`cy.intercept` / `page.route` under `e2e/mock-ui/`), not Jest. Copy that sample when you add a case.
 
-Each page has a sample next to it, for example `web/src/pages/Login.test.tsx`. The sample mocks `api`, renders the page, and checks a test id. Copy that file when you add a case.
+**Cypress** — `npm run cypress:api` / `npm run cypress:e2e`, or `npm run cypress` to open the runner. Specs live under `cypress/tests/`.
 
-A push to GitHub runs five checks: unit tests, Prettier, ESLint, Cypress, and Playwright. The Cypress and Playwright checks start the shop, then run tests in Docker workers (Cypress splits API vs e2e specs; Playwright uses `--shard` — no Cypress Cloud).
+**Playwright** — `npm run playwright` / `npm run playwright:api` / `npm run playwright:ui`. Specs live under `playwright/`.
+
+**Appium + WDIO** — with the API up and Xcode installed, `npm run appium:ios` runs Simulator UI tests from `appium/`. See [appium/README.md](appium/README.md).
+
+A push to GitHub runs unit tests, Prettier, ESLint, Cypress, and Playwright. The Cypress and Playwright checks start the shop, then run tests in Docker workers (Cypress splits API vs e2e specs; Playwright uses `--shard` — no Cypress Cloud).
 
 Locally, with Docker available:
 
