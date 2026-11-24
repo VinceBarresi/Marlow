@@ -130,6 +130,22 @@ npm run playwright:docker
 
 Each script starts the shop via `scripts/e2e-up.sh` if needed, then runs parallel containers against `host.docker.internal:5173`.
 
+Cypress writes Allure results under `allure-results/` (failure screenshots are attached automatically). After a run:
+
+```bash
+npm run allure:cypress   # generate HTML into allure-report/
+npm run allure:open      # open the report
+```
+
+`npm run cypress:docker` generates the report when the workers finish.
+
+In GitHub Actions:
+
+- **Cypress Allure:** `https://vincebarresi.github.io/data-lab/allure/<run id>/` (+ artifact `cypress-allure-report-<run id>`)
+- **Playwright HTML:** `https://vincebarresi.github.io/data-lab/playwright/<run id>/` (+ artifact `playwright-report-<run id>`)
+
+Both URLs are printed in the job logs and job summary. One-time Pages setup: **Settings → Pages → Deploy from a branch → `gh-pages` / `(root)`**.
+
 ## Lint and format
 
 From this directory:

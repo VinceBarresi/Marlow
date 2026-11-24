@@ -27,10 +27,20 @@ pid2=$!
 wait "$pid1" || failed=1
 wait "$pid2" || failed=1
 
+# Always merge blob reports when present (including failed runs).
+if compgen -G "blob-report/*" >/dev/null; then
+  echo "Merging Playwright blob reports…"
+  npx playwright merge-reports --reporter html blob-report || true
+  if [[ -f playwright-report/index.html ]]; then
+    echo "Merged report: playwright-report/index.html"
+  fi
+else
+  echo "No blob-report files to merge." >&2
+fi
+
 if [[ "$failed" -ne 0 ]]; then
   echo "One or more Playwright shards failed." >&2
   exit 1
 fi
 
-npx playwright merge-reports --reporter html blob-report
-echo "Merged report: playwright-report/index.html"
+echo "Playwright Docker shards finished."

@@ -3,6 +3,12 @@ name: CI
 on:
   push:
 
+# Needed to publish Allure HTML to the gh-pages branch for GitHub Pages.
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   unit-tests:
     name: Unit tests
@@ -113,12 +119,69 @@ jobs:
           CYPRESS_INSTALL_BINARY: "0"
 
       - name: Cypress (Docker workers)
+        id: cypress
         run: npm run cypress:docker
 
       - name: Shop logs
         if: failure()
         run: tail -n 80 .e2e-logs/*.log || true
 
+      - name: Ensure Allure HTML exists
+        if: always()
+        run: |
+          if [[ ! -f allure-report/index.html ]]; then
+            if compgen -G "allure-results/api/*" >/dev/null || compgen -G "allure-results/e2e/*" >/dev/null; then
+              npx allure generate allure-results/api allure-results/e2e -o allure-report --clean
+            elif [[ -d allure-results ]] && compgen -G "allure-results/*" >/dev/null; then
+              npx allure generate allure-results -o allure-report --clean
+            fi
+          fi
+          ls -la allure-report 2>/dev/null || echo "No allure-report directory yet."
+
+      - name: Upload Allure report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-allure-report-${{ github.run_id }}
+          path: |
+            allure-report/
+            allure-results/
+            cypress/screenshots/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Publish Allure to GitHub Pages
+        id: allure_pages
+        if: always() && hashFiles('allure-report/index.html') != ''
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./allure-report
+          destination_dir: allure/${{ github.run_id }}
+          keep_files: true
+          commit_message: "Allure Cypress report for run ${{ github.run_id }}"
+
+      - name: Allure summary
+        if: always()
+        env:
+          REPORT_URL: https://vincebarresi.github.io/data-lab/allure/${{ github.run_id }}/
+        run: |
+          if [[ -f allure-report/index.html ]]; then
+            echo "========================================"
+            echo "Allure report: ${REPORT_URL}"
+            echo "========================================"
+            {
+              echo "## Cypress Allure report"
+              echo ""
+              echo "- **Live report:** [${REPORT_URL}](${REPORT_URL})"
+              echo "- **Artifact:** \`cypress-allure-report-${{ github.run_id }}\` (download from this run if Pages is unavailable)"
+              echo ""
+              echo "Failure screenshots are attached inside the Allure report when tests fail."
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No Allure HTML was generated for this run."
+            echo "No Allure HTML was generated for this run (workers may have failed before writing results)." >> "$GITHUB_STEP_SUMMARY"
+          fi
   playwright:
     name: Playwright
     runs-on: ubuntu-latest
@@ -153,6 +216,7 @@ jobs:
           CYPRESS_INSTALL_BINARY: "0"
 
       - name: Playwright (Docker shards)
+        id: playwright
         run: npm run playwright:docker
 
       - name: Shop logs
@@ -160,9 +224,43 @@ jobs:
         run: tail -n 80 .e2e-logs/*.log || true
 
       - name: Upload Playwright report
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
-          path: playwright-report/
-          if-no-files-found: ignore
+          name: playwright-report-${{ github.run_id }}
+          path: |
+            playwright-report/
+            blob-report/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Publish Playwright report to GitHub Pages
+        if: always() && hashFiles('playwright-report/index.html') != ''
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./playwright-report
+          destination_dir: playwright/${{ github.run_id }}
+          keep_files: true
+          commit_message: "Playwright report for run ${{ github.run_id }}"
+
+      - name: Playwright report summary
+        if: always()
+        env:
+          REPORT_URL: https://vincebarresi.github.io/data-lab/playwright/${{ github.run_id }}/
+        run: |
+          if [[ -f playwright-report/index.html ]]; then
+            echo "========================================"
+            echo "Playwright report: ${REPORT_URL}"
+            echo "========================================"
+            {
+              echo "## Playwright report"
+              echo ""
+              echo "- **Live report:** [${REPORT_URL}](${REPORT_URL})"
+              echo "- **Artifact:** \`playwright-report-${{ github.run_id }}\`"
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No Playwright HTML report was generated for this run."
+            echo "No Playwright HTML report was generated for this run." >> "$GITHUB_STEP_SUMMARY"
+          fi
