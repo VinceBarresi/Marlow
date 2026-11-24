@@ -13,11 +13,11 @@ npm run dev
 
 ## Auth
 
-| Endpoint | Auth |
-| -------- | ---- |
-| `POST /oauth/token` | `client_id` + `client_secret` (`grant_type=client_credentials`) |
-| `POST/GET/DELETE /v1/payment-methods` | Service Bearer (`scope=payments`) |
-| `POST/GET /v1/payment-intents` | Service Bearer |
+| Endpoint                              | Auth                                                            |
+| ------------------------------------- | --------------------------------------------------------------- |
+| `POST /oauth/token`                   | `client_id` + `client_secret` (`grant_type=client_credentials`) |
+| `POST/GET/DELETE /v1/payment-methods` | Service Bearer (`scope=payments`)                               |
+| `POST/GET /v1/payment-intents`        | Service Bearer                                                  |
 
 Default local credentials (override with env):
 
@@ -27,10 +27,10 @@ Default local credentials (override with env):
 
 ## Test cards
 
-| Number | Result |
-| ------ | ------ |
-| `4242424242424242` | Succeeds |
-| `4000000000000002` | `card_declined` |
+| Number             | Result               |
+| ------------------ | -------------------- |
+| `4242424242424242` | Succeeds             |
+| `4000000000000002` | `card_declined`      |
 | `4000000000009995` | `insufficient_funds` |
 
 CVC is required on create but never stored. Only a sandbox `test_card_key` is kept so later charges work without the PAN.

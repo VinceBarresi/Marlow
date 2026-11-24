@@ -93,14 +93,14 @@ Login `POST /api/login` sets `datalab_session`. Logout clears the Redis session 
 
 ## Screens and endpoints
 
-| Screen          | Primary API                                     |
-| --------------- | ----------------------------------------------- |
-| Login           | `POST /api/login`                               |
-| Shop            | `GET /api/products`, search via `q`             |
-| Product         | `GET /api/products/:sku`, `PUT /api/cart/items` |
-| Cart            | `GET /api/cart`, `DELETE /api/cart/items/:sku`  |
-| Checkout (ship) | `POST /api/checkout` (card or `paymentMethodId`) |
-| Orders          | `GET /api/orders`, `GET /api/orders/:number`      |
+| Screen          | Primary API                                        |
+| --------------- | -------------------------------------------------- |
+| Login           | `POST /api/login`                                  |
+| Shop            | `GET /api/products`, search via `q`                |
+| Product         | `GET /api/products/:sku`, `PUT /api/cart/items`    |
+| Cart            | `GET /api/cart`, `DELETE /api/cart/items/:sku`     |
+| Checkout (ship) | `POST /api/checkout` (card or `paymentMethodId`)   |
+| Orders          | `GET /api/orders`, `GET /api/orders/:number`       |
 | Account         | `GET /api/me`, payment-methods, `POST /api/logout` |
 
 ## Testing

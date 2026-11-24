@@ -72,7 +72,11 @@ export function Customer() {
         {customer.email}
       </p>
 
-      <section className="panel stack" style={{ maxWidth: 480 }} data-testid="customer-payment-methods">
+      <section
+        className="panel stack"
+        style={{ maxWidth: 480 }}
+        data-testid="customer-payment-methods"
+      >
         <h2 data-testid="customer-cards-title">Saved cards</h2>
         <p className="hint" data-testid="customer-cards-hint">
           Tokenized only — brand, last four, and expiry. Full numbers and CVC are never shown.

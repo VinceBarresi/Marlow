@@ -260,7 +260,17 @@ export async function registerPayments(app: FastifyInstance, deps: Deps) {
       `insert into payment_intents (
          id, customer_ref, amount_cents, currency, status, payment_method_id, order_number, decline_code, confirmed_at
        ) values ($1, $2::uuid, $3, $4, $5, $6, $7, $8, $9)`,
-      [id, customer, amount, currency, status, paymentMethodId, orderNumber, declineCode, confirmedAt],
+      [
+        id,
+        customer,
+        amount,
+        currency,
+        status,
+        paymentMethodId,
+        orderNumber,
+        declineCode,
+        confirmedAt,
+      ],
     );
 
     return reply.code(201).send({

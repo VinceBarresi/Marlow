@@ -89,7 +89,11 @@ export function Account() {
         </div>
       </section>
 
-      <section className="panel stack" style={{ maxWidth: 480 }} data-testid="account-payment-methods">
+      <section
+        className="panel stack"
+        style={{ maxWidth: 480 }}
+        data-testid="account-payment-methods"
+      >
         <h2 data-testid="account-cards-title">Saved cards</h2>
         <p className="hint">
           Cards are tokenized by the payments sandbox. Marlow keeps only brand and last four digits.

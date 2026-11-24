@@ -37,11 +37,7 @@ function cardFromBody(body: Record<string, unknown> | null | undefined) {
   return { number, expMonth, expYear, cvc };
 }
 
-async function ordersFetch(
-  user: SessionUser,
-  pathname: string,
-  init: RequestInit = {},
-) {
+async function ordersFetch(user: SessionUser, pathname: string, init: RequestInit = {}) {
   const headers = new Headers(init.headers);
   headers.set("x-datalab-user", user.id);
   headers.set("x-datalab-role", user.role);
@@ -105,24 +101,21 @@ export async function registerPaymentsGateway(app: FastifyInstance, { requireUse
     }
   });
 
-  app.delete<{ Params: { id: string } }>(
-    "/api/payment-methods/:id",
-    async (request, reply) => {
-      const user = await requireUser(request, reply);
-      if (!user) return;
-      try {
-        const owned = await listPaymentMethods(user.id);
-        if (!owned.data.some((method) => method.id === request.params.id)) {
-          return reply.code(404).send({ error: "Payment method not found." });
-        }
-        const result = await deletePaymentMethod(request.params.id);
-        return result;
-      } catch (error) {
-        const failure = paymentsUnavailableError(error);
-        return reply.code(failure.status).send(failure.body);
+  app.delete<{ Params: { id: string } }>("/api/payment-methods/:id", async (request, reply) => {
+    const user = await requireUser(request, reply);
+    if (!user) return;
+    try {
+      const owned = await listPaymentMethods(user.id);
+      if (!owned.data.some((method) => method.id === request.params.id)) {
+        return reply.code(404).send({ error: "Payment method not found." });
       }
-    },
-  );
+      const result = await deletePaymentMethod(request.params.id);
+      return result;
+    } catch (error) {
+      const failure = paymentsUnavailableError(error);
+      return reply.code(failure.status).send(failure.body);
+    }
+  });
 
   app.post<{
     Body: {

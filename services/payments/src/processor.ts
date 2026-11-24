@@ -18,9 +18,7 @@ export type ValidatedCard = {
   testCardKey: TestCardKey;
 };
 
-export type ChargeResult =
-  | { ok: true }
-  | { ok: false; declineCode: string; message: string };
+export type ChargeResult = { ok: true } | { ok: false; declineCode: string; message: string };
 
 const SUCCESS = "4242424242424242";
 const DECLINE = "4000000000000002";
