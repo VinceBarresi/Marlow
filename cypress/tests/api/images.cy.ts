@@ -12,11 +12,40 @@ describe("product images API", () => {
       .its("status")
       .should("eq", 200);
 
-  /** Copy into a fresh ArrayBuffer-backed view so BlobPart typing accepts it. */
-  function jpegBlob(bytes: Uint8Array) {
-    const copy = new Uint8Array(bytes.byteLength);
-    copy.set(bytes);
-    return new Blob([copy], { type: "image/jpeg" });
+  function concatBytes(...parts: Uint8Array[]) {
+    const total = parts.reduce((n, p) => n + p.length, 0);
+    const out = new Uint8Array(total);
+    let offset = 0;
+    for (const part of parts) {
+      out.set(part, offset);
+      offset += part.length;
+    }
+    return out;
+  }
+
+  /** Build a multipart body cy.request can send (browser FormData does not work here). */
+  function jpegMultipart(filename: string, bytes: Uint8Array) {
+    const boundary = `----CypressFormBoundary${Date.now()}`;
+    const encoder = new TextEncoder();
+    const preamble = encoder.encode(
+      `--${boundary}\r\n` +
+        `Content-Disposition: form-data; name="file"; filename="${filename}"\r\n` +
+        `Content-Type: image/jpeg\r\n\r\n`,
+    );
+    const closing = encoder.encode(`\r\n--${boundary}--\r\n`);
+    const payload = concatBytes(preamble, bytes, closing);
+    return {
+      body: payload.buffer.slice(payload.byteOffset, payload.byteOffset + payload.byteLength),
+      headers: { "content-type": `multipart/form-data; boundary=${boundary}` },
+    };
+  }
+
+  function readAlarmClockJpeg() {
+    return cy.readFile(alarmClockImage, null).then((file) => {
+      const bytes = file instanceof Uint8Array ? file : new Uint8Array(file as ArrayBuffer);
+      expect(bytes.byteLength).to.be.greaterThan(10_000);
+      return bytes;
+    });
   }
 
   it("includes imageUrl on products and serves public image bytes", () => {
@@ -39,17 +68,14 @@ describe("product images API", () => {
 
   it("staff uploads the Black Analog Alarm Clock catalog JPEG", () => {
     login("staff@marlow.test");
-    cy.readFile(alarmClockImage, null).then((file) => {
-      const bytes = file instanceof Uint8Array ? file : new Uint8Array(file as ArrayBuffer);
-      expect(bytes.byteLength).to.be.greaterThan(10_000);
-
-      const form = new FormData();
-      form.set("file", jpegBlob(bytes), "black-analog-alarm-clock.jpg");
+    readAlarmClockJpeg().then((bytes) => {
+      const { body, headers } = jpegMultipart("black-analog-alarm-clock.jpg", bytes);
 
       cy.request({
         method: "POST",
         url: `/api/products/${encodeURIComponent(alarmClockSku)}/image`,
-        body: form,
+        body,
+        headers,
       }).then((upload) => {
         expect(upload.status).to.eq(201);
         expect(upload.body.image).to.include({
@@ -67,10 +93,10 @@ describe("product images API", () => {
           method: "GET",
           url: uploadedImageUrl,
           encoding: "binary",
-        }).then((image) => {
-          expect(image.status).to.eq(200);
-          expect(image.headers["content-type"]).to.match(/image\/jpeg/);
-          expect(image.body.length).to.eq(bytes.byteLength);
+        }).then((served) => {
+          expect(served.status).to.eq(200);
+          expect(served.headers["content-type"]).to.match(/image\/jpeg/);
+          expect(served.body.length).to.eq(bytes.byteLength);
         });
 
         cy.request("GET", `/api/products/${encodeURIComponent(alarmClockSku)}`).then((product) => {
@@ -111,14 +137,13 @@ describe("product images API", () => {
 
   it("rejects customer image uploads", () => {
     login("customer@marlow.test");
-    cy.readFile(alarmClockImage, null).then((file) => {
-      const bytes = file instanceof Uint8Array ? file : new Uint8Array(file as ArrayBuffer);
-      const form = new FormData();
-      form.set("file", jpegBlob(bytes), "black-analog-alarm-clock.jpg");
+    readAlarmClockJpeg().then((bytes) => {
+      const { body, headers } = jpegMultipart("black-analog-alarm-clock.jpg", bytes);
       cy.request({
         method: "POST",
         url: `/api/products/${encodeURIComponent(alarmClockSku)}/image`,
-        body: form,
+        body,
+        headers,
         failOnStatusCode: false,
       }).then((response) => {
         expect(response.status).to.eq(403);
