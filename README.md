@@ -1,6 +1,17 @@
-# data-lab
+# Marlow
 
-Local retail shop for practicing Cypress and Playwright. The shop is called Marlow. Postgres and Redis run in Docker. The shop shell and the product and order screens are separate frontends. The API, catalog, orders, and database console are separate services.
+Local retail shop for practicing test automation across the stack. Postgres and Redis run in Docker. The shop shell and the product and order screens are separate frontends (Vite + Module Federation). The API, catalog, orders, shipping, payments, images, and database console are separate Fastify services. There is also a native SwiftUI iOS app.
+
+**Test layers**
+
+| Layer | Tools | What it covers |
+| ----- | ----- | -------------- |
+| Unit / stubbed UI | Jest + Testing Library | Page components with a mocked API (`*.test.tsx`); also server/web unit tests |
+| API | Cypress + Playwright | HTTP status/body against the live gateway (`cypress/tests/api`, `playwright/api`) |
+| Browser e2e | Cypress + Playwright | Full shop flows in the browser (`cypress/tests/e2e`, `playwright/e2e`) |
+| iOS UI | Appium + WebDriverIO | Simulator flows for `ios/Marlow` (`appium/`) |
+
+Cypress and Playwright mirror each other for API and e2e so you can compare frameworks on the same product.
 
 ## Run it
 
@@ -10,7 +21,7 @@ From this directory:
 npm run dev
 ```
 
-That starts Postgres, Redis, and all seven apps. The first time the database has no tables, it creates them and loads the shop. Later runs leave the data in place. Ctrl+C stops the apps and leaves Postgres and Redis running.
+That starts Postgres, Redis, and every app in the Processes table. The first time the database has no tables, it creates them and loads the shop. Later runs leave the data in place. Ctrl+C stops the apps and leaves Postgres and Redis running.
 
 Open the shop at [http://localhost:5173](http://localhost:5173). Use `localhost`, not `127.0.0.1`.
 
@@ -135,11 +146,15 @@ On the database console, staff can run read-only queries. The admin can also ins
 
 ## Tests
 
-From this directory, `npm run test:unit` runs every unit test: the Jest page tests, then the pricing and query tests in `server`, then the money formatting test in `web`.
+**Jest (unit / stubbed UI)** — `npm run test:unit` runs every unit test: Jest page tests, then pricing and query tests in `server`, then the money formatting test in `web`. Each page has a sample next to it (for example `web/src/pages/Login.test.tsx`). The sample mocks `api`, renders the page, and checks a test id.
 
-Each page has a sample next to it, for example `web/src/pages/Login.test.tsx`. The sample mocks `api`, renders the page, and checks a test id. Copy that file when you add a case.
+**Cypress** — `npm run cypress:api` / `npm run cypress:e2e`, or `npm run cypress` to open the runner. Specs live under `cypress/tests/`.
 
-A push to GitHub runs five checks: unit tests, Prettier, ESLint, Cypress, and Playwright. The Cypress and Playwright checks start the shop, then run tests in Docker workers (Cypress splits API vs e2e specs; Playwright uses `--shard` — no Cypress Cloud).
+**Playwright** — `npm run playwright` / `npm run playwright:api` / `npm run playwright:ui`. Specs live under `playwright/`.
+
+**Appium + WDIO** — with the API up and Xcode installed, `npm run appium:ios` runs Simulator UI tests from `appium/`. See [appium/README.md](appium/README.md).
+
+A push to GitHub runs unit tests, Prettier, ESLint, Cypress, and Playwright. The Cypress and Playwright checks start the shop, then run tests in Docker workers (Cypress splits API vs e2e specs; Playwright uses `--shard` — no Cypress Cloud).
 
 Locally, with Docker available:
 
