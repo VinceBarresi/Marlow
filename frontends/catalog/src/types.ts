@@ -7,4 +7,6 @@ export type Product = {
   onHand: number;
   reserved: number;
   available: number;
+  imageId?: string | null;
+  imageUrl?: string | null;
 };

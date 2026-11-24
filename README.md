@@ -1,6 +1,17 @@
-# data-lab
+# Marlow
 
-Local retail shop for practicing Cypress and Playwright. The shop is called Marlow. Postgres and Redis run in Docker. The shop shell and the product and order screens are separate frontends. The API, catalog, orders, and database console are separate services.
+Local retail shop for practicing test automation across the stack. Postgres and Redis run in Docker. The shop shell and the product and order screens are separate frontends (Vite + Module Federation). The API, catalog, orders, shipping, payments, images, and database console are separate Fastify services. There is also a native SwiftUI iOS app.
+
+**Test layers**
+
+| Layer             | Tools                  | What it covers                                                                    |
+| ----------------- | ---------------------- | --------------------------------------------------------------------------------- |
+| Unit / stubbed UI | Jest + Testing Library | Page components with a mocked API (`*.test.tsx`); also server/web unit tests      |
+| API               | Cypress + Playwright   | HTTP status/body against the live gateway (`cypress/tests/api`, `playwright/api`) |
+| Browser e2e       | Cypress + Playwright   | Full shop flows in the browser (`cypress/tests/e2e`, `playwright/e2e`)            |
+| iOS UI            | Appium + WebDriverIO   | Simulator flows for `ios/Marlow` (`appium/`)                                      |
+
+Cypress and Playwright mirror each other for API and e2e so you can compare frameworks on the same product.
 
 ## Run it
 
@@ -10,7 +21,7 @@ From this directory:
 npm run dev
 ```
 
-That starts Postgres, Redis, and all seven apps. The first time the database has no tables, it creates them and loads the shop. Later runs leave the data in place. Ctrl+C stops the apps and leaves Postgres and Redis running.
+That starts Postgres, Redis, and every app in the Processes table. The first time the database has no tables, it creates them and loads the shop. Later runs leave the data in place. Ctrl+C stops the apps and leaves Postgres and Redis running.
 
 Open the shop at [http://localhost:5173](http://localhost:5173). Use `localhost`, not `127.0.0.1`.
 
@@ -52,7 +63,7 @@ Store maps use the Google Maps JavaScript API when `VITE_GOOGLE_MAPS_API_KEY` is
    npm run dev
    ```
 
-   The directories are `server`, `services/catalog`, `services/orders`, `services/shipping`, `services/payments`, `services/db`, `web`, `frontends/catalog`, and `frontends/orders`.
+   The directories are `server`, `services/catalog`, `services/orders`, `services/shipping`, `services/payments`, `services/images`, `services/db`, `web`, `frontends/catalog`, and `frontends/orders`.
 
    If `npm install` stops on the esbuild postinstall script, approve it and install again:
 
@@ -70,6 +81,7 @@ Store maps use the Google Maps JavaScript API when `VITE_GOOGLE_MAPS_API_KEY` is
 | `services/orders`   | Cart, checkout, order history, and cancel                                                         | [http://127.0.0.1:4002](http://127.0.0.1:4002) |
 | `services/shipping` | Carrier shipments and tracking (OAuth2 Bearer; mock FedEx-shaped)                                 | [http://127.0.0.1:4004](http://127.0.0.1:4004) |
 | `services/payments` | Stripe-style PaymentMethods / PaymentIntents (OAuth2 Bearer; sandbox test cards)                  | [http://127.0.0.1:4005](http://127.0.0.1:4005) |
+| `services/images`   | Product images on disk (OAuth2 Bearer upload; public GET bytes)                                   | [http://127.0.0.1:4006](http://127.0.0.1:4006) |
 | `services/db`       | Database console                                                                                  | [http://127.0.0.1:4003](http://127.0.0.1:4003) |
 | `web`               | Shop shell                                                                                        | [http://localhost:5173](http://localhost:5173) |
 | `frontends/catalog` | Product grid and product page, loaded by the shell                                                | [http://localhost:5174](http://localhost:5174) |
@@ -80,6 +92,8 @@ API docs are at [http://127.0.0.1:4000/docs](http://127.0.0.1:4000/docs). The sh
 Shipping is a separate service with **Bearer** auth (`POST /oauth/token`). The gateway uses a service token for staff ship/track, and web/iOS can mint a user tracking token via `POST /api/shipping/access-token` then call `GET /api/tracking/:trackingNumber` with `Authorization: Bearer …`. See [`services/shipping/README.md`](services/shipping/README.md).
 
 Payments is the same pattern on `:4005`: the API mints a service Bearer token and proxies `/api/payment-methods` plus card-charged `/api/checkout`. PAN/CVC never leave the payments service; Marlow stores `pm_…` / `pi_…` ids and last4/brand. See [`services/payments/README.md`](services/payments/README.md).
+
+Images on `:4006` stores product files under `services/images/data` and seeds SVG placeholders per SKU. The shop loads them via same-origin `/api/images/:id`; staff can replace an image with `POST /api/products/:sku/image`. See [`services/images/README.md`](services/images/README.md).
 
 How the processes, screens, and data fit together is in [ARCHITECTURE.md](ARCHITECTURE.md).
 
@@ -132,11 +146,15 @@ On the database console, staff can run read-only queries. The admin can also ins
 
 ## Tests
 
-From this directory, `npm run test:unit` runs every unit test: the Jest page tests, then the pricing and query tests in `server`, then the money formatting test in `web`.
+**Jest (unit / stubbed UI)** — `npm run test:unit` runs every unit test: Jest page tests, then pricing and query tests in `server`, then the money formatting test in `web`. Each page has a sample next to it (for example `web/src/pages/Login.test.tsx`). The sample mocks `api`, renders the page, and checks a test id.
 
-Each page has a sample next to it, for example `web/src/pages/Login.test.tsx`. The sample mocks `api`, renders the page, and checks a test id. Copy that file when you add a case.
+**Cypress** — `npm run cypress:api` / `npm run cypress:e2e`, or `npm run cypress` to open the runner. Specs live under `cypress/tests/`.
 
-A push to GitHub runs five checks: unit tests, Prettier, ESLint, Cypress, and Playwright. The Cypress and Playwright checks start the shop, then run tests in Docker workers (Cypress splits API vs e2e specs; Playwright uses `--shard` — no Cypress Cloud).
+**Playwright** — `npm run playwright` / `npm run playwright:api` / `npm run playwright:ui`. Specs live under `playwright/`.
+
+**Appium + WDIO** — with the API up and Xcode installed, `npm run appium:ios` runs Simulator UI tests from `appium/`. See [appium/README.md](appium/README.md).
+
+A push to GitHub runs unit tests, Prettier, ESLint, Cypress, and Playwright. The Cypress and Playwright checks start the shop, then run tests in Docker workers (Cypress splits API vs e2e specs; Playwright uses `--shard` — no Cypress Cloud).
 
 Locally, with Docker available:
 

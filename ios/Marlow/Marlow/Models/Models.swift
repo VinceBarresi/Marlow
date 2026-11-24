@@ -34,6 +34,16 @@ struct Product: Codable, Identifiable, Equatable, Sendable {
   let onHand: Int
   let reserved: Int
   let available: Int
+  let imageId: String?
+  let imageUrl: String?
+
+  var absoluteImageURL: URL? {
+    guard let imageUrl, !imageUrl.isEmpty else { return nil }
+    if let absolute = URL(string: imageUrl), absolute.scheme != nil {
+      return absolute
+    }
+    return URL(string: imageUrl, relativeTo: AppConfig.apiBaseURL)?.absoluteURL
+  }
 }
 
 struct ProductList: Decodable, Sendable {

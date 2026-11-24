@@ -20,7 +20,7 @@ docker compose up -d --wait
 users=$(docker compose exec -T postgres psql -U datalab -d datalab -tAc "select to_regclass('public.users')" | tr -d '[:space:]')
 if [[ "$users" != "users" ]]; then
   echo "Empty database. Creating tables and loading the shop."
-  for file in server/sql/001_schema.sql server/sql/002_tracking.sql server/sql/004_locations.sql server/sql/005_careers.sql server/sql/006_payments.sql; do
+  for file in server/sql/001_schema.sql server/sql/002_tracking.sql server/sql/004_locations.sql server/sql/005_careers.sql server/sql/006_payments.sql server/sql/007_product_images.sql; do
     docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -f - < "$file"
   done
   node server/scripts/seed.mjs | docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -q
@@ -30,9 +30,14 @@ else
     echo "Applying payments schema."
     docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -f - < server/sql/006_payments.sql
   fi
+  images=$(docker compose exec -T postgres psql -U datalab -d datalab -tAc "select to_regclass('public.product_images')" | tr -d '[:space:]')
+  if [[ "$images" != "product_images" ]]; then
+    echo "Applying product images schema."
+    docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -f - < server/sql/007_product_images.sql
+  fi
 fi
 
-ports=(4000 4001 4002 4003 4004 4005 5173 5174 5175)
+ports=(4000 4001 4002 4003 4004 4005 4006 5173 5174 5175)
 if command -v lsof >/dev/null 2>&1; then
   for port in "${ports[@]}"; do
     if lsof -nP -iTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1; then
@@ -48,6 +53,7 @@ apps=(
   "orders|services/orders"
   "shipping|services/shipping"
   "payments|services/payments"
+  "images|services/images"
   "db|services/db"
   "web|web"
   "catalog-ui|frontends/catalog"
@@ -61,6 +67,9 @@ for spec in "${apps[@]}"; do
     (cd "$dir" && npm install)
   fi
 done
+
+echo "Seeding product image placeholders (missing only)"
+(cd "$root/services/images" && npm run seed-placeholders) || true
 
 pids=()
 use_script=0

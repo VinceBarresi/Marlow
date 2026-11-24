@@ -17,6 +17,20 @@ struct ProductView: View {
       } else if let product {
         List {
           Section {
+            if let url = product.absoluteImageURL {
+              AsyncImage(url: url) { phase in
+                switch phase {
+                case .success(let image):
+                  image
+                    .resizable()
+                    .scaledToFit()
+                default:
+                  ProgressView()
+                }
+              }
+              .frame(maxWidth: .infinity)
+              .accessibilityIdentifier("product-image")
+            }
             Text(product.name)
               .font(.title2.bold())
               .accessibilityIdentifier("product-name")

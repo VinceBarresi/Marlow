@@ -15,6 +15,7 @@ import { registerLocations } from "./locations.js";
 import { registerOrdersProxy } from "./orders-proxy.js";
 import { verifyPassword } from "./passwords.js";
 import { pageQuery } from "./query.js";
+import { registerImagesGateway } from "./images.js";
 import { listPaymentMethods } from "./payments-client.js";
 import { registerPaymentsGateway } from "./payments.js";
 import { registerShippingGateway } from "./shipping.js";
@@ -240,6 +241,7 @@ await registerCareers(app, { pool, requireUser });
 await registerCommerce(app, { pool, redis, requireUser });
 await registerShippingGateway(app, { requireUser });
 await registerPaymentsGateway(app, { requireUser });
+await registerImagesGateway(app, { requireUser });
 
 await app.register(swagger, {
   mode: "static",

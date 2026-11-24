@@ -7,6 +7,14 @@ jest.mock("./api", () => ({ api: jest.fn() }));
 
 test("shows the product and an add-to-cart control", async () => {
   whenApi({
+    "/api/me": {
+      user: {
+        id: "u1",
+        email: "customer@marlow.test",
+        name: "Mina Adler",
+        role: "customer",
+      },
+    },
     "/api/products": {
       product: {
         sku: "LAMP-1",
@@ -17,6 +25,8 @@ test("shows the product and an add-to-cart control", async () => {
         onHand: 4,
         reserved: 1,
         available: 3,
+        imageUrl: "/api/images/abc",
+        imageId: "abc",
       },
     },
   });
@@ -24,5 +34,7 @@ test("shows the product and an add-to-cart control", async () => {
 
   expect(screen.getByTestId("product-name")).toHaveTextContent("Linen shade");
   expect(screen.getByTestId("product-price")).toHaveTextContent("$48.00");
+  expect(screen.getByTestId("product-image")).toBeInTheDocument();
   expect(screen.getByTestId("product-add")).toBeEnabled();
+  expect(screen.queryByTestId("product-image-upload")).toBeNull();
 });
