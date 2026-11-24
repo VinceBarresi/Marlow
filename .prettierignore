@@ -4,3 +4,6 @@ package-lock.json
 *.log
 @mf-types
 .mf
+.appium
+ios/Marlow/build
+**/*.xcassets/**

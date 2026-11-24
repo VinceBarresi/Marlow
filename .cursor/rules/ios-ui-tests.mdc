@@ -1,0 +1,16 @@
+---
+description: Conventions for Marlow iOS Appium / WebDriverIO UI tests
+globs: appium/**/*.ts,ios/Marlow/Marlow/Features/**/*.swift,ios/Marlow/Marlow/App/**/*.swift,scripts/appium-ios.sh
+alwaysApply: false
+---
+
+# iOS UI tests (Appium)
+
+- Prefer the `ios-ui-test-author` skill when creating Simulator UI coverage.
+- Specs live in `appium/specs/`; screen objects in `appium/screens/`. Config: `appium/wdio.conf.ts`.
+- Selectors: SwiftUI `.accessibilityIdentifier` → Appium `~id` (e.g. `$("~login-email")`). Prefer ids that mirror web `data-testid`s when the screen exists on both platforms.
+- Specs go through screen objects—no raw `~` strings scattered in specs.
+- Customer v1 flows only (login, shop, product, cart, checkout, orders, account) unless the user expands scope.
+- Require local API on `:4000` (`npm run dev`). Run with `npm run appium:ios` (build + test) or `npm run appium:ios:run` (prebuilt `.app`).
+- Device: `MARLOW_IOS_DEVICE` (default `iPhone 16`); app path: `MARLOW_APP_PATH`.
+- Do not commit `ios/Marlow/build/`, `.appium/`, or `**/xcuserdata/`.

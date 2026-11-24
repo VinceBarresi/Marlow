@@ -13,3 +13,7 @@ cypress/screenshots
 cypress/downloads
 coverage
 .e2e-logs
+.appium
+ios/Marlow/build
+**/xcuserdata/
+.DS_Store

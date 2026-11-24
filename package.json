@@ -15,6 +15,8 @@
     "playwright:api": "playwright test --project=api",
     "playwright:docker": "bash scripts/playwright-docker.sh",
     "playwright:ui": "playwright test --ui",
+    "appium:ios": "bash scripts/appium-ios.sh",
+    "appium:ios:run": "APPIUM_HOME=${APPIUM_HOME:-$PWD/.appium} wdio run appium/wdio.conf.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
@@ -32,6 +34,12 @@
     "@types/node": "^24.19.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "@wdio/appium-service": "^10.2.0",
+    "@wdio/cli": "^10.2.0",
+    "@wdio/local-runner": "^10.2.0",
+    "@wdio/mocha-framework": "^10.2.0",
+    "@wdio/spec-reporter": "^10.2.0",
+    "appium": "^4.0.1",
     "babel-jest": "^30.5.2",
     "cypress": "^16.3.0",
     "eslint": "^9.39.5",
@@ -46,7 +54,8 @@
     "react-dom": "^19.3.1",
     "react-router-dom": "^7.18.5",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.72.2"
+    "typescript-eslint": "^8.72.2",
+    "webdriverio": "^10.2.0"
   },
   "allowScripts": {
     "cypress@16.3.0": true
