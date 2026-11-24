@@ -2,6 +2,9 @@ import { federation } from "@module-federation/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
+const publicHost = process.env.E2E_HOST ?? "localhost";
+const listenHost = process.env.LISTEN_HOST ?? "127.0.0.1";
+
 export default defineConfig({
   plugins: [
     react(),
@@ -11,12 +14,12 @@ export default defineConfig({
         catalog: {
           type: "module",
           name: "catalog",
-          entry: "http://localhost:5174/remoteEntry.js",
+          entry: `http://${publicHost}:5174/remoteEntry.js`,
         },
         orders: {
           type: "module",
           name: "orders",
-          entry: "http://localhost:5175/remoteEntry.js",
+          entry: `http://${publicHost}:5175/remoteEntry.js`,
         },
       },
       shared: {
@@ -27,9 +30,12 @@ export default defineConfig({
     }),
   ],
   server: {
+    host: listenHost,
     port: 5173,
     strictPort: true,
-    origin: "http://localhost:5173",
+    // Docker e2e hits the shop as host.docker.internal (Vite blocks unknown hosts by default).
+    allowedHosts: true,
+    origin: `http://${publicHost}:5173`,
     proxy: {
       "/api": "http://127.0.0.1:4000",
     },

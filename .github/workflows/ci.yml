@@ -80,16 +80,8 @@ jobs:
         run: npm run lint
 
   cypress:
-    name: Cypress ${{ matrix.suite }}
+    name: Cypress
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - suite: API
-            script: cypress:api
-          - suite: e2e
-            script: cypress:e2e
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -106,6 +98,7 @@ jobs:
             services/orders/package-lock.json
             web/package-lock.json
             frontends/catalog/package-lock.json
+            frontends/orders/package-lock.json
 
       - name: Install dependencies
         run: |
@@ -115,12 +108,12 @@ jobs:
           npm ci --prefix services/orders
           npm ci --prefix web
           npm ci --prefix frontends/catalog
+          npm ci --prefix frontends/orders
+        env:
+          CYPRESS_INSTALL_BINARY: "0"
 
-      - name: Start the shop
-        run: bash scripts/e2e-up.sh
-
-      - name: Cypress
-        run: npm run ${{ matrix.script }}
+      - name: Cypress (Docker workers)
+        run: npm run cypress:docker
 
       - name: Shop logs
         if: failure()
@@ -145,6 +138,7 @@ jobs:
             services/orders/package-lock.json
             web/package-lock.json
             frontends/catalog/package-lock.json
+            frontends/orders/package-lock.json
 
       - name: Install dependencies
         run: |
@@ -154,18 +148,21 @@ jobs:
           npm ci --prefix services/orders
           npm ci --prefix web
           npm ci --prefix frontends/catalog
+          npm ci --prefix frontends/orders
         env:
           CYPRESS_INSTALL_BINARY: "0"
 
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
-
-      - name: Start the shop
-        run: bash scripts/e2e-up.sh
-
-      - name: Playwright
-        run: npx playwright test --project=chromium
+      - name: Playwright (Docker shards)
+        run: npm run playwright:docker
 
       - name: Shop logs
         if: failure()
         run: tail -n 80 .e2e-logs/*.log || true
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          if-no-files-found: ignore

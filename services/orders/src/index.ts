@@ -19,4 +19,5 @@ app.get("/health", async () => {
 await registerOrders(app, { pool, redis });
 
 const port = Number(process.env.PORT ?? 4002);
-await app.listen({ port, host: "127.0.0.1" });
+const host = process.env.LISTEN_HOST ?? "127.0.0.1";
+await app.listen({ port, host });
