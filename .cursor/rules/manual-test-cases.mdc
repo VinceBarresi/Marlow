@@ -1,0 +1,15 @@
+---
+description: Conventions for manual QA test case Markdown
+globs: docs/test-cases/**/*.md
+alwaysApply: false
+---
+
+# Manual test cases
+
+- Prefer the `manual-test-cases` skill when authoring new cases.
+- One feature/flow per file under `docs/test-cases/` (kebab-case).
+- Include Meta, Preconditions, at least one happy path and one negative/edge case, Expected results, Notes.
+- Steps should name `data-testid` controls when they exist.
+- Use seed logins only: customer / staff / admin `@marlow.test` with password `datalab`.
+- Do not invent production URLs or non-seed credentials.
+- When the user says the case is done / ready to automate, hand off per `test-creation.mdc` (API / e2e / stubbed).
