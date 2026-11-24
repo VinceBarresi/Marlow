@@ -12,40 +12,35 @@ describe("product images API", () => {
       .its("status")
       .should("eq", 200);
 
-  function concatBytes(...parts: Uint8Array[]) {
-    const total = parts.reduce((n, p) => n + p.length, 0);
-    const out = new Uint8Array(total);
-    let offset = 0;
-    for (const part of parts) {
-      out.set(part, offset);
-      offset += part.length;
-    }
-    return out;
-  }
-
-  /** Build a multipart body cy.request can send (browser FormData does not work here). */
-  function jpegMultipart(filename: string, bytes: Uint8Array) {
-    const boundary = `----CypressFormBoundary${Date.now()}`;
-    const encoder = new TextEncoder();
-    const preamble = encoder.encode(
-      `--${boundary}\r\n` +
-        `Content-Disposition: form-data; name="file"; filename="${filename}"\r\n` +
-        `Content-Type: image/jpeg\r\n\r\n`,
-    );
-    const closing = encoder.encode(`\r\n--${boundary}--\r\n`);
-    const payload = concatBytes(preamble, bytes, closing);
-    return {
-      body: payload.buffer.slice(payload.byteOffset, payload.byteOffset + payload.byteLength),
-      headers: { "content-type": `multipart/form-data; boundary=${boundary}` },
-    };
-  }
-
-  function readAlarmClockJpeg() {
-    return cy.readFile(alarmClockImage, null).then((file) => {
-      const bytes = file instanceof Uint8Array ? file : new Uint8Array(file as ArrayBuffer);
-      expect(bytes.byteLength).to.be.greaterThan(10_000);
-      return bytes;
+  function sessionCookie() {
+    return cy.getCookie("datalab_session").then((cookie) => {
+      expect(cookie, "datalab_session cookie").to.not.equal(null);
+      return `${cookie!.name}=${cookie!.value}`;
     });
+  }
+
+  function uploadAlarmClockJpeg() {
+    return sessionCookie().then((cookie) =>
+      cy.task<{
+        status: number;
+        body: {
+          image?: {
+            id: string;
+            imageUrl: string;
+            byteSize: number;
+            sku: string;
+            contentType: string;
+            isPrimary: boolean;
+          };
+          error?: string;
+        };
+      }>("postMultipartFile", {
+        url: `${Cypress.config("baseUrl")}/api/products/${encodeURIComponent(alarmClockSku)}/image`,
+        filePath: alarmClockImage,
+        filename: "black-analog-alarm-clock.jpg",
+        cookie,
+      }),
+    );
   }
 
   it("includes imageUrl on products and serves public image bytes", () => {
@@ -68,26 +63,22 @@ describe("product images API", () => {
 
   it("staff uploads the Black Analog Alarm Clock catalog JPEG", () => {
     login("staff@marlow.test");
-    readAlarmClockJpeg().then((bytes) => {
-      const { body, headers } = jpegMultipart("black-analog-alarm-clock.jpg", bytes);
+    cy.readFile(alarmClockImage, null).then((file) => {
+      const bytes = file instanceof Uint8Array ? file : new Uint8Array(file as ArrayBuffer);
+      expect(bytes.byteLength).to.be.greaterThan(10_000);
 
-      cy.request({
-        method: "POST",
-        url: `/api/products/${encodeURIComponent(alarmClockSku)}/image`,
-        body,
-        headers,
-      }).then((upload) => {
+      uploadAlarmClockJpeg().then((upload) => {
         expect(upload.status).to.eq(201);
         expect(upload.body.image).to.include({
           sku: alarmClockSku,
           contentType: "image/jpeg",
           isPrimary: true,
         });
-        expect(upload.body.image.imageUrl).to.match(/^\/api\/images\//);
-        expect(upload.body.image.byteSize).to.eq(bytes.byteLength);
+        expect(upload.body.image!.imageUrl).to.match(/^\/api\/images\//);
+        expect(upload.body.image!.byteSize).to.eq(bytes.byteLength);
 
-        uploadedImageId = upload.body.image.id as string;
-        uploadedImageUrl = upload.body.image.imageUrl as string;
+        uploadedImageId = upload.body.image!.id;
+        uploadedImageUrl = upload.body.image!.imageUrl;
 
         cy.request({
           method: "GET",
@@ -137,18 +128,9 @@ describe("product images API", () => {
 
   it("rejects customer image uploads", () => {
     login("customer@marlow.test");
-    readAlarmClockJpeg().then((bytes) => {
-      const { body, headers } = jpegMultipart("black-analog-alarm-clock.jpg", bytes);
-      cy.request({
-        method: "POST",
-        url: `/api/products/${encodeURIComponent(alarmClockSku)}/image`,
-        body,
-        headers,
-        failOnStatusCode: false,
-      }).then((response) => {
-        expect(response.status).to.eq(403);
-        expect(response.body).to.have.property("error");
-      });
+    uploadAlarmClockJpeg().then((response) => {
+      expect(response.status).to.eq(403);
+      expect(response.body).to.have.property("error");
     });
   });
 });
