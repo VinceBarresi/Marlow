@@ -43,7 +43,16 @@ Store maps use the Google Maps JavaScript API when `VITE_GOOGLE_MAPS_API_KEY` is
    docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -f - < server/sql/002_tracking.sql
    docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -f - < server/sql/004_locations.sql
    docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -f - < server/sql/005_careers.sql
+   docker compose exec -T postgres psql -U datalab -d datalab -v ON_ERROR_STOP=1 -f - < server/sql/006_payments.sql
    ```
+
+   | Migration           | Adds                                                                        |
+   | ------------------- | --------------------------------------------------------------------------- |
+   | `001_schema.sql`    | Core shop: `users`, `products`, `inventory`, `orders`, lines/events, etc.   |
+   | `002_tracking.sql`  | Shipping: `shipments`, `tracking_events`                                    |
+   | `004_locations.sql` | Stores: `locations`, `location_inventory`                                   |
+   | `005_careers.sql`   | Hiring: `jobs`, `applications`                                              |
+   | `006_payments.sql`  | Payments: `payment_methods`, `payment_intents`; payment columns on `orders` |
 
 3. Load the catalog, customers, and orders. This replaces the current shop data.
 

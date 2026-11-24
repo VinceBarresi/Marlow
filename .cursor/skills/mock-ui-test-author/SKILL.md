@@ -23,7 +23,9 @@ description: >-
 
 ```ts
 loginAsCustomer();
-cy.intercept("GET", "/api/orders*", { statusCode: 200, body: { orders: [], total: 0 } }).as("empty");
+cy.intercept("GET", "/api/orders*", { statusCode: 200, body: { orders: [], total: 0 } }).as(
+  "empty",
+);
 Orders.visit();
 cy.wait("@empty");
 cy.get(Orders.empty).should("have.text", "You have no orders yet.");

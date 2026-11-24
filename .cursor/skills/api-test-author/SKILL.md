@@ -27,13 +27,14 @@ description: >-
 import { loginEndpoints } from "../../fixtures/endpoints/loginEndpoints";
 import { loginResponseModel, type LoginResponseModel } from "../../fixtures/models/loginModel";
 
-cy.request("POST", loginEndpoints.login, { email: "customer@marlow.test", password: "datalab" }).then(
-  (response) => {
-    expect(response.status).to.eq(200);
-    expect(response.body).to.have.all.keys("user");
-    expect(response.body.user).to.include(loginResponseModel.user);
-  },
-);
+cy.request("POST", loginEndpoints.login, {
+  email: "customer@marlow.test",
+  password: "datalab",
+}).then((response) => {
+  expect(response.status).to.eq(200);
+  expect(response.body).to.have.all.keys("user");
+  expect(response.body.user).to.include(loginResponseModel.user);
+});
 ```
 
 ## Spec shape (Playwright)

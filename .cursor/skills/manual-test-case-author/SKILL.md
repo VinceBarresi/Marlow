@@ -23,12 +23,14 @@ description: >-
 # Shop — customer browse
 
 ## Preconditions
+
 - Shop running (`npm run dev`)
 - Customer: customer@marlow.test / datalab
 
 ## Cases
 
 ### Opens shop after sign-in
+
 1. Sign in as customer.
 2. Land on `/` — see `[data-testid=shop-title]` = "Shop".
 3. See `[data-testid=nav-user]` contains customer@marlow.test.
